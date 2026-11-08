@@ -67,6 +67,15 @@ FIELDS = {
     "785": "Môi trường và bảo vệ môi trường",
     "786": "An ninh, quốc phòng",
 }
+OTHER = "khac"  # mã có 3 số đầu ngoài danh mục (700, 730, 780, 790…): nhóm "Ngành khác", cuối trang
+
+
+def field_of(code: str) -> str:
+    return code[:3] if code[:3] in FIELDS else OTHER
+
+
+def field_name(f: str) -> str:
+    return FIELDS.get(f, "Ngành khác")
 
 
 def esc(s) -> str:
@@ -165,8 +174,8 @@ def nav(prefix: str, active: str) -> str:
         (f"{prefix}#advice", "Tư vấn theo điểm", ""),
         (f"{prefix}#network", "Mạng SNA", ""),
         (f"{prefix}#coverage", "Độ phủ dữ liệu", ""),
-        (f"{prefix}truong/", "Trường", "truong"),
-        (f"{prefix}nganh/", "Ngành", "nganh"),
+        (f"{prefix}truong/", "DS Trường", "truong"),
+        (f"{prefix}nganh/", "DS Ngành", "nganh"),
         (f"{prefix}mos.html", "Thi MOS", "mos"),
     ]
     out = []
@@ -735,9 +744,13 @@ def export(site: Path = SITE) -> dict:
             if vals
             else ""
         )
-        field = FIELDS.get(m[:3], f"nhóm mã {m[:3]}")
+        field = (
+            f"lĩnh vực {FIELDS[m[:3]]}"
+            if m[:3] in FIELDS
+            else "mã ngoài các lĩnh vực của danh mục Bộ GD&ĐT"
+        )
         lead = (
-            f'<p class="seo-lead">Ngành {esc(info["major_name"])} (mã {m}, lĩnh vực {esc(field)}) có {len(us)} trường '
+            f'<p class="seo-lead">Ngành {esc(info["major_name"])} (mã {m}, {esc(field)}) có {len(us)} trường '
             f"xét tuyển trong dữ liệu năm {', '.join(map(str, myears))}.{esc(stat_txt)}</p>"
         )
         rel = [(c2, n2) for c2, n2, _ in similar.get(m, []) if c2 in major_page][:8]
@@ -858,10 +871,10 @@ def export(site: Path = SITE) -> dict:
     # ----- danh sách ngành -----
     by_field = defaultdict(list)
     for m in major_link:
-        by_field[m[:3]].append(m)
-    fields = sorted(by_field)
+        by_field[field_of(m)].append(m)
+    fields = sorted(by_field, key=lambda f: (f == OTHER, f))
     jump = "".join(
-        f'<a class="chip" href="#linh-vuc-{f}">{esc(FIELDS.get(f, f"Nhóm mã {f}"))} ({len(by_field[f])})</a>'
+        f'<a class="chip" href="#linh-vuc-{f}">{esc(field_name(f))} ({len(by_field[f])})</a>'
         for f in fields
     )
     groups = []
@@ -877,7 +890,7 @@ def export(site: Path = SITE) -> dict:
                 f'<li><a href="../{major_link[m]}">{esc(majors[m]["major_name"])}</a> <span class="sub">{esc(sub)}</span></li>'
             )
         groups.append(
-            f'<section class="seo-group" id="linh-vuc-{f}"><h2>{esc(FIELDS.get(f, f"Nhóm mã {f}"))}</h2><ul class="seo-list">{"".join(lis)}</ul></section>'
+            f'<section class="seo-group" id="linh-vuc-{f}"><h2>{esc(field_name(f))}</h2><ul class="seo-list">{"".join(lis)}</ul></section>'
         )
     body = (
         f"<h1>Danh sách ngành đại học và điểm chuẩn {span(years)}</h1>"
