@@ -108,6 +108,8 @@ def export():
     html = (api.STATIC / "index.html").read_text(encoding="utf-8")
     html = html.replace('<html lang="vi">', '<html lang="vi" data-mode="static">')
     (SITE / "index.html").write_text(html.replace('="static/', '="'), encoding="utf-8")
+    mos = (api.STATIC / "mos.html").read_text(encoding="utf-8")
+    (SITE / "mos.html").write_text(mos.replace('="static/', '="'), encoding="utf-8")
     (SITE / ".nojekyll").touch()
     files = [p for p in SITE.rglob("*") if p.is_file()]
     largest = max(files, key=lambda p: p.stat().st_size)
