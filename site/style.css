@@ -180,3 +180,16 @@ table.timeline{font-size:14px}table.timeline td{padding:4px 8px}table.timeline t
   .mos-feature,.mos-plan{padding:24px}
 }
 @media (max-width:640px){.tabs .nav-mos,.tabs a[href="mos.html"]{order:-1}}
+/* ---------- Trang tĩnh trường / ngành (/truong/, /nganh/) ---------- */
+.crumbs ol{list-style:none;display:flex;flex-wrap:wrap;gap:4px 6px;margin:18px 0 0;padding:0;font-size:13px;color:var(--muted)}
+.crumbs li{min-width:0;overflow-wrap:anywhere}.crumbs li+li::before{content:"›";margin-right:6px;color:var(--muted)}
+.seo-lead{font-size:16px;max-width:860px}.seo-block h2,.page-seo .card h2{font-size:19px;margin:0 0 8px}.seo-block{margin:20px 0}
+.seo-actions{margin:0 0 8px}.seo-cta{display:inline-block;background:var(--accent);color:#fff;font-weight:600;text-decoration:none;padding:9px 16px;border-radius:12px}.seo-cta:hover{background:var(--accent-strong)}
+.seo-method{border:1px solid var(--line);border-radius:12px;background:var(--card);margin-bottom:10px;min-width:0}
+.seo-method>summary{cursor:pointer;padding:12px 14px;font-weight:600}.seo-method>summary .sub{font-weight:400}
+.seo-method[open]>summary{border-bottom:1px solid var(--line);background:var(--bg);border-radius:12px 12px 0 0}
+.seo-method .tbl-wrap{border:0;border-radius:0 0 12px 12px;-webkit-overflow-scrolling:touch}
+.seo-table{min-width:680px}.seo-table td.prog a{font-weight:500}
+.seo-list{columns:2 300px;column-gap:28px;padding-left:20px;margin:0}.seo-list li{break-inside:avoid;margin:0 0 6px}
+.seo-jump{margin:12px 0 4px}.seo-jump .chip{text-decoration:none;color:var(--ink)}.seo-group h2{font-size:18px;margin:24px 0 8px;scroll-margin-top:90px}
+.seo-updated{margin:24px 0 0}.page-seo [id^="nganh-"]{scroll-margin-top:90px}.page-seo [id^="nganh-"]:target{background:var(--accent-wash);border-radius:6px}

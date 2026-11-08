@@ -18,6 +18,11 @@ const Data = {
     }
     this.meta = await this.file("data/meta.json");
   },
+  // trang tĩnh /truong/, /nganh/ (scripts/export_seo.py); chỉ có ở bản tĩnh
+  async seoPages() {
+    if (!this.static) return { uni: {}, major: {} };
+    return this.file("data/seo_pages.json").catch(() => ({ uni: {}, major: {} }));
+  },
   async searchIndex() {
     if (!this.static) return this.file("api/search-index");
     const [unis, majors] = await Promise.all([this.file("data/universities.json"), this.file("data/majors.json")]);
@@ -253,6 +258,7 @@ async function loadUni() {
   let d;
   try { d = await api(`api/universities/${encodeURIComponent(curUni)}/scores?year=${$("#uni-year").value}`); } catch (e) { return fail(out, e); }
   location.hash = `uni/${curUni}/${d.year}`;
+  const seoUni = (await Data.seoPages()).uni[d.university.uni_code];
   $("#uni-q").value = d.university.name;
   renderUniGrid();
   if (!d.rows.length) {
@@ -270,7 +276,7 @@ async function loadUni() {
     </tr>`).join("");
   out.innerHTML = `<div class="card">
     <div class="head"><h2>${esc(d.university.name)} <span class="sub">(${esc(d.university.uni_code)})</span></h2>
-      <span class="muted small">${d.rows.length} chương trình · năm ${d.year} · <a href="${esc(d.source_url)}" target="_blank" rel="noopener">nguồn</a></span></div>
+      <span class="muted small">${d.rows.length} chương trình · năm ${d.year} · <a href="${esc(d.source_url)}" target="_blank" rel="noopener">nguồn</a>${seoUni ? ` · <a class="seo-page-link" href="${esc(seoUni)}">Trang riêng của trường ↗</a>` : ""}</span></div>
     <div class="tbl-wrap"><table class="stack">
       <thead><tr><th>Mã</th><th>Ngành / chương trình</th><th>Tổ hợp</th>${cols.map((m) => `<th class="num">${esc(m.method_name)}</th>`).join("")}</tr></thead>
       <tbody>${body}</tbody></table></div></div>${deanHtml(d.dean, d.year)}${feeHtml(d)}`;
@@ -301,6 +307,7 @@ async function loadMajor() {
   let d;
   try { d = await api(url); } catch (e) { return fail(out, e); }
   location.hash = code ? `major/${code}/${d.year}` : `major/~${encodeURIComponent(name)}/${d.year}`;
+  const seoMajor = code && (await Data.seoPages()).major[code];
   $("#major-q").value = d.major.major_name;
   const rawNote = d.major.unmapped ? `<p class="muted small">Tên chương trình gốc, chưa gán mã ngành chuẩn — chỉ gồm các dòng chưa map${d.years ? ` (năm có dữ liệu: ${d.years.join(", ")})` : ""}.</p>` : "";
   if (!d.rows.length) { out.innerHTML = `<div class="card empty">Chưa có dữ liệu cho ${code ? "ngành" : "chương trình"} này năm ${d.year}.${rawNote}</div>`; return; }
@@ -309,7 +316,7 @@ async function loadMajor() {
   const simHtml = sim.length ? `<div class="chips"><span class="muted small">Ngành tương tự (mạng G3):</span>${sim.map((x) =>
     `<button type="button" class="chip" data-code="${esc(x.major_code)}" data-name="${esc(x.major_name)}" title="Jaccard ${x.jaccard}">${esc(x.major_name)}</button>`).join("")}</div>` : "";
   out.innerHTML = `<div class="card"><div class="head"><h2>${esc(d.major.major_name)} <span class="sub">${esc(d.major.major_code || "chưa map")}</span></h2>
-    <span class="muted small">${unis} trường · ${d.rows.length} dòng · năm ${d.year}</span></div>${rawNote}${simHtml}
+    <span class="muted small">${unis} trường · ${d.rows.length} dòng · năm ${d.year}${seoMajor && seoMajor.startsWith("nganh/") ? ` · <a class="seo-page-link" href="${esc(seoMajor)}">Trang riêng của ngành ↗</a>` : ""}</span></div>${rawNote}${simHtml}
     <div class="tbl-wrap"><table class="stack"><thead><tr><th>Trường</th><th>Chương trình</th><th>Phương thức</th><th>Tổ hợp</th><th class="num">Điểm chuẩn</th></tr></thead>
     <tbody>${d.rows.map((r) => `<tr><td class="main">${uniCell(r)}</td>
       <td data-label="Chương trình">${esc(r.program_name)}${tag(r.program_type)}</td><td class="sub" data-label="Phương thức">${esc(r.method_name)}</td>
