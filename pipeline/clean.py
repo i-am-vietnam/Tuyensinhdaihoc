@@ -6,6 +6,11 @@ Dau ra  : data/clean/admissions.csv, universities.csv, majors.csv, admission_com
           data/interim/major_unmatched.csv (ten nganh chua map duoc -> duyet tay)
 Sua tay : data/manual/major_map.csv (cot: name_key,major_code) - duoc uu tien hon tu dong.
           major_code trong = chua quyet (bo qua); "-" = bo map tu dong (de lai chua map).
+          Dong "ma:<ma 7 so nguon>" hoac "ma:<ma>@<MA_TRUONG>": doi ma nganh ma nguon ghi
+          (VD ma:7000204,7220204); "-" = de trong major_code (ma thi diem/rieng cua truong,
+          dong chi hien o trang truong). match_how: doi_ma_nguon / bo_ma_nguon.
+          data/manual/danh_muc_nganh.csv (ma,ten,nguon_ten,...): ten nganh chuan cho bang
+          majors (sinh/cap nhat bang scripts/build_danh_muc_nganh.py; thieu ma -> ten pho bien).
           data/manual/vnur_2026.csv + vnur_map.csv (vnur_name,uni_code,ghi_chu).
           ghi_chu bat dau "thuoc" (co dau tieng Viet) danh dau don vi ke thua hang dai hoc me.
 
@@ -297,8 +302,22 @@ def main() -> None:
     df["major_code"] = m
     df["match_how"] = m.notna().map({True: "ma_7_so", False: ""})
 
+    manual = {}
+    mfile = MANUAL / "major_map.csv"
+    if mfile.exists():
+        mm = pd.read_csv(mfile, dtype=str).dropna()
+        manual = dict(zip(mm["name_key"], mm["major_code"]))
+    # sua ma nguon ghi: "ma:<ma>@<truong>" uu tien hon "ma:<ma>"
+    for i in df.index[df["major_code"].notna()]:
+        src, uni = df.at[i, "major_code"], df.at[i, "uni_code"]
+        target = manual.get(f"ma:{src}@{uni}", manual.get(f"ma:{src}"))
+        if target == "-":
+            df.at[i, "major_code"], df.at[i, "match_how"] = pd.NA, "bo_ma_nguon"
+        elif target:
+            df.at[i, "major_code"], df.at[i, "match_how"] = target, "doi_ma_nguon"
+
     # danh muc nganh tu chinh du lieu: ma 7 so -> ten pho bien nhat
-    base = df[df["major_code"].notna()]
+    base = df[df["match_how"] == "ma_7_so"]
     catalog = {}
     for code, grp in base.groupby("major_code"):
         plain = grp[grp["program_type"] == "CHUAN"]["name"]
@@ -324,12 +343,6 @@ def main() -> None:
 
     cat_by_key = dominant((name_key(nm), code) for code, nm in catalog.items())
     key_to_code.update(cat_by_key)
-
-    manual = {}
-    mfile = MANUAL / "major_map.csv"
-    if mfile.exists():
-        mm = pd.read_csv(mfile, dtype=str).dropna()
-        manual = dict(zip(mm["name_key"], mm["major_code"]))
 
     keys_list = list(key_to_code)
 
@@ -386,13 +399,25 @@ def main() -> None:
         return r
 
     key_name = dict(zip(df["name_key"], df["name"]))
-    need = df["major_code"].isna()
+    need = df["major_code"].isna() & (df["match_how"] == "")
     res = df.loc[need, "name_key"].map(resolve)
     df.loc[need, "major_code"] = res.map(lambda t: t[0] or pd.NA)
     df.loc[need, "match_how"] = res.map(lambda t: t[1])
 
+    # ten nganh chuan: data/manual/danh_muc_nganh.csv, thieu ma thi lay ten pho bien trong nguon
+    names = dict(catalog)
+    dfile = MANUAL / "danh_muc_nganh.csv"
+    if dfile.exists():
+        dm = pd.read_csv(dfile, dtype=str).fillna("")
+        names.update({r.ma: r.ten for r in dm.itertuples() if r.ten})
+    # nguon chi ghi ma so thay cho ten chuong trinh (VD QSY "7720201") -> ten nganh chuan
+    only_code = df["name"].str.fullmatch(r"[\d\s]+") & df["major_code"].notna()
+    df.loc[only_code, "name"] = df.loc[only_code, "major_code"].map(names)
+    df.loc[only_code, "match_how"] = "ten_tu_ma"
+    steps.append(("Ten chuong trinh chi la ma so -> ten nganh chuan", int(only_code.sum()), ""))
+
     unmatched = (
-        df[df["major_code"].isna()]
+        df[df["major_code"].isna() & (df["match_how"] == "")]
         .groupby("name_key")
         .agg(
             vi_du=("name", "first"),
@@ -449,7 +474,7 @@ def main() -> None:
 
     used = adm["major_code"].dropna().unique()
     majors = pd.DataFrame({"major_code": sorted(used)})
-    majors["major_name"] = majors["major_code"].map(lambda c: catalog.get(c, ""))
+    majors["major_name"] = majors["major_code"].map(lambda c: names.get(c, ""))
     majors["field_code"] = majors["major_code"].str[:5]  # nhom nganh cap III (5 so)
     majors.to_csv(CLEAN / "majors.csv", index=False, encoding="utf-8-sig")
 

@@ -11,7 +11,9 @@ Hạn nộp ~06/11/2026. Ưu tiên: chạy được, đủ yêu cầu đề bài
 - `sna/build.py` — mạng G1 (Trường–Ngành), G2 (Trường–Trường, Jaccard), G3 (Ngành–Ngành),
   G4 (cạnh tranh có hướng) → `data/network/` (JSON cho web, GEXF cho Gephi, metrics CSV, PNG, summary.csv).
 - `webapp/main.py` (FastAPI) + `webapp/static/` (index.html, app.js, style.css, vanilla JS, vis-network).
-- Sửa dữ liệu bằng tay: `data/manual/major_map.csv` (name_key,major_code), `data/manual/tuition.csv`.
+- Sửa dữ liệu bằng tay: `data/manual/major_map.csv` (name_key,major_code; dòng `ma:<mã>` hoặc `ma:<mã>@<TRƯỜNG>`
+  đổi/bỏ mã 7 số nguồn ghi, `-` = để trống), `data/manual/tuition.csv`, `data/manual/danh_muc_nganh.csv`
+  (tên ngành chuẩn; sinh bằng `scripts/build_danh_muc_nganh.py`, `nguon_ten=da_duyet` không bị ghi đè).
 - Thư mục `services/`, `apps/`, `infra/`, `config/`, `docs/reports/` là hệ thống v1 cũ: chỉ đọc tham khảo.
 
 ## Lệnh (PowerShell, venv đã có pandas, networkx, fastapi, uvicorn)
@@ -23,7 +25,7 @@ Hạn nộp ~06/11/2026. Ưu tiên: chạy được, đủ yêu cầu đề bài
 ```
 
 ## Dữ liệu (23/10/2026)
-71.011 dòng sạch, 292 trường, 472 ngành chuẩn, 94% dòng có `major_code` (mã 7 số Bộ GD&ĐT).
+71.011 dòng sạch, 292 trường, 457 ngành chuẩn, 97% dòng có `major_code` (mã 7 số Bộ GD&ĐT; 08/11/2026).
 Bảng `admissions`: id, uni_code, year, method (THPT, HOCBA, DGNL_HCM, DGNL_HN, DGTD, DGNL_SPT, KETHOP,
 CCQT, UTXT, KHAC), method_name, sub_method, program_code, major_code, program_name, program_type,
 combos ("A00;A01"), score, scale_max, score_equiv, note, flag, match_how, source_url, crawled_at.
