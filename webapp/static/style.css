@@ -1,9 +1,6 @@
-:root{--bg:#f9fafb;--card:#fff;--ink:#1f2937;--muted:#4b5563;--line:#e5e7eb;--accent:#2563eb;--accent-strong:#1d4ed8;--accent-deep:#1e3a8a;--accent-soft:#dbeafe;--accent-wash:#eff6ff;
+:root{color-scheme:light;--bg:#f9fafb;--card:#fff;--ink:#1f2937;--muted:#4b5563;--line:#e5e7eb;--accent:#2563eb;--accent-strong:#1d4ed8;--accent-deep:#1e3a8a;--accent-soft:#dbeafe;--accent-wash:#eff6ff;
 --hero-a:#1e40af;--hero-b:#1d4ed8;--hero-c:#2563eb;--foot-bg:#111827;--foot-ink:#9ca3af;
 --good:#15803d;--good-soft:#dcfce7;--warn:#9a5b00;--warn-soft:#fdf1dc;--bad:#b42318;--bad-soft:#fdeceb;}
-@media (prefers-color-scheme:dark){:root{--bg:#0b1120;--card:#131c2e;--ink:#e5e9f0;--muted:#9aa8bb;--line:#24324a;--accent:#7aa7ff;--accent-strong:#9dbcff;--accent-deep:#c7d8ff;--accent-soft:#1c2e55;--accent-wash:#14213d;
---hero-a:#172554;--hero-b:#1e3a8a;--hero-c:#1e40af;--foot-bg:#070b14;--foot-ink:#8b97a8;
---good:#5fd39a;--good-soft:#123326;--warn:#f2b45a;--warn-soft:#3a2a10;--bad:#ff8a80;--bad-soft:#3d1a18;}}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Inter",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;min-height:100vh}
 body>main{flex:1 0 auto;width:100%}
 a{color:var(--accent)}.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
@@ -174,7 +171,6 @@ table.timeline{font-size:14px}table.timeline td{padding:4px 8px}table.timeline t
 .mos-steps li{position:relative;text-align:center;display:flex;flex-direction:column;align-items:center}
 .mos-step-num{width:64px;height:64px;border-radius:50%;background:#2563eb;color:#fff;font-size:24px;font-weight:800;display:flex;align-items:center;justify-content:center;border:4px solid #fff;box-shadow:0 10px 15px -3px rgba(37,99,235,.35);margin-bottom:20px}
 .mos-steps h3{font-size:20px;font-weight:800;margin:0 0 10px}.mos-steps p{color:var(--muted);margin:0;max-width:320px}
-@media (prefers-color-scheme:dark){.mos-steps::before{background:#24324a}.mos-step-num{border-color:var(--accent-wash)}}
 @media (max-width:860px){.mos-grid-2,.mos-steps{grid-template-columns:1fr}.mos-steps::before{display:none}.mos-plan-featured{transform:none}}
 @media (max-width:767px){.br-md{display:none}}
 @media (max-width:639px){
