@@ -3,7 +3,7 @@
 Đồ án SNA: tra cứu theo trường/ngành, tư vấn theo điểm, mạng SNA và độ phủ dữ liệu.
 Dữ liệu điểm chuẩn 2024–2026; đề án HOCMAI; học phí tra tay; VNUR 2026.
 
-**Web công khai:** <https://tiennguyen2406.github.io/Tuyensinhdaihoc/>
+**Web công khai:** <[https://tiennguyen2406.github.io/Tuyensinhdaihoc/](https://i-am-vietnam.github.io/Tuyensinhdaihoc/)>
 
 ## Cài đặt
 
