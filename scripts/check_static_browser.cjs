@@ -348,9 +348,15 @@ async function waitServer(url) {
       for (const href of ["/", "/truong/", "/nganh/"]) assert.ok(await page.locator(`main a[href="${href}"]`).count(), `404 link ${href}`);
       await page.screenshot({ path: path.join(screenshots, `seo-404-${width}.png`) });
       if (process.argv.includes("--live")) {
+        const [nErr, nBad] = [errors.length, bad.length];
         const res = await page.goto(pages + "khong-ton-tai/trang-sau/");
         assert.equal(res.status(), 404);
         assert.equal(await page.locator("h1").innerText(), "Không tìm thấy trang");
+        await page.waitForLoadState("networkidle");
+        // 404 của chính request cố ý này là kết quả mong đợi; mọi lỗi khác vẫn bị bắt
+        const expected = (s) => /404/.test(s) && (!/https?:/.test(s) || s.includes("khong-ton-tai"));
+        assert.ok(errors.slice(nErr).every(expected) && bad.slice(nBad).every(expected), "404 page assets load");
+        errors.splice(nErr); bad.splice(nBad);
       }
       assert.deepEqual(errors, [], "SEO pages: console/page errors");
       assert.deepEqual(bad, [], "SEO pages: HTTP errors");
