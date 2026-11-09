@@ -9,6 +9,7 @@ nguon_ten:
   can_xem   chỉ 1 trường có mã này, hoặc tên chọn được chỉ 1 trường dùng, hoặc vẫn còn dấu hiệu
             chuyên ngành/ghi chú (cột ly_do) -> người duyệt sửa cột ten rồi đổi nguon_ten = da_duyet
   da_duyet  đã duyệt tay: chạy lại script KHÔNG ghi đè dòng này
+ten_khac: các tên khác của ngành (cách nhau " | "), hiện dưới h1 trang /nganh/ (điền khi duyệt).
 
 Run: .venv/Scripts/python.exe scripts/build_danh_muc_nganh.py   (sau đó chạy lại pipeline.clean)
 """
@@ -25,7 +26,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / "data" / "eduradar.db"
 OUT = ROOT / "data" / "manual" / "danh_muc_nganh.csv"
-FIELDS = ["ma", "ten", "nguon_ten", "so_truong", "so_truong_cung_ten", "ly_do", "vi_du_goc"]
+FIELDS = [
+    "ma",
+    "ten",
+    "ten_khac",
+    "nguon_ten",
+    "so_truong",
+    "so_truong_cung_ten",
+    "ly_do",
+    "vi_du_goc",
+]
 
 # Hậu tố/đoạn ghi chú (không dấu, chữ thường) cắt khỏi cuối tên. Cắt từ vị trí khớp đến hết tên.
 TAIL = re.compile(

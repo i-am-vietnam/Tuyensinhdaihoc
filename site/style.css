@@ -193,3 +193,4 @@ table.timeline{font-size:14px}table.timeline td{padding:4px 8px}table.timeline t
 .seo-list{columns:2 300px;column-gap:28px;padding-left:20px;margin:0}.seo-list li{break-inside:avoid;margin:0 0 6px}
 .seo-jump{margin:12px 0 4px}.seo-jump .chip{text-decoration:none;color:var(--ink)}.seo-group h2{font-size:18px;margin:24px 0 8px;scroll-margin-top:90px}
 .seo-updated{margin:24px 0 0}.page-seo [id^="nganh-"]{scroll-margin-top:90px}.page-seo [id^="nganh-"]:target{background:var(--accent-wash);border-radius:6px}
+.seo-alt{margin:-6px 0 10px;color:var(--muted);font-size:14px}.seo-404-links{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 8px}

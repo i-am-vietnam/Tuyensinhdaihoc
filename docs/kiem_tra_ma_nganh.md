@@ -1,22 +1,22 @@
 # Kiểm tra chất lượng mã ngành
 
-Ngày kiểm: 08/11/2026. Nguồn: `data/eduradar.db` (bảng `majors`, `admissions`). Chỉ báo cáo, chưa sửa dữ liệu. Tạo lại: `.venv\Scripts\python.exe scripts/report_major_codes.py`.
+Ngày kiểm: 09/11/2026. Nguồn: `data/eduradar.db` (bảng `majors`, `admissions`). Chỉ báo cáo, chưa sửa dữ liệu. Tạo lại: `.venv\Scripts\python.exe scripts/report_major_codes.py`.
 
 ## Tóm tắt
 
 | Hạng mục | Số lượng |
 |---|---|
-| Mã ngành trong bảng `majors` | 457 |
-| Dòng điểm có `major_code` | 69.149 / 71.011 |
+| Mã ngành trong bảng `majors` | 455 |
+| Dòng điểm có `major_code` | 69.112 / 71.011 |
 | 1. Mã sai cấu trúc (3 số đầu không phải lĩnh vực của danh mục) | 0 mã, 0 dòng |
-| 2. Tên ngành chuẩn lấy từ tên chương trình, không phải tên danh mục | 1 mã |
+| 2. Tên ngành chuẩn lấy từ tên chương trình, không phải tên danh mục | 0 mã |
 | 3a. Tên chương trình khác hẳn tên ngành, mã do ghép tự động/thủ công | 34 cặp, 350 dòng |
-| 3b. Tên chương trình khác hẳn tên ngành, mã do nguồn ghi | 157 cặp, 737 dòng |
-| 3c. Tên chương trình chứa tên ngành nhưng thêm ≥ 3 từ (chuyên ngành hẹp) | 646 cặp, 3130 dòng |
+| 3b. Tên chương trình khác hẳn tên ngành, mã do nguồn ghi | 159 cặp, 745 dòng |
+| 3c. Tên chương trình chứa tên ngành nhưng thêm ≥ 3 từ (chuyên ngành hẹp) | 649 cặp, 3141 dòng |
 | 4. Một mã dùng cho các chương trình khác nghĩa ở các trường | 0 mã |
 | 5. Tên chương trình chỉ là mã số (nguồn thiếu tên) | 0 cặp, 0 dòng |
 
-Cặp = (trường, tên chương trình, mã ngành). "Khác hẳn" = sau khi bỏ dấu, bỏ phần trong ngoặc và các từ chung (ngành, chương trình, chất lượng cao, tiếng Anh…), tên chương trình không có từ nào trùng với tên ngành chuẩn. Tổng mục 3a + 3b: 191 cặp, 1087 dòng (1.6% số dòng có mã).
+Cặp = (trường, tên chương trình, mã ngành). "Khác hẳn" = sau khi bỏ dấu, bỏ phần trong ngoặc và các từ chung (ngành, chương trình, chất lượng cao, tiếng Anh…), tên chương trình không có từ nào trùng với tên ngành chuẩn. Tổng mục 3a + 3b: 193 cặp, 1095 dòng (1.6% số dòng có mã).
 
 ## 1. Mã sai cấu trúc mã 7 số của Bộ
 
@@ -31,7 +31,6 @@ Bảng `majors` lấy tên từ tên chương trình của nguồn, nên có tê
 
 | Mã | Tên hiện tại |
 |---|---|
-| 7860222 | Quân sự cơ sở - Quân khu 1 |
 
 ## 3a. Tên chương trình khác hẳn tên ngành — mã do pipeline ghép (cần xem trước)
 
@@ -88,12 +87,13 @@ Phần lớn là chuyên ngành hoặc chương trình riêng mà trường tuy�
 | BVH | Thiết kế và phát triển Game (ngành Công nghệ đa phương tiện) | 7329001 | Công nghệ đa phương tiện | 10 |
 | BVH | Quan hệ công chúng (ngành Marketing) | 7340115 | Marketing | 10 |
 | VGU | Quản trị số và Kinh doanh Quốc tế (BDE) | 7340122 | Thương mại điện tử | 10 |
-| VGU | Kỹ thuật Điện và Máy tính (ECE) | 7520208 | Công nghệ internet vạn vật | 10 |
 | BVH | Trí tuệ nhân tạo vạn vật (AIoT) (ngành Kỹ thuật Điện tử viễn thông) | 7520207 | Kỹ thuật điện tử - viễn thông | 9 |
 | BVH | Thiết kế đồ họa game | 7329001 | Công nghệ đa phương tiện | 9 |
 | BVH | Thiết kế và phát triển Game (Chất lượng cao) | 7329001 | Công nghệ đa phương tiện | 9 |
 | BVH | Quan hệ công chúng | 7340115 | Marketing | 9 |
 | BVH | Trí tuệ nhân tạo vạn vật (AIoT) | 7520207 | Kỹ thuật điện tử - viễn thông | 9 |
+| BVS | Công nghệ internet vạn vật (IoT) | 7520208 | Kỹ thuật Điện và Máy tính | 9 |
+| BVS | Công nghệ Internet vạn vật (IoT) | 7520208 | Kỹ thuật Điện và Máy tính | 9 |
 | KSA | Tiếng Anh thương mại | 7220201 | Ngôn ngữ Anh | 9 |
 | KSA | Phân tích rủi ro và định phí bảo hiểm | 7310108 | Toán kinh tế | 9 |
 | KSA | Thuế | 7340201 | Tài chính - Ngân hàng | 9 |
@@ -117,7 +117,6 @@ Phần lớn là chuyên ngành hoặc chương trình riêng mà trường tuy�
 | HHK | Thương mại quốc tế | 7340120 | Kinh doanh quốc tế | 7 |
 | HHK | Trí tuệ nhân tạo và Dữ liệu lớn | 7480201 | Công nghệ thông tin | 7 |
 | HHK | Trí tuệ nhân tạo và Internet vạn vật | 7480201 | Công nghệ thông tin | 7 |
-| HHK | Quản lý và khai thác cảng hàng không | 7510102 | Công nghệ kỹ thuật công trình xây dựng | 7 |
 
 ## 3c. Chuyên ngành hẹp mang mã ngành rộng
 
@@ -174,7 +173,7 @@ Mã ngành đúng nhưng nguồn không ghi tên chương trình; trang trườn
 
 1. **Mã gõ nhầm (700…, 730…, 780…)**: thêm dòng vào `data/manual/major_map.csv` để chuyển sang mã danh mục cùng tên (cột cuối bảng mục 1), rồi chạy lại `pipeline.clean` và `sna.build`.
 2. **Mã riêng/thí điểm (790…, 7549002…)**: giữ mã gốc của trường ở `program_code`; với `major_code` chọn một trong hai: (a) map về ngành danh mục gần nhất (VD CTTT Kỹ thuật điện → 7520201) qua `major_map.csv`, hoặc (b) để trống `major_code` để dòng chỉ hiện ở trang trường, không lẫn vào trang ngành. Đề xuất (a) cho chương trình tiên tiến/song ngành có ngành gốc rõ, (b) cho phần còn lại.
-3. **Tên ngành chuẩn**: thêm file `data/manual/danh_muc_nganh.csv` (mã, tên theo Thông tư 09/2022/TT-BGDĐT và các thông tư bổ sung) và để `pipeline.clean` lấy `majors.major_name` từ file này thay vì từ tên chương trình. Sửa được cả 1 tên ở mục 2 và tên nhóm ngành trên `/nganh/`.
+3. **Tên ngành chuẩn**: thêm file `data/manual/danh_muc_nganh.csv` (mã, tên theo Thông tư 09/2022/TT-BGDĐT và các thông tư bổ sung) và để `pipeline.clean` lấy `majors.major_name` từ file này thay vì từ tên chương trình. Sửa được cả 0 tên ở mục 2 và tên nhóm ngành trên `/nganh/`.
 4. **Mục 3a**: xem từng dòng; dòng ghép sai thì thêm/sửa `major_map.csv` (ghép thủ công được ưu tiên hơn tự động). Đây là nhóm ít dòng nhất nhưng dễ sai nhất.
 5. **Mục 5**: trong `pipeline.clean`, khi tên chương trình chỉ là mã số thì thay bằng tên ngành chuẩn (ghi `match_how` riêng để còn dấu vết).
 6. **Mục 3b, 3c**: không sửa mã. Có thể hiển thị tên chương trình gốc rõ hơn trên trang ngành (đã có cột Chương trình) và thêm chú thích "chuyên ngành của ngành …".

@@ -340,6 +340,18 @@ async function waitServer(url) {
       await page.goto(siteBase + "#major/7480201/2026");
       await page.locator("#major-out .seo-page-link").click();
       await page.waitForURL(siteBase + seo.major["7480201"]);
+      // Trang 404 (GitHub Pages trả cho URL không tồn tại; local mở trực tiếp /404.html)
+      await page.goto(siteBase + "404.html");
+      assert.equal(await page.locator("h1").innerText(), "Không tìm thấy trang");
+      assert.match(await page.getAttribute('meta[name="robots"]', "content"), /noindex/);
+      assert.equal(await page.locator('link[rel="canonical"]').count(), 0);
+      for (const href of ["/", "/truong/", "/nganh/"]) assert.ok(await page.locator(`main a[href="${href}"]`).count(), `404 link ${href}`);
+      await page.screenshot({ path: path.join(screenshots, `seo-404-${width}.png`) });
+      if (process.argv.includes("--live")) {
+        const res = await page.goto(pages + "khong-ton-tai/trang-sau/");
+        assert.equal(res.status(), 404);
+        assert.equal(await page.locator("h1").innerText(), "Không tìm thấy trang");
+      }
       assert.deepEqual(errors, [], "SEO pages: console/page errors");
       assert.deepEqual(bad, [], "SEO pages: HTTP errors");
       console.log(`PASS seo ${width}px: ${seoPaths.length} pages, cross links, no-JS content, app links, no console/HTTP errors`);

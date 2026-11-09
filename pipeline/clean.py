@@ -410,6 +410,9 @@ def main() -> None:
     if dfile.exists():
         dm = pd.read_csv(dfile, dtype=str).fillna("")
         names.update({r.ma: r.ten for r in dm.itertuples() if r.ten})
+        other_names = {r.ma: r.ten_khac for r in dm.itertuples() if getattr(r, "ten_khac", "")}
+    else:
+        other_names = {}
     # nguon chi ghi ma so thay cho ten chuong trinh (VD QSY "7720201") -> ten nganh chuan
     only_code = df["name"].str.fullmatch(r"[\d\s]+") & df["major_code"].notna()
     df.loc[only_code, "name"] = df.loc[only_code, "major_code"].map(names)
@@ -476,6 +479,7 @@ def main() -> None:
     majors = pd.DataFrame({"major_code": sorted(used)})
     majors["major_name"] = majors["major_code"].map(lambda c: names.get(c, ""))
     majors["field_code"] = majors["major_code"].str[:5]  # nhom nganh cap III (5 so)
+    majors["other_names"] = majors["major_code"].map(lambda c: other_names.get(c, ""))
     majors.to_csv(CLEAN / "majors.csv", index=False, encoding="utf-8-sig")
 
     # dung DB o thu muc tam roi chep sang (an toan voi o mang / thu muc dong bo)

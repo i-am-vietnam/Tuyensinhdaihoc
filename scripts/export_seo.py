@@ -190,6 +190,50 @@ def nav(prefix: str, active: str) -> str:
     return "\n".join(out)
 
 
+def not_found_page() -> str:
+    """site/404.html: GitHub Pages trả trang này cho mọi URL không tồn tại, ở mọi độ sâu,
+    nên mọi đường dẫn tính từ gốc "/". noindex, không canonical, không vào sitemap."""
+    return f"""<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Không tìm thấy trang | {BRAND}</title>
+<meta name="description" content="Trang bạn tìm không tồn tại hoặc đã đổi địa chỉ. Tra cứu điểm chuẩn theo danh sách trường, danh sách ngành hoặc từ trang chủ.">
+<meta name="robots" content="noindex, follow">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="theme-color" content="#1e40af">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/{CSS}">
+</head>
+<body class="page-seo page-404">
+<a class="skip-link" href="#main">Đến nội dung chính</a>
+<header class="top">
+  <div class="wrap top-row">
+    <a class="brand" href="/" aria-label="{BRAND} — trang chủ"><span class="dot"></span>{BRAND}</a>
+    <nav class="tabs" aria-label="Điều hướng chính">
+{nav("/", "")}
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+<h1>Không tìm thấy trang</h1>
+<p class="seo-lead">Trang bạn tìm không tồn tại hoặc đã đổi địa chỉ. Hãy thử một trong các trang sau:</p>
+<p class="seo-actions seo-404-links"><a class="seo-cta" href="/">Trang chủ</a> <a class="seo-cta" href="/truong/">DS Trường</a> <a class="seo-cta" href="/nganh/">DS Ngành</a></p>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="foot-brand">{BRAND}</p>
+    <p>&copy; 2026 {BRAND} · <a href="/">Tra cứu điểm chuẩn</a> · <a href="/truong/">Danh sách trường</a> · <a href="/nganh/">Danh sách ngành</a> · <a href="/mos.html">Tài liệu luyện thi MOS</a></p>
+  </div>
+</footer>
+</body>
+</html>
+"""
+
+
 def page(
     path: str,
     title: str,
@@ -744,6 +788,9 @@ def export(site: Path = SITE) -> dict:
             if vals
             else ""
         )
+        # tên khác của ngành (data/manual/danh_muc_nganh.csv, cột ten_khac)
+        alts = [x.strip() for x in (info.get("other_names") or "").split("|") if x.strip()]
+        alt_html = f'<p class="seo-alt">Tên khác: {esc(", ".join(alts))}</p>' if alts else ""
         field = (
             f"lĩnh vực {FIELDS[m[:3]]}"
             if m[:3] in FIELDS
@@ -766,7 +813,7 @@ def export(site: Path = SITE) -> dict:
             else ""
         )
         body = (
-            f"<h1>Điểm chuẩn ngành {esc(info['major_name'])} ({m}) {span(myears)}</h1>{lead}"
+            f"<h1>Điểm chuẩn ngành {esc(info['major_name'])} ({m}) {span(myears)}</h1>{alt_html}{lead}"
             f'<p class="seo-actions"><a class="seo-cta" href="{prefix}#major/{m}/{myears[-1]}">Mở trong công cụ tra cứu</a></p>'
             f'<section class="seo-block"><h2>So sánh điểm chuẩn giữa các trường</h2>'
             f'<p class="muted small">Mỗi phương thức một bảng, xếp theo điểm năm gần nhất giảm dần; bảng cuộn ngang được trên điện thoại. "—" là năm chưa có dữ liệu; "a–b" là năm có nhiều mức điểm (theo tổ hợp hoặc đối tượng).</p>{tables}</section>{rel_html}'
@@ -777,10 +824,13 @@ def export(site: Path = SITE) -> dict:
             + " (trang điểm chuẩn của từng trường)."
         )
         title = f"Điểm chuẩn ngành {info['major_name']} ({m}) {span(myears)} – {len(us)} trường | {BRAND}"
-        desc = cut(
-            f"Điểm chuẩn ngành {info['major_name']} ({m}) {span(myears)} tại {len(us)} trường.{short_stat} "
-            "So sánh theo năm, phương thức xét tuyển."
-        )
+        desc = f"Điểm chuẩn ngành {info['major_name']} ({m}) {span(myears)} tại {len(us)} trường.{short_stat}"
+        for k in range(len(alts), 0, -1):  # tên khác vào description nếu còn chỗ (≤ 160 ký tự)
+            extra = f" Tên khác: {', '.join(alts[:k])}."
+            if len(desc + extra) <= 160:
+                desc += extra
+                break
+        desc = cut(desc + " So sánh theo năm, phương thức xét tuyển.")
         crumbs = [("Trang chủ", ""), ("Ngành", "nganh/"), (info["major_name"], path)]
         listed = sorted(us, key=lambda u: sort_key(unis[u]["name"]))
         item_list = {
@@ -915,6 +965,9 @@ def export(site: Path = SITE) -> dict:
         ),
         updated_all,
     )
+
+    # ----- 404.html (không vào sitemap) -----
+    (site / "404.html").write_text(not_found_page(), encoding="utf-8")
 
     # ----- seo_pages.json cho app.js, sitemap.xml -----
     (site / "data").mkdir(parents=True, exist_ok=True)

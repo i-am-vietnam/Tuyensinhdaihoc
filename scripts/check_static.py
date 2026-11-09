@@ -87,6 +87,11 @@ def check_seo(unis, majors) -> str:
         new = path.startswith(("truong/", "nganh/"))
         # trang chủ có một h1 cho mỗi tab (sẵn có); trang tĩnh mới đúng một h1
         assert p.title == 1 and (p.h1 == 1 if new else p.h1 >= 1), f"{path}: title/h1"
+        if path == "404.html":  # trang lỗi: noindex, không canonical/og, link tính từ gốc "/"
+            assert "noindex" in p.meta.get("robots", "") and "canonical" not in p.meta, path
+            assert {"/", "/truong/", "/nganh/"} <= set(p.links), path
+            noindex.add(path)
+            continue
         assert p.meta["canonical"] == p.meta["og:url"] == base + path, path
         assert p.meta["og:title"] == p.title_text, f"{path}: og:title = title"
         assert 50 <= len(p.meta["description"]) <= 200, f"{path}: description length"
@@ -100,7 +105,8 @@ def check_seo(unis, majors) -> str:
             assert all(k not in json.dumps(p.ld) for k in ("aggregateRating", "review")), path
             assert "Dữ liệu cập nhật ngày" in f.read_text(encoding="utf-8"), path
     assert sitemap == set(parsed) - noindex, "sitemap = public pages"
-    assert all(p.startswith("truong/") for p in noindex)
+    assert all(p.startswith("truong/") or p == "404.html" for p in noindex)
+    assert "404.html" in parsed, "site/404.html"
     links = 0
     for path, p in parsed.items():
         for href in p.links:
