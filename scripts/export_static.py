@@ -78,6 +78,7 @@ def export():
     write("data/majors.json", {"majors": idx["majors"], "programs": programs})
     write("data/coverage.json", api.coverage())
     write("data/dean.json", api.dean_index())
+    write("data/career.json", api.career_data())
     for year in meta["years"]:
         for u in idx["unis"]:
             write(
@@ -100,6 +101,8 @@ def export():
     for name in (
         "app.js",
         "style.css",
+        "career.js",
+        "career.css",
         "favicon.svg",
         "vendor/vis-network.min.js",
         "vendor/LICENSE-MIT",

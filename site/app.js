@@ -172,7 +172,7 @@ function tuitionExtraHtml(x) {
 }
 const feeHtml = (d) => (d.tuition_extra ? tuitionExtraHtml(d.tuition_extra) : tuitionHtml(d.tuition));
 const fail = (out, e) => (out.innerHTML = `<div class="card empty">Lỗi: ${esc(e.message)}</div>`);
-const TABS = ["uni", "major", "advice", "network", "coverage"];
+const TABS = ["uni", "major", "advice", "career", "network", "coverage"];
 let META = null;
 let UNIVERSITIES = [];
 
@@ -214,6 +214,7 @@ function showTab(t) {
   document.querySelectorAll(".tab").forEach((s) => s.classList.toggle("active", s.id === "tab-" + t));
   if (t === "network") loadNetworkList();
   if (t === "coverage") loadCoverage();
+  if (t === "career") window.Career?.open();
   history.replaceState(null, "", "#" + t);
 }
 

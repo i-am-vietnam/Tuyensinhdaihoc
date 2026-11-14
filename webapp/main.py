@@ -299,6 +299,160 @@ def hot_parts(r: dict) -> dict:
     }
 
 
+CAREER_PROFILES = ROOT / "data" / "manual" / "career_profiles.json"
+SEO_SLUGS = ROOT / "data" / "manual" / "seo_slugs.csv"
+SUBJECT_EXACT = {
+    "toán": "toan",
+    "ngữ văn": "van",
+    "văn": "van",
+    "vật lí": "ly",
+    "vật lý": "ly",
+    "lý": "ly",
+    "lí": "ly",
+    "hóa học": "hoa",
+    "hoá học": "hoa",
+    "hóa": "hoa",
+    "hoá": "hoa",
+    "sinh học": "sinh",
+    "sinh": "sinh",
+    "tin": "tin",
+    "đọc": "nk",
+    "lịch sử": "su",
+    "địa lí": "dia",
+    "địa lý": "dia",
+    "địa": "dia",
+    "tiếng anh": "anh",
+    "tin học": "tin",
+    "gdktpl": "gdkt",
+    "gdkt&pl": "gdkt",
+    "giáo dục kinh tế và pháp luật": "gdkt",
+    "công nghệ công nghiệp": "cncn",
+    "công nghệ nông nghiệp": "cnnn",
+    "ngoại ngữ": "nnk",
+}
+SUBJECT_VE = ("vẽ", "hình họa", "bố cục", "trang trí")
+SUBJECT_NK = (
+    "năng khiếu",
+    "năng kiếu",
+    "nk",
+    "âm nhạc",
+    "hát",
+    "diễn cảm",
+    "kể chuyện",
+    "biểu diễn",
+    "múa",
+    "xướng âm",
+    "kịch bản",
+)
+
+
+def subject_key(name: str) -> str | None:
+    """Ten mon trong bang combos -> khoa mon dung chung voi career.js (None = khong quy doi)."""
+    s = unicodedata.normalize("NFC", name).strip().lower()
+    if s in SUBJECT_EXACT:
+        return SUBJECT_EXACT[s]
+    if s.startswith("tiếng "):
+        return "nnk"
+    if any(k in s for k in SUBJECT_VE):
+        return "ve"
+    if any(k in s for k in SUBJECT_NK):
+        return "nk"
+    return None
+
+
+def split_subjects(text: str) -> list[str]:
+    """Tach theo , hoac ; nam ngoai ngoac: 'NK Mam non 1( ke chuyen, doc, dien cam)' la mot mon."""
+    parts, depth, cur = [], 0, ""
+    for ch in text or "":
+        depth += (ch == "(") - (ch == ")")
+        if ch in ",;" and depth <= 0:
+            parts.append(cur)
+            cur, depth = "", 0
+        else:
+            cur += ch
+    return [p for p in (*parts, cur) if p.strip()]
+
+
+def combo_subjects(c: sqlite3.Connection) -> dict[str, list[str]]:
+    out = {}
+    for combo, subjects in c.execute("SELECT combo, subjects FROM combos"):
+        keys = [subject_key(x) for x in split_subjects(subjects)]
+        if keys and all(keys):
+            out[combo] = keys
+    return out
+
+
+def seo_paths() -> dict[tuple[str, str], str]:
+    if not SEO_SLUGS.exists():
+        return {}
+    with SEO_SLUGS.open(encoding="utf-8", newline="") as f:
+        return {(r["kind"], r["code"]): f"{r['kind']}/{r['slug']}/" for r in csv.DictReader(f)}
+
+
+@lru_cache(maxsize=4)
+def career_data(year: int | None = None) -> dict:
+    """Du lieu tab 'Tu van chon nganh': ho so nganh (data/manual) + diem chuan THPT thang 30."""
+    c = con()
+    if year is None:
+        year = c.execute("SELECT MAX(year) FROM admissions WHERE method='THPT'").fetchone()[0]
+    majors_doc = json.loads(CAREER_PROFILES.read_text(encoding="utf-8"))["majors"]
+    names = dict(c.execute("SELECT major_code, major_name FROM majors"))
+    profiles = [dict(m, name=names.get(m["code"], m["code"])) for m in majors_doc]
+    codes = [m["code"] for m in profiles]
+    combos = combo_subjects(c)
+    marks = ",".join("?" * len(codes))
+    picked = c.execute(
+        "SELECT id, uni_code, major_code, score, program_type FROM admissions "
+        f"WHERE method='THPT' AND year=? AND flag='' AND score IS NOT NULL AND scale_max=30 "
+        f"AND major_code IN ({marks}) ORDER BY major_code, score DESC, uni_code, id",
+        (year, *codes),
+    ).fetchall()
+    ids = {r[0] for r in picked}
+    # DB mo immutable, khong co chi muc: quet admission_combos mot lan thay vi JOIN.
+    combo_map: dict[int, list[str]] = {}
+    for aid, combo in c.execute("SELECT admission_id, combo FROM admission_combos ORDER BY rowid"):
+        if aid in ids:
+            combo_map.setdefault(aid, []).append(combo)
+    rows: dict[str, list] = {}
+    used_unis, used_combos = set(), set()
+    for aid, uni, major, score, ptype in picked:
+        cbs = [x for x in combo_map.get(aid, []) if x in combos]
+        if not cbs:
+            continue
+        rows.setdefault(major, []).append(
+            [uni, score, ";".join(cbs), "" if ptype in (None, "CHUAN") else ptype]
+        )
+        used_unis.add(uni)
+        used_combos.update(cbs)
+    paths = seo_paths()
+    unis = {
+        r["uni_code"]: [
+            r["short_name"] or r["uni_code"],
+            r["name"],
+            r["vnur_rank"],
+            paths.get(("truong", r["uni_code"]), ""),
+        ]
+        for r in c.execute("SELECT uni_code, name, short_name, vnur_rank FROM universities")
+        if r["uni_code"] in used_unis
+    }
+    c.close()
+    return {
+        "year": year,
+        "method": "THPT",
+        "scale": 30,
+        "profiles": profiles,
+        "majors": {m: {"rows": rows[m]} for m in codes if m in rows},
+        "unis": unis,
+        "major_pages": {m: paths[("nganh", m)] for m in codes if ("nganh", m) in paths},
+        "combos": {k: combos[k] for k in sorted(used_combos)},
+    }
+
+
+@app.get("/api/career")
+def career(year: int | None = None):
+    return career_data(year)
+
+
 @app.get("/api/meta")
 def meta():
     c = con()
