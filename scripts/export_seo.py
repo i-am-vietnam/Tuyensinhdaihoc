@@ -330,6 +330,12 @@ def cells(t: dict, years: list[int]) -> str:
     return "".join(out)
 
 
+def tie_key(t: dict) -> tuple:
+    """Xếp phụ cố định cho dòng bằng nhau: mã chương trình, thang, tên chương trình, id dòng."""
+    r = t["r"]
+    return (r["program_code"] or "", r["scale_max"] or 0, r["program_name"] or "", r["id"])
+
+
 def method_sections(rows, keyf, head: str, row_html, sortf, years, method_names) -> str:
     by_m = defaultdict(list)
     for r in rows:
@@ -520,9 +526,9 @@ def load():
     rows = [
         dict(r)
         for r in c.execute(
-            "SELECT uni_code, year, method, method_name, program_code, major_code, program_name, "
-            "program_type, combos, score, scale_max, note, source_url FROM admissions "
-            f"WHERE flag NOT IN ({','.join('?' * len(SKIP_FLAGS))})",
+            "SELECT id, uni_code, year, method, method_name, program_code, major_code, "
+            "program_name, program_type, combos, score, scale_max, note, source_url FROM admissions "
+            f"WHERE flag NOT IN ({','.join('?' * len(SKIP_FLAGS))}) ORDER BY id",
             SKIP_FLAGS,
         )
     ]
@@ -615,7 +621,7 @@ def export(site: Path = SITE) -> dict:
             lambda r: (r["program_code"], r["scale_max"]),
             "<th>Mã</th><th>Ngành / chương trình</th><th>Tổ hợp</th>",
             uni_row,
-            lambda t, s: (t["r"]["scale_max"] != s, t["r"]["program_code"]),
+            lambda t, s: (t["r"]["scale_max"] != s, *tie_key(t)),
             years,
             method_names,
         )
@@ -646,7 +652,7 @@ def export(site: Path = SITE) -> dict:
         )
         mcodes = sorted(
             {r["major_code"] for r in rs if r["major_code"] in majors},
-            key=lambda m: sort_key(majors[m]["major_name"]),
+            key=lambda m: (sort_key(majors[m]["major_name"]), m),
         )
         major_items = []
         for m in mcodes:
@@ -752,7 +758,12 @@ def export(site: Path = SITE) -> dict:
             lambda r: (r["uni_code"], r["program_code"], r["scale_max"]),
             "<th>Trường</th><th>Tỉnh/thành</th><th>Chương trình</th><th>Tổ hợp</th>",
             major_row,
-            lambda t, s: (t["r"]["scale_max"] != s, -(latest(t) or 0), t["r"]["uni_code"]),
+            lambda t, s: (
+                t["r"]["scale_max"] != s,
+                -(latest(t) or 0),
+                t["r"]["uni_code"],
+                *tie_key(t),
+            ),
             years,
             method_names,
         )
@@ -832,7 +843,7 @@ def export(site: Path = SITE) -> dict:
                 break
         desc = cut(desc + " So sánh theo năm, phương thức xét tuyển.")
         crumbs = [("Trang chủ", ""), ("Ngành", "nganh/"), (info["major_name"], path)]
-        listed = sorted(us, key=lambda u: sort_key(unis[u]["name"]))
+        listed = sorted(us, key=lambda u: (sort_key(unis[u]["name"]), u))
         item_list = {
             "@context": "https://schema.org",
             "@type": "ItemList",
@@ -884,7 +895,7 @@ def export(site: Path = SITE) -> dict:
     groups = []
     for p in provs:
         lis = []
-        for u in sorted(by_prov[p], key=lambda u: sort_key(unis[u]["name"])):
+        for u in sorted(by_prov[p], key=lambda u: (sort_key(unis[u]["name"]), u)):
             info = unis[u]
             n = len({(r["program_code"], r["program_name"]) for r in by_uni.get(u, [])})
             rank = f" · Top {info['vnur_rank']} VNUR" if info["vnur_rank"] is not None else ""
@@ -930,7 +941,7 @@ def export(site: Path = SITE) -> dict:
     groups = []
     for f in fields:
         lis = []
-        for m in sorted(by_field[f], key=lambda m: sort_key(majors[m]["major_name"])):
+        for m in sorted(by_field[f], key=lambda m: (sort_key(majors[m]["major_name"]), m)):
             n = len(major_unis[m])
             if m in major_page:
                 sub = f"{m} · {n} trường"
