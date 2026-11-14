@@ -1,5 +1,7 @@
 """Export the local API to site/ for GitHub Pages (no crawl, no database writes).
 
+Also regenerates the SEO pages (/truong/, /nganh/) and site/sitemap.xml via scripts/export_seo.py.
+
 Run: .venv/Scripts/python.exe scripts/export_static.py
 """
 
@@ -14,6 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from scripts import export_seo  # noqa: E402
 from webapp import main as api  # noqa: E402
 
 SITE = ROOT / "site"
@@ -108,7 +111,11 @@ def export():
     html = (api.STATIC / "index.html").read_text(encoding="utf-8")
     html = html.replace('<html lang="vi">', '<html lang="vi" data-mode="static">')
     (SITE / "index.html").write_text(html.replace('="static/', '="'), encoding="utf-8")
+    mos = (api.STATIC / "mos.html").read_text(encoding="utf-8")
+    (SITE / "mos.html").write_text(mos.replace('="static/', '="'), encoding="utf-8")
     (SITE / ".nojekyll").touch()
+    # Trang tĩnh /truong/, /nganh/, data/seo_pages.json và sitemap.xml sinh lại theo dữ liệu mới.
+    export_seo.export(SITE)
     files = [p for p in SITE.rglob("*") if p.is_file()]
     largest = max(files, key=lambda p: p.stat().st_size)
     if largest.stat().st_size >= 50_000_000:

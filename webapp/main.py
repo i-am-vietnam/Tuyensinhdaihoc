@@ -40,7 +40,7 @@ METHOD_ORDER = [
     "KHAC",
 ]
 
-app = FastAPI(title="EduRadar", version="2.0")
+app = FastAPI(title="Tuyển Sinh Đại Học", version="2.0")
 
 
 @app.middleware("http")
@@ -607,6 +607,11 @@ def network_list():
 @app.get("/")
 def index():
     return FileResponse(STATIC / "index.html")
+
+
+@app.get("/mos.html")
+def mos_page():
+    return FileResponse(STATIC / "mos.html")
 
 
 app.mount("/static", StaticFiles(directory=STATIC), name="static")

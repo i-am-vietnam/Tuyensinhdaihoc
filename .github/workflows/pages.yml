@@ -1,4 +1,4 @@
-name: Deploy EduRadar to GitHub Pages
+name: Deploy Tuyển Sinh Đại Học to GitHub Pages
 
 on:
   push:

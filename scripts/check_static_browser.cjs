@@ -1,5 +1,6 @@
 /* Edge headless regression: npm install --prefix .venv/browser-check playwright
- * Run: node scripts/check_static_browser.cjs
+ * Run: node scripts/check_static_browser.cjs   (site/ served at "/", như https://diemthidaihoc.com/)
+ *      node scripts/check_static_browser.cjs --live   (kiểm bản đang chạy thật)
  */
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
@@ -44,15 +45,13 @@ async function waitServer(url) {
 (async () => {
   fs.mkdirSync(scratch, { recursive: true });
   fs.mkdirSync(screenshots, { recursive: true });
-  const link = path.join(scratch, "Tuyensinhdaihoc");
-  if (!fs.existsSync(link)) fs.symlinkSync(path.join(root, "site"), link, "junction");
-  assert.equal(fs.realpathSync(link), fs.realpathSync(path.join(root, "site")));
   const staticPort = await freePort(), apiPort = await freePort();
-  run(["-m", "http.server", String(staticPort), "--bind", "127.0.0.1", "--directory", scratch]);
+  run(["-m", "http.server", String(staticPort), "--bind", "127.0.0.1", "--directory", path.join(root, "site")]);
   run(["-m", "uvicorn", "webapp.main:app", "--host", "127.0.0.1", "--port", String(apiPort)]);
-  const base = `http://127.0.0.1:${staticPort}/Tuyensinhdaihoc/`;
+  const base = `http://127.0.0.1:${staticPort}/`;
   const live = `http://127.0.0.1:${apiPort}/`;
-  const pages = "https://tiennguyen2406.github.io/Tuyensinhdaihoc/";
+  const pages = "https://diemthidaihoc.com/";
+  const FONTS = /^https:\/\/fonts\.(googleapis|gstatic)\.com\//;
   let browser;
   const results = [];
   try {
@@ -275,10 +274,93 @@ async function waitServer(url) {
       assert.deepEqual(errors, [], "Console/page errors");
       assert.deepEqual(badResponses, [], "HTTP errors");
       assert.deepEqual(failedRequests, [], "Failed requests");
-      assert.ok(requests.every((u) => u.startsWith(target)), "All requests stay under the project subpath");
+      assert.ok(requests.every((u) => u.startsWith(target) || FONTS.test(u)), "All requests stay on the site (plus Google Fonts)");
       if (mode !== "api") assert.ok(requests.every((u) => !u.includes("/api/")), "Static mode makes no API probes");
       results.push({ mode, width, tabs: 5, coverage: true, parity: cases.length, consoleErrors: 0, httpErrors: 0 });
       console.log(`PASS ${mode} ${width}px: five tabs, rank grid, plans/tuition, hot advice, ${cases.length} API comparisons, no console/HTTP errors`);
+      await page.close();
+    }
+    // Trang tĩnh SEO (scripts/export_seo.py): /truong/, /nganh/, link từ app, cuộn ngang bảng trên 375px.
+    const siteBase = process.argv.includes("--live") ? pages : base;
+    const seo = await json(siteBase + "data/seo_pages.json");
+    const pick = (keys, n) => [...keys].sort(() => Math.random() - 0.5).slice(0, n);
+    const uniKeys = Object.keys(seo.uni), majorKeys = Object.keys(seo.major).filter((k) => seo.major[k].startsWith("nganh/"));
+    const seoPaths = ["truong/", "nganh/", seo.uni.BKA, seo.major["7480201"],
+      ...pick(uniKeys, 3).map((k) => seo.uni[k]), ...pick(majorKeys, 3).map((k) => seo.major[k])];
+    console.log("SEO sample:", seoPaths.join(" "));
+    for (const width of [375, 1280]) {
+      const page = await browser.newPage({ viewport: { width, height: 900 }, deviceScaleFactor: 1 });
+      const errors = [], bad = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
+      page.on("response", (r) => { if (r.status() >= 400) bad.push(`${r.status()} ${r.url()}`); });
+      page.on("requestfailed", (r) => bad.push(`${r.url()} ${r.failure()?.errorText}`));
+      for (const p of seoPaths) {
+        const res = await page.goto(siteBase + p);
+        assert.equal(res.status(), 200, p);
+        assert.equal(await page.getAttribute('link[rel="canonical"]', "href"), pages + p, p);
+        assert.equal(await page.getAttribute('meta[property="og:url"]', "content"), pages + p, p);
+        assert.equal(await page.getAttribute('meta[property="og:title"]', "content"), await page.title(), p);
+        assert.equal(await page.locator("h1").count(), 1, p);
+        assert.ok(await page.locator('nav.tabs a[href$="truong/"]').count() && await page.locator('nav.tabs a[href$="nganh/"]').count(), `${p} menu Trường/Ngành`);
+        assert.match(await page.locator(".seo-updated").innerText(), /Dữ liệu cập nhật ngày \d{2}\/\d{2}\/\d{4}/, p);
+        const types = await page.locator('script[type="application/ld+json"]').evaluateAll((s) => s.map((x) => JSON.parse(x.textContent)["@type"]));
+        assert.ok(types.includes("BreadcrumbList"), p);
+        assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${p} no page-level horizontal scroll`);
+        if (p.split("/").length > 2) {
+          const open = await page.locator("details.seo-method[open]").count();
+          assert.equal(open, 1, `${p} exactly one method open`);
+          if (await page.locator("#pt-thpt").count()) assert.ok(await page.locator("#pt-thpt").evaluate((d) => d.open), `${p} THPT open`);
+          const wrap = page.locator("details.seo-method[open] .tbl-wrap");
+          if (width === 375) assert.ok(await wrap.evaluate((e) => e.scrollWidth > e.clientWidth && getComputedStyle(e).overflowX === "auto"), `${p} table scrolls horizontally`);
+        }
+        await page.screenshot({ path: path.join(screenshots, `seo-${p.replace(/\W+/g, "_")}-${width}.png`) });
+      }
+      // Liên kết chéo: ngành → trường, danh sách → trang ngành 1 trường (#nganh-...)
+      await page.goto(siteBase + seo.major["7480201"]);
+      await page.locator("details.seo-method[open] tbody a").first().click();
+      await page.waitForURL(/\/truong\/[a-z0-9-]+\/$/);
+      const single = Object.entries(seo.major).find(([, v]) => v.includes("#nganh-"));
+      await page.goto(siteBase + "nganh/");
+      await page.locator(`a[href="../${single[1]}"]`).click();
+      await page.waitForURL((u) => u.hash === `#nganh-${single[0]}`);
+      assert.ok(await page.locator(`#nganh-${single[0]}`).isVisible());
+      // Nội dung có sẵn trong HTML: tắt JS vẫn thấy bảng điểm
+      const nojs = await browser.newContext({ javaScriptEnabled: false });
+      const raw = await nojs.newPage();
+      await raw.goto(siteBase + seo.uni.BKA);
+      assert.ok((await raw.locator("details.seo-method tbody tr").count()) > 50, "server-rendered rows");
+      await nojs.close();
+      // App chính (bản tĩnh): menu Trường/Ngành và link "Trang riêng ↗"
+      await page.goto(siteBase + "#uni/BKA/2026");
+      await page.locator("#uni-out .seo-page-link").waitFor();
+      assert.ok(await page.locator('nav.tabs a[href="truong/"]').count() && await page.locator('nav.tabs a[href="nganh/"]').count());
+      await page.locator("#uni-out .seo-page-link").click();
+      await page.waitForURL(siteBase + seo.uni.BKA);
+      await page.goto(siteBase + "#major/7480201/2026");
+      await page.locator("#major-out .seo-page-link").click();
+      await page.waitForURL(siteBase + seo.major["7480201"]);
+      // Trang 404 (GitHub Pages trả cho URL không tồn tại; local mở trực tiếp /404.html)
+      await page.goto(siteBase + "404.html");
+      assert.equal(await page.locator("h1").innerText(), "Không tìm thấy trang");
+      assert.match(await page.getAttribute('meta[name="robots"]', "content"), /noindex/);
+      assert.equal(await page.locator('link[rel="canonical"]').count(), 0);
+      for (const href of ["/", "/truong/", "/nganh/"]) assert.ok(await page.locator(`main a[href="${href}"]`).count(), `404 link ${href}`);
+      await page.screenshot({ path: path.join(screenshots, `seo-404-${width}.png`) });
+      if (process.argv.includes("--live")) {
+        const [nErr, nBad] = [errors.length, bad.length];
+        const res = await page.goto(pages + "khong-ton-tai/trang-sau/");
+        assert.equal(res.status(), 404);
+        assert.equal(await page.locator("h1").innerText(), "Không tìm thấy trang");
+        await page.waitForLoadState("networkidle");
+        // 404 của chính request cố ý này là kết quả mong đợi; mọi lỗi khác vẫn bị bắt
+        const expected = (s) => /404/.test(s) && (!/https?:/.test(s) || s.includes("khong-ton-tai"));
+        assert.ok(errors.slice(nErr).every(expected) && bad.slice(nBad).every(expected), "404 page assets load");
+        errors.splice(nErr); bad.splice(nBad);
+      }
+      assert.deepEqual(errors, [], "SEO pages: console/page errors");
+      assert.deepEqual(bad, [], "SEO pages: HTTP errors");
+      console.log(`PASS seo ${width}px: ${seoPaths.length} pages, cross links, no-JS content, app links, no console/HTTP errors`);
       await page.close();
     }
     fs.writeFileSync(path.join(scratch, "results.json"), JSON.stringify(results, null, 2));

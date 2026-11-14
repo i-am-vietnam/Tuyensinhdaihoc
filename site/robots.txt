@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://diemthidaihoc.com/sitemap.xml
