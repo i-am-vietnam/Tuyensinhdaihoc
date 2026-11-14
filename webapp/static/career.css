@@ -1,0 +1,155 @@
+/* Tab "Tư vấn chọn ngành" (career.js). Chép từ docs/prototype/tu-van-chon-nganh.prototype.html,
+   mọi selector nằm trong #tab-career; biến màu dùng lại từ :root của style.css.
+   Khảo sát dính dưới header dính .top: career.js đặt --tv-head bằng chiều cao thật của .top
+   (menu hiện 2 dòng, ~91px ở màn rộng); 92px là giá trị dự phòng. */
+#tab-career{--tv-head:92px}
+#tab-career .tv-intro{margin:0 0 4px;color:var(--muted);max-width:80ch}
+#tab-career button,#tab-career input,#tab-career select{font:inherit;color:inherit}
+#tab-career :focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+/* style.css đặt th dính và viền dưới cho mọi bảng: trả lại như bản mẫu trong tab này */
+#tab-career th,#tab-career td{border-bottom:0;position:static;background:none}
+/* Thanh trạng thái hồ sơ */
+#tab-career .tv-notice{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--accent-wash);border:1px solid var(--accent-soft);border-radius:12px;padding:10px 14px;margin:18px 0}
+#tab-career .tv-notice span{flex:1 1 320px;min-width:0}
+#tab-career .tv-btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:600}
+#tab-career .tv-btn:hover{border-color:var(--accent);color:var(--accent)}
+#tab-career .tv-btn.pri{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.25)}
+#tab-career .tv-btn.pri:hover{background:var(--accent-strong);color:#fff}
+#tab-career .tv-btn:disabled{opacity:.45;cursor:default}
+#tab-career .tv-grid{display:grid;grid-template-columns:minmax(360px,440px) minmax(0,1fr);gap:20px;align-items:start;padding-bottom:48px}
+@media (max-width:1000px){#tab-career .tv-grid{grid-template-columns:minmax(0,1fr)}}
+#tab-career .tv-card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 3px rgba(15,23,42,.05);min-width:0}
+/* Khảo sát */
+#tab-career .tv-survey{position:sticky;top:calc(var(--tv-head) + 12px);max-height:calc(100vh - var(--tv-head) - 24px);display:flex;flex-direction:column;overflow:hidden}
+@media (max-width:1000px){#tab-career .tv-survey{position:static;max-height:none}}
+#tab-career .tv-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-bottom:1px solid var(--line)}
+#tab-career .tv-step{border:0;background:none;padding:10px 4px 9px;cursor:pointer;display:grid;gap:2px;justify-items:center;font-size:12.5px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent}
+#tab-career .tv-step .n{font-variant-numeric:tabular-nums;font-weight:500;font-size:11.5px}
+#tab-career .tv-step .n.ok{color:var(--good);font-weight:700}
+#tab-career .tv-step[aria-selected="true"]{color:var(--accent-strong);border-bottom-color:var(--accent)}
+#tab-career .tv-sbody{padding:14px 16px 18px;overflow:auto;display:grid;gap:12px}
+#tab-career .tv-sh{margin:0;font-size:16px;font-weight:700;color:var(--accent-deep)}
+#tab-career .tv-help{margin:0;color:var(--muted);font-size:13.5px}
+#tab-career .tv-q{display:grid;gap:6px;padding:10px 0;border-top:1px solid var(--line)}
+#tab-career .tv-qt{font-weight:500}
+#tab-career .tv-lk{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+#tab-career .tv-lk label{position:relative}
+#tab-career .tv-lk input{position:absolute;opacity:0;inset:0;margin:0;padding:0}
+#tab-career .tv-lk span{display:block;text-align:center;border:1px solid var(--line);border-radius:8px;padding:5px 2px;font-size:11.5px;line-height:1.25;cursor:pointer;color:var(--muted);background:var(--card)}
+#tab-career .tv-lk span b{display:block;font-size:14px;color:var(--ink)}
+#tab-career .tv-lk input:checked+span{background:var(--accent);border-color:var(--accent);color:#fff}
+#tab-career .tv-lk input:checked+span b{color:#fff}
+#tab-career .tv-lk input:focus-visible+span{outline:3px solid #f59e0b;outline-offset:1px}
+#tab-career .tv-pair{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;font-size:13.5px}
+#tab-career .tv-pair .l{text-align:right}
+#tab-career .tv-dots{display:flex;gap:5px}
+#tab-career .tv-dots label{position:relative}
+#tab-career .tv-dots input{position:absolute;opacity:0;inset:0;margin:0;padding:0}
+#tab-career .tv-dots span{display:block;border-radius:50%;border:2px solid var(--accent);cursor:pointer;background:var(--card)}
+#tab-career .tv-dots label:nth-child(1) span,#tab-career .tv-dots label:nth-child(5) span{width:24px;height:24px}
+#tab-career .tv-dots label:nth-child(2) span,#tab-career .tv-dots label:nth-child(4) span{width:19px;height:19px;margin-top:2.5px}
+#tab-career .tv-dots label:nth-child(3) span{width:15px;height:15px;margin-top:4.5px;border-color:#94a3b8}
+#tab-career .tv-dots input:checked+span{background:var(--accent);border-color:var(--accent)}
+#tab-career .tv-dots input:focus-visible+span{outline:3px solid #f59e0b;outline-offset:2px}
+@media (max-width:480px){#tab-career .tv-pair{grid-template-columns:1fr;gap:6px}#tab-career .tv-pair .l{text-align:left}#tab-career .tv-dots{justify-content:center}}
+#tab-career .tv-subj{width:100%;border-collapse:collapse;font-size:14px}
+#tab-career .tv-subj th,#tab-career .tv-subj td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
+#tab-career .tv-subj th{font-size:12px;color:var(--muted);font-weight:600}
+#tab-career .tv-subj td.c,#tab-career .tv-subj th.c{text-align:center}
+#tab-career .tv-subj input[type=number]{width:76px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);font-variant-numeric:tabular-nums}
+#tab-career .tv-subj input[type=checkbox]{width:17px;height:17px;padding:0;accent-color:var(--accent)}
+#tab-career .tv-subj tr.grp td{background:var(--bg);font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+#tab-career .tv-field{display:grid;gap:4px;min-width:0}
+#tab-career .tv-field label{font-size:13px;font-weight:600}
+#tab-career .tv-field select,#tab-career .tv-field input[type=number]{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;width:100%;min-width:0}
+#tab-career .tv-combos{display:flex;flex-wrap:wrap;gap:6px}
+#tab-career .tv-cb{font-size:12.5px;border-radius:999px;padding:3px 9px;background:var(--accent-soft);color:var(--accent-deep);font-variant-numeric:tabular-nums}
+#tab-career .tv-snav{display:flex;justify-content:space-between;gap:8px;padding:12px 16px;border-top:1px solid var(--line);background:var(--card)}
+/* Kết quả */
+#tab-career .tv-results{display:grid;gap:16px;min-width:0}
+#tab-career .tv-sum{padding:18px;display:grid;gap:16px}
+#tab-career .tv-codes{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:flex-end}
+#tab-career .tv-code{display:grid;gap:2px}
+#tab-career .tv-lab{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;margin:0}
+#tab-career .tv-big{font-size:36px;font-weight:800;letter-spacing:.04em;color:var(--accent-deep);line-height:1.05}
+#tab-career .tv-big small{font-size:14px;font-weight:600;letter-spacing:0;color:var(--muted);margin-left:6px}
+#tab-career .tv-conf{margin-left:auto;font-size:13px;border-radius:999px;padding:4px 11px;font-weight:600}
+#tab-career .tv-conf.hi{background:var(--good-soft);color:var(--good)}
+#tab-career .tv-conf.mid{background:var(--warn-soft);color:var(--warn)}
+#tab-career .tv-conf.lo{background:var(--bad-soft);color:var(--bad)}
+#tab-career .tv-sumtext{margin:0;color:var(--muted);max-width:78ch}
+#tab-career .tv-profiles{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+@media (max-width:640px){#tab-career .tv-profiles{grid-template-columns:minmax(0,1fr)}}
+#tab-career .tv-bars{display:grid;gap:7px}
+#tab-career .tv-bar{display:grid;grid-template-columns:112px 1fr 34px;gap:8px;align-items:center;font-size:13px}
+#tab-career .tv-track{height:9px;background:var(--accent-wash);border:1px solid var(--accent-soft);border-radius:5px;overflow:hidden}
+#tab-career .tv-fill{display:block;height:100%;background:#93a6c9;border-radius:4px}
+#tab-career .tv-bar.tv-hi .tv-fill{background:var(--accent)}
+#tab-career .tv-bar.tv-hi .lb{font-weight:700}
+#tab-career .tv-bar .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+#tab-career .tv-mb{display:grid;grid-template-columns:96px 1fr 96px;gap:8px;align-items:center;font-size:12.5px}
+#tab-career .tv-mb .r{text-align:right}
+#tab-career .tv-mb .on{font-weight:700;color:var(--accent-deep)}
+#tab-career .tv-mtrack{position:relative;height:9px;background:var(--accent-wash);border:1px solid var(--accent-soft);border-radius:5px}
+#tab-career .tv-mtrack::before{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:#94a3b8}
+#tab-career .tv-mfill{position:absolute;top:0;bottom:0;background:var(--accent);border-radius:4px}
+#tab-career .tv-checks{display:grid;gap:4px;font-size:13.5px;background:var(--bg);border-radius:10px;padding:10px 12px}
+#tab-career .tv-checks b{font-size:13px}
+#tab-career .tv-ok{color:var(--good);font-weight:700}
+#tab-career .tv-no{color:var(--warn);font-weight:700}
+#tab-career .tv-sort{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+#tab-career .tv-seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+#tab-career .tv-seg button{border:0;background:none;padding:7px 12px;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--muted)}
+#tab-career .tv-seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+#tab-career .tv-mj{padding:16px 18px;display:grid;gap:12px;border-left:4px solid var(--line)}
+#tab-career .tv-mj.f1{border-left-color:var(--good)}
+#tab-career .tv-mj.f2{border-left-color:var(--accent)}
+#tab-career .tv-mj.f3{border-left-color:#d6a24a}
+#tab-career .tv-mh{display:flex;gap:14px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap}
+#tab-career .tv-mh>div:first-child{min-width:0}
+#tab-career .tv-mh h3{margin:2px 0;font-size:18px;color:var(--ink);text-wrap:balance}
+#tab-career .tv-meta{font-size:12.5px;color:var(--muted)}
+#tab-career .tv-score{display:grid;justify-items:end;gap:4px;text-align:right}
+#tab-career .tv-score b{font-size:30px;line-height:1;font-weight:800;font-variant-numeric:tabular-nums;color:var(--accent-deep)}
+#tab-career .tv-score b small{font-size:13px;color:var(--muted);font-weight:600}
+#tab-career .tv-lvl{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
+#tab-career .tv-lvl.f1,#tab-career .tv-lvl.safe{background:var(--good-soft);color:var(--good)}
+#tab-career .tv-lvl.f2{background:var(--accent-soft);color:var(--accent-strong)}
+#tab-career .tv-lvl.f3,#tab-career .tv-lvl.fit{background:var(--warn-soft);color:var(--warn)}
+#tab-career .tv-lvl.try{background:var(--bad-soft);color:var(--bad)}
+#tab-career .tv-lvl.na{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+#tab-career .tv-dims{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+@media (max-width:700px){#tab-career .tv-dims{grid-template-columns:repeat(3,minmax(0,1fr))}}
+#tab-career .tv-dim{display:grid;gap:3px;font-size:11.5px;color:var(--muted)}
+#tab-career .tv-dim b{color:var(--ink);font-variant-numeric:tabular-nums}
+#tab-career .tv-dim .tv-track{height:6px}
+#tab-career .tv-dim.feas .tv-fill{background:var(--good)}
+#tab-career .tv-why{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:760px){#tab-career .tv-why{grid-template-columns:minmax(0,1fr)}}
+#tab-career .tv-why h4{margin:0 0 5px;font-size:13px}
+#tab-career .tv-why ul{margin:0;padding-left:18px;display:grid;gap:5px;font-size:14px}
+#tab-career .tv-pros h4{color:var(--good)}
+#tab-career .tv-cons h4{color:var(--warn)}
+#tab-career .tv-adm{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+#tab-career .tv-admh{padding:9px 12px;background:var(--bg);font-size:13.5px;display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between}
+#tab-career .tv-tbl{overflow-x:auto}
+#tab-career .tv-tbl table{border-collapse:collapse;width:100%;font-size:13.5px}
+#tab-career .tv-tbl th,#tab-career .tv-tbl td{padding:6px 10px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+#tab-career .tv-tbl th{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap}
+#tab-career .tv-tbl .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+#tab-career .tv-whynot{background:var(--accent-wash);border-radius:10px;padding:10px 12px;font-size:14px;display:grid;gap:4px}
+#tab-career .tv-whynot p{margin:0}
+#tab-career .tv-foot{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:space-between;font-size:13px;color:var(--muted)}
+#tab-career .tv-sec{padding:16px 18px;display:grid;gap:10px}
+#tab-career .tv-sec h2{margin:0;font-size:19px;color:var(--accent-deep)}
+#tab-career .tv-sec p{margin:0}
+#tab-career .tv-low{display:grid;gap:8px;font-size:14px}
+#tab-career .tv-cmpctl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+@media (max-width:560px){#tab-career .tv-cmpctl{grid-template-columns:minmax(0,1fr)}}
+#tab-career .tv-method{font-size:14px;color:var(--muted)}
+#tab-career .tv-method ul{margin:2px 0 0;padding-left:18px;display:grid;gap:3px}
+#tab-career .tv-empty{padding:24px;display:grid;gap:10px;justify-items:start}
+#tab-career .tv-more{justify-self:center}
+#tab-career .tv-toast{font-size:13px;color:var(--good);font-weight:600}
+@media (max-width:480px){#tab-career .tv-bar{grid-template-columns:96px 1fr 30px}#tab-career .tv-mb{grid-template-columns:78px 1fr 78px}#tab-career .tv-big{font-size:30px}}
+@media (prefers-reduced-motion:no-preference){#tab-career .tv-fill,#tab-career .tv-mfill{transition:all .3s ease}}

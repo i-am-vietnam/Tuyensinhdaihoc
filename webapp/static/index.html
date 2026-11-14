@@ -17,6 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="static/style.css?v=light-20261108">
+<link rel="stylesheet" href="static/career.css?v=career-20261114">
 </head>
 <body>
 <a class="skip-link" href="#main">Đến nội dung chính</a>
@@ -27,6 +28,7 @@
       <button data-tab="uni" class="active">Theo trường</button>
       <button data-tab="major">Theo ngành</button>
       <button data-tab="advice">Tư vấn theo điểm</button>
+      <button data-tab="career">Tư vấn chọn ngành</button>
       <button data-tab="network">Mạng SNA</button>
       <button data-tab="coverage">Độ phủ dữ liệu</button>
       <a href="truong/">DS Trường</a>
@@ -92,6 +94,25 @@
     <div id="advice-out"></div>
   </section>
 
+  <!-- TU VAN CHON NGANH (career.js, career.css) -->
+  <section id="tab-career" class="tab">
+    <h1>Tư vấn chọn ngành theo sở thích, tính cách và điểm</h1>
+    <p class="tv-intro">Khoảng 10 phút cho 58 câu hỏi và bảng điểm. Hệ thống chấm mức phù hợp với <span id="tv-nmaj">86</span> ngành theo trắc nghiệm sở thích RIASEC và tính cách MBTI, tính khả năng trúng tuyển từ điểm chuẩn THPT thật và giải thích vì sao gợi ý ngành này mà không phải ngành khác.</p>
+    <div class="tv-notice">
+      <span id="tv-noticeText"></span>
+      <button class="tv-btn pri" id="tv-reset" type="button"></button>
+      <button class="tv-btn" id="tv-sample" type="button">Xem lại hồ sơ mẫu</button>
+    </div>
+    <div class="tv-grid">
+      <section class="tv-card tv-survey" aria-label="Khảo sát">
+        <div class="tv-steps" role="tablist" id="tv-steps"></div>
+        <div class="tv-sbody" id="tv-sbody"></div>
+        <div class="tv-snav"><button class="tv-btn" id="tv-prev" type="button">← Trước</button><button class="tv-btn pri" id="tv-next" type="button">Tiếp →</button></div>
+      </section>
+      <section class="tv-results" id="tv-results" aria-live="polite"></section>
+    </div>
+  </section>
+
   <!-- MANG SNA -->
   <section id="tab-network" class="tab">
     <h1>Mạng xã hội Trường – Ngành</h1>
@@ -117,5 +138,6 @@
 </footer>
 <script src="static/vendor/vis-network.min.js"></script>
 <script src="static/app.js"></script>
+<script src="static/career.js?v=career-20261114"></script>
 </body>
 </html>

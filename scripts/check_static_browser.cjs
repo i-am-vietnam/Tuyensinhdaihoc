@@ -216,6 +216,32 @@ async function waitServer(url) {
       await page.waitForFunction(() => document.querySelectorAll("#advice-out tbody tr").length === 100);
       assert.match(await page.locator("#advice-out .head").innerText(), /đang hiện 100\//);
 
+      // Tab "Tư vấn chọn ngành" (career.js): hồ sơ mẫu, giải thích, so sánh, khảo sát trống.
+      // --live bỏ qua khi bản đang chạy thật chưa có tab này.
+      if (mode !== "pages" || await page.locator('[data-tab="career"]').count()) {
+        await page.locator('[data-tab="career"]').click();
+        await page.locator("#tv-results .tv-mj").first().waitFor();
+        assert.equal(await page.locator("#tv-holland").innerText(), "IRC");
+        assert.equal(await page.locator("#tv-mbti").innerText(), "INTJ");
+        assert.ok(await page.locator("#tv-results .tv-mj").count() >= 6, "at least 6 major cards");
+        const first = page.locator("#tv-results .tv-mj").first();
+        assert.ok(await first.locator(".tv-pros li").count() >= 1, "why-this list");
+        assert.match(await first.locator(".tv-pros h4").innerText(), /Vì sao gợi ý ngành này/);
+        assert.match(await first.locator(".tv-adm").innerText(), /Khả năng trúng tuyển/);
+        assert.ok(await first.locator(".tv-adm tbody tr").count() >= 1, "admission rows");
+        if (mode === "api") assert.equal(await page.locator("#tv-results .tv-mj a").count(), 0, "no SEO links without static pages");
+        await page.screenshot({ path: path.join(screenshots, `${mode}-career-${width}.png`) });
+        const before = await page.locator("#tv-compare table").innerText();
+        const optB = await page.locator("#tv-cmpB option").evaluateAll((os) => os.map((o) => o.value).find((v) => v !== document.querySelector("#tv-cmpA").value && v !== document.querySelector("#tv-cmpB").value));
+        await page.locator("#tv-cmpB").selectOption(optB);
+        await page.waitForFunction((b) => document.querySelector("#tv-compare table").innerText !== b, before);
+        assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "career: no horizontal scroll");
+        await page.locator("#tv-reset").click();
+        assert.match(await page.locator("#tv-results").innerText(), /Kết quả sẽ hiện ở đây/);
+        await page.locator("#tv-sample").click();
+        await page.locator("#tv-results .tv-mj").first().waitFor();
+      }
+
       await page.locator('[data-tab="network"]').click();
       await page.waitForFunction(() => document.querySelector("#net-name").value === "g2_uni_uni_2026");
       await page.locator("#net-side table").first().waitFor();
@@ -276,8 +302,8 @@ async function waitServer(url) {
       assert.deepEqual(failedRequests, [], "Failed requests");
       assert.ok(requests.every((u) => u.startsWith(target) || FONTS.test(u)), "All requests stay on the site (plus Google Fonts)");
       if (mode !== "api") assert.ok(requests.every((u) => !u.includes("/api/")), "Static mode makes no API probes");
-      results.push({ mode, width, tabs: 5, coverage: true, parity: cases.length, consoleErrors: 0, httpErrors: 0 });
-      console.log(`PASS ${mode} ${width}px: five tabs, rank grid, plans/tuition, hot advice, ${cases.length} API comparisons, no console/HTTP errors`);
+      results.push({ mode, width, tabs: 6, coverage: true, parity: cases.length, consoleErrors: 0, httpErrors: 0 });
+      console.log(`PASS ${mode} ${width}px: six tabs (career), rank grid, plans/tuition, hot advice, ${cases.length} API comparisons, no console/HTTP errors`);
       await page.close();
     }
     // Trang tĩnh SEO (scripts/export_seo.py): /truong/, /nganh/, link từ app, cuộn ngang bảng trên 375px.
