@@ -182,39 +182,73 @@ async function waitServer(url) {
       assert.match(await page.locator("#major-out").innerText(), /7480201/);
       await page.screenshot({ path: path.join(screenshots, `${mode}-major-${width}.png`) });
 
-      await page.locator('[data-tab="advice"]').click();
-      for (const year of ["2026", "2025", "2024"]) for (const method of ["THPT", "HOCBA", "DGNL_HCM"]) {
-        await page.locator("#adv-year").selectOption(year);
-        await page.locator("#adv-method").selectOption(method);
-        const choices = await page.evaluate(() => ({
-          actual: [...document.querySelector("#adv-combo").options].slice(1).map((o) => o.value),
-          expected: (META.combo_usage[document.querySelector("#adv-year").value]?.[document.querySelector("#adv-method").value] || []).map((r) => r.combo),
-          labels: [...document.querySelector("#adv-combo").options].map((o) => o.textContent)
-        }));
-        assert.deepEqual(choices.actual, choices.expected);
-        assert.ok(choices.labels.every((label) => !label.includes("nguồn có nhiều định nghĩa")));
+      // Tab Xếp nguyện vọng: cùng dữ liệu và hành vi ở bản tĩnh lẫn FastAPI.
+      assert.ok(!requests.some(u => /(?:api\/nv|data\/nv\.json)$/.test(u)), "NV tải lười");
+      await page.locator('[data-tab="nv"]').click();
+      await page.locator("#nv-out .nv-plan").waitFor();
+      await page.locator("#nv-sample").click();
+      const nvRows = page.locator("#nv-out .nv-plan tbody tr:not(.nv-sub)");
+      assert.equal(await nvRows.count(), 8);
+      assert.match(await nvRows.first().innerText(), /CNTT: Khoa học Máy tính.*Đại Học Bách Khoa Hà Nội/s);
+      assert.match(await nvRows.last().innerText(), /Công nghệ thông tin.*Đại Học Mở Hà Nội/s);
+      assert.equal(await page.locator("#tab-nv h1").count(), 1);
+      assert.equal(await page.locator('#nv-out a[href^="truong/"]').count() > 0, mode !== "api");
+      const nvData = mode === "api" ? await json(live + "api/nv") : await json(target + "data/nv.json");
+      assert.deepEqual(nvData, await json(live + "api/nv"));
+      const totalNV = async () => Number((await page.locator("#nv-sugg .nv-hd").innerText()).match(/Tìm thấy ([\d.]+)/)[1].replace(/\./g, ""));
+      await page.locator("#nv-q").fill("7480201");
+      assert.ok(await totalNV() >= 150);
+      const totalBeforeCombo = await totalNV();
+      await page.locator("#nv-combo").selectOption("H00");
+      assert.equal(await totalNV(), totalBeforeCombo, "Tìm kiếm không lọc tổ hợp");
+      assert.ok(await page.locator("#nv-sugg .nv-na").count(), "Gắn nhãn không xét tổ hợp");
+      await page.locator("#nv-combo").selectOption("A00");
+      assert.equal(await page.locator("#nv-sugg button[data-i]").count(), 50);
+      await page.locator("#nv-sugg [data-more]").click();
+      assert.equal(await page.locator("#nv-sugg button[data-i]").count(), 100);
+      await page.locator("#nv-q").fill("BKA");
+      assert.match(await page.locator("#nv-sugg button[data-i]").first().innerText(), /Đại Học Bách Khoa Hà Nội \(BKA\)/);
+      await page.locator("#nv-q").fill("sư phạm toán");
+      assert.ok(await totalNV() >= 30);
+      const beforeNV = await page.locator("#nv-list > li").count();
+      await page.locator("#nv-q").press("ArrowDown");
+      await page.locator("#nv-q").press("Enter");
+      assert.equal(await page.locator("#nv-list > li").count(), beforeNV + 1);
+      await page.locator("#nv-q").fill("BKA IT2");
+      await page.locator("#nv-q").press("Escape");
+      assert.equal(await page.locator("#nv-sugg").evaluate(e => getComputedStyle(e).display), "none");
+      await page.locator("#nv-q").press("Enter");
+      assert.equal(await page.locator("#nv-list > li").count(), beforeNV + 1, "Enter không thêm kết quả đã đóng bằng Escape");
+      await page.locator("#nv-q").fill("");
+      await page.locator("#nv-sample").click();
+      for (const colorScheme of ["light", "dark"]) {
+        await page.emulateMedia({ colorScheme });
+        const colors = await page.locator("#nv-copytext").evaluate(e => ({ color: getComputedStyle(e).color, bg: getComputedStyle(e).backgroundColor }));
+        assert.equal(colors.color, "rgb(17, 24, 39)");
+        assert.equal(colors.bg, "rgb(248, 250, 252)");
+        for (const input of await page.locator("#tab-nv input, #tab-nv select, #tab-nv textarea").all()) {
+          assert.equal(await input.evaluate(e => getComputedStyle(e).color), "rgb(17, 24, 39)");
+        }
       }
-      await page.locator("#adv-year").selectOption("2026");
-      await page.locator("#adv-method").selectOption("THPT");
-      assert.equal(await page.locator('#adv-combo option[value="A00"]').textContent(), "A00 (Toán, Vật lí, Hóa học)");
-      await page.locator("#adv-combo").selectOption("A00");
-      await page.locator("#adv-score").fill("24");
-      await page.locator("#advice-form button[type=submit]").click();
-      await page.locator("#advice-out tbody tr").first().waitFor();
-      assert.equal(await page.locator("#advice-out tbody tr").count(), 50);
-      const levels = await page.locator("#advice-out .lvl").allTextContents();
-      assert.equal(levels.length, 50);
-      assert.ok(levels.every((l) => ["Thử sức", "Vừa sức", "An toàn"].includes(l)));
-      const hots = await page.locator("#advice-out .why summary").allTextContents();
-      const num = (x) => Number(x.replace(",", "."));
-      assert.ok(hots.every((h, i) => i === 0 || num(hots[i - 1]) >= num(h)), "hot descending");
-      assert.match(await page.locator("#advice-out .why summary").first().getAttribute("title"), /0,5 × điểm trường .* \+ 0,3 × điểm ngành .* \+ 0,2 × điểm xu hướng/);
-      assert.ok(await page.locator("#advice-out .tag-hot").count(), "Ngành hot 2026 badge");
-      assert.match(await page.locator("#advice-out .head").innerText(), /xếp theo độ hot · đang hiện 50\//);
-      await page.screenshot({ path: path.join(screenshots, `${mode}-advice-${width}.png`) });
-      await page.locator("#adv-more").click();
-      await page.waitForFunction(() => document.querySelectorAll("#advice-out tbody tr").length === 100);
-      assert.match(await page.locator("#advice-out .head").innerText(), /đang hiện 100\//);
+      await page.emulateMedia({ colorScheme: "light" });
+      // Clipboard bị chặn: chọn sẵn nội dung để Ctrl+C, không phát sinh lỗi.
+      await page.evaluate(() => Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: () => Promise.reject(new Error("blocked")) } }));
+      await page.locator("#nv-copy").click();
+      assert.match(await page.locator("#nv-toast").innerText(), /Ctrl\+C/);
+      assert.ok(await page.locator("#nv-copytext").evaluate(e => e.selectionEnd === e.value.length));
+      await page.evaluate(() => scrollTo(0, 0));
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), width);
+      await page.screenshot({ path: path.join(screenshots, `${mode}-nv-${width}.png`) });
+      await page.setViewportSize({ width: 360, height: 900 });
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 360, "NV: không cuộn ngang ở 360px");
+      await page.screenshot({ path: path.join(screenshots, `${mode}-nv-360.png`) });
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(target + "#advice");
+      await page.waitForURL(/#nv$/);
+      await page.locator("#tab-nv.active .nv-plan").waitFor();
+      assert.equal(new URL(page.url()).hash, "#nv");
+      assert.equal(await page.locator('[data-tab="advice"]').count(), 0);
+      assert.deepEqual(await page.locator("#tab-nv [class], #tab-nv [id]").evaluateAll(es => es.flatMap(e => [...e.classList, ...(e.id ? [e.id] : [])]).filter(c => !c.startsWith("nv-"))), []);
 
       // Tab "Tư vấn chọn ngành" (career.js): hồ sơ mẫu, giải thích, so sánh, khảo sát trống.
       // --live bỏ qua khi bản đang chạy thật chưa có tab này.
@@ -303,8 +337,40 @@ async function waitServer(url) {
       assert.ok(requests.every((u) => u.startsWith(target) || FONTS.test(u)), "All requests stay on the site (plus Google Fonts)");
       if (mode !== "api") assert.ok(requests.every((u) => !u.includes("/api/")), "Static mode makes no API probes");
       results.push({ mode, width, tabs: 6, coverage: true, parity: cases.length, consoleErrors: 0, httpErrors: 0 });
-      console.log(`PASS ${mode} ${width}px: six tabs (career), rank grid, plans/tuition, hot advice, ${cases.length} API comparisons, no console/HTTP errors`);
+      console.log(`PASS ${mode} ${width}px: six tabs (career), rank grid, plans/tuition, Xếp nguyện vọng, ${cases.length} API comparisons, no console/HTTP errors`);
       await page.close();
+      if (width === 1280 && mode !== "pages") {
+        // Lỗi tải, retry, API fallback, cache, năm động và localStorage bị chặn.
+        const retryPage = await browser.newPage({ viewport: { width, height: 900 } });
+        const retryErrors = [];
+        retryPage.on("pageerror", e => retryErrors.push(e.message));
+        await retryPage.addInitScript(() => {
+          Storage.prototype.getItem = () => { throw new Error("storage blocked"); };
+          Storage.prototype.setItem = () => { throw new Error("storage blocked"); };
+        });
+        let available = false, loads = 0;
+        const futureData = { ...nvData, years: [2028, 2029, 2030], next: 2031,
+          p: nvData.p.filter(p => !(p[0] === "MHN" && p[1] === "7480201")) };
+        await retryPage.route("**/api/nv", route => { loads++; return route.fulfill({ contentType: "application/json", body: "invalid JSON" }); });
+        await retryPage.route("**/data/nv.json", route => { loads++; return route.fulfill({ contentType: "application/json", body: available ? JSON.stringify(futureData) : "invalid JSON" }); });
+        await retryPage.goto(target + "#nv");
+        await retryPage.locator("#nv-retry").waitFor();
+        assert.match(await retryPage.locator("#nv-out").innerText(), /Không tải được dữ liệu/);
+        available = true;
+        await retryPage.locator("#nv-retry").click();
+        await retryPage.locator("#nv-out .nv-plan").waitFor();
+        assert.equal(loads, mode === "api" ? 4 : 2);
+        await retryPage.locator("#nv-sample").click();
+        assert.equal(await retryPage.locator("#nv-list > li").count(), 7, "Hồ sơ mẫu bỏ mã đã biến mất ở năm mới");
+        assert.match(await retryPage.locator("#nv-out .nv-method").innerText(), /2028, 2029, 2030/);
+        assert.match(await retryPage.locator("#nv-out").innerText(), /Dự báo 2031/);
+        const cachedLoads = loads;
+        await retryPage.evaluate(async () => { await window.NV.open(); await window.NV.open(); });
+        assert.equal(loads, cachedLoads);
+        assert.deepEqual(retryErrors, []);
+        await retryPage.close();
+        console.log(`PASS ${mode}: retry, fallback, cache, năm động, storage bị chặn`);
+      }
     }
     // Trang tĩnh SEO (scripts/export_seo.py): /truong/, /nganh/, link từ app, cuộn ngang bảng trên 375px.
     const siteBase = process.argv.includes("--live") ? pages : base;
@@ -328,6 +394,10 @@ async function waitServer(url) {
         assert.equal(await page.getAttribute('meta[property="og:url"]', "content"), pages + p, p);
         assert.equal(await page.getAttribute('meta[property="og:title"]', "content"), await page.title(), p);
         assert.equal(await page.locator("h1").count(), 1, p);
+        const navText = await page.locator("nav.tabs").innerText();
+        assert.match(navText, /Xếp nguyện vọng/);
+        assert.match(navText, /Tư vấn chọn ngành/);
+        assert.doesNotMatch(navText, /Tư vấn theo điểm/);
         assert.ok(await page.locator('nav.tabs a[href$="truong/"]').count() && await page.locator('nav.tabs a[href$="nganh/"]').count(), `${p} menu Trường/Ngành`);
         assert.match(await page.locator(".seo-updated").innerText(), /Dữ liệu cập nhật ngày \d{2}\/\d{2}\/\d{4}/, p);
         const types = await page.locator('script[type="application/ld+json"]').evaluateAll((s) => s.map((x) => JSON.parse(x.textContent)["@type"]));

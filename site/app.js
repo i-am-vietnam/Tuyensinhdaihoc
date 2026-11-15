@@ -172,7 +172,7 @@ function tuitionExtraHtml(x) {
 }
 const feeHtml = (d) => (d.tuition_extra ? tuitionExtraHtml(d.tuition_extra) : tuitionHtml(d.tuition));
 const fail = (out, e) => (out.innerHTML = `<div class="card empty">Lỗi: ${esc(e.message)}</div>`);
-const TABS = ["uni", "major", "advice", "career", "network", "coverage"];
+const TABS = ["uni", "major", "nv", "career", "network", "coverage"];
 let META = null;
 let UNIVERSITIES = [];
 
@@ -197,26 +197,22 @@ $("#uni-grid").addEventListener("click", (e) => {
   if (card) { curUni = card.dataset.uni; $("#uni-year").value = card.dataset.year; loadUni(); }
 });
 
-function fillCombos() {
-  const selected = $("#adv-combo").value;
-  const used = META.combo_usage[$("#adv-year").value]?.[$("#adv-method").value] || [];
-  $("#adv-combo").innerHTML = `<option value="">Mọi tổ hợp</option>` + used.map(({ combo: c }) => `<option value="${esc(c)}" title="${esc(META.combo_tooltips[c])}">${esc(c)} (${esc(META.combo_subjects[c])})</option>`).join("");
-  $("#adv-combo").value = used.some((r) => r.combo === selected) ? selected : "";
-}
-$("#adv-method").addEventListener("change", fillCombos);
-$("#adv-year").addEventListener("change", fillCombos);
-
 /* ---------- tabs ---------- */
 document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => showTab(b.dataset.tab)));
 function showTab(t) {
+  if (t === "advice") t = "nv";
   if (!TABS.includes(t)) t = "uni";
   document.querySelectorAll(".tabs button").forEach((b) => b.classList.toggle("active", b.dataset.tab === t));
   document.querySelectorAll(".tab").forEach((s) => s.classList.toggle("active", s.id === "tab-" + t));
   if (t === "network") loadNetworkList();
   if (t === "coverage") loadCoverage();
   if (t === "career") window.Career?.open();
+  if (t === "nv") window.NV?.open();
   history.replaceState(null, "", "#" + t);
 }
+window.addEventListener("hashchange", () => {
+  if (location.hash === "#advice") showTab("nv");
+});
 
 /* ---------- autocomplete ---------- */
 function autocomplete(input, list, url, render, onPick) {
@@ -330,47 +326,6 @@ $("#major-out").addEventListener("click", (e) => {
   if (b) { curMajor = { code: b.dataset.code }; $("#major-q").value = b.dataset.name; loadMajor(); }
 });
 
-/* ---------- 2. tu van ---------- */
-let adv = null; // { query, d (trang dau), rows (da tai) }
-const ADV_LEVEL = { "Thử sức": "lvl-try", "Vừa sức": "lvl-fit", "An toàn": "lvl-safe" };
-const pct = (x) => fmt(Math.round(x * 100) / 100);
-const whyHtml = (r) => {
-  const tip = `Độ hot ${pct(r.hot)} = 0,5 × điểm trường ${pct(r.hot_uni)} + 0,3 × điểm ngành ${pct(r.hot_major)} + 0,2 × điểm xu hướng ${pct(r.hot_trend)}`;
-  return `<details class="why"><summary title="${esc(tip)}">${pct(r.hot)}</summary><span class="sub">Trường ${pct(r.hot_uni)} · Ngành ${pct(r.hot_major)} · Xu hướng ${pct(r.hot_trend)}</span></details>`;
-};
-$("#advice-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const out = $("#advice-out");
-  out.innerHTML = `<div class="empty">Đang tải…</div>`;
-  const query = new URLSearchParams({ method: $("#adv-method").value, score: $("#adv-score").value, combo: $("#adv-combo").value, year: $("#adv-year").value });
-  let d;
-  try { d = await api("api/advice?" + query); } catch (err) { return fail(out, err); }
-  adv = { query, d, rows: d.rows };
-  renderAdvice();
-});
-$("#advice-out").addEventListener("click", async (e) => {
-  const b = e.target.closest("#adv-more");
-  if (!b || !adv) return;
-  b.disabled = true; b.textContent = "Đang tải…";
-  const q = new URLSearchParams(adv.query); q.set("offset", adv.rows.length);
-  try { adv.rows = adv.rows.concat((await api("api/advice?" + q)).rows); } catch (err) { return fail($("#advice-out"), err); }
-  renderAdvice();
-});
-function renderAdvice() {
-  const out = $("#advice-out"), { d, rows } = adv;
-  if (!rows.length) { out.innerHTML = `<div class="card empty">Không có ngành phù hợp.</div>`; return; }
-  const yrs = [...new Set(rows.flatMap((r) => Object.keys(r.history)))].sort();
-  out.innerHTML = `<div class="card"><div class="head"><h2>${d.total} lựa chọn với ${fmt(d.score)} điểm${d.scale !== 30 ? ` <span class="sub">(thang ${fmt(d.scale)})</span>` : ""}</h2>
-    <span class="muted small">Thử sức ${d.counts["Thử sức"]} · Vừa sức ${d.counts["Vừa sức"]} · An toàn ${d.counts["An toàn"]} · tham chiếu năm ${d.year} · xếp theo độ hot · đang hiện ${rows.length}/${d.total}</span></div>
-    <div class="tbl-wrap"><table class="stack"><thead><tr><th>Mức</th><th>Trường</th><th>Hạng VNUR</th><th>Ngành / chương trình</th><th>Tổ hợp</th>${yrs.map((y) => `<th class="num">${y}</th>`).join("")}<th class="num">Vì sao ở đây</th></tr></thead>
-    <tbody>${rows.map((r) => `<tr><td data-label="Mức"><span class="lvl ${ADV_LEVEL[r.level]}">${r.level}</span></td>
-      <td data-label="Trường">${uniCell(r)}</td><td data-label="Hạng VNUR">${rankHtml(r, true)}</td><td class="main">${esc(r.program_name)}${tag(r.program_type)}${r.hot_badge ? `<span class="tag tag-hot">Ngành hot 2026</span>` : ""}</td>
-      <td class="sub" data-label="Tổ hợp">${comboHtml(r.combos)}</td>
-      ${yrs.map((y) => `<td class="num" data-label="${y}">${y == d.year ? `<b>${fmt(r.history[y])}</b>` : fmt(r.history[y])}</td>`).join("")}
-      <td class="num" data-label="Vì sao ở đây (độ hot)">${whyHtml(r)}</td></tr>`).join("")}</tbody></table></div>
-    ${rows.length < d.total ? `<p class="more"><button type="button" class="primary" id="adv-more">Xem thêm (${Math.min(50, d.total - rows.length)} dòng)</button></p>` : ""}</div>`;
-}
-
 /* ---------- 3. mang SNA ---------- */
 let netLoaded = false, netObj = null;
 async function loadNetworkList() {
@@ -453,12 +408,10 @@ $("#coverage-out").addEventListener("click", (e) => {
   try { META = await api("api/meta"); } catch (e) { $("#stats").textContent = "Lỗi: " + e.message; return; }
   $("#data-updated").textContent = `Dữ liệu cập nhật ngày ${META.updated_on.split("-").reverse().join("/")}. `;
   const yearOpts = META.years.map((y) => `<option>${y}</option>`).join("");
-  ["#uni-year", "#major-year", "#adv-year"].forEach((s) => ($(s).innerHTML = yearOpts));
+  ["#uni-year", "#major-year"].forEach((s) => ($(s).innerHTML = yearOpts));
   const mOpts = META.methods.map((m) => `<option value="${m.method}">${esc(m.method_name)}</option>`).join("");
   $("#major-method").insertAdjacentHTML("beforeend", mOpts);
-  $("#adv-method").innerHTML = mOpts;
   $("#major-method").value = "THPT";
-  fillCombos();
   UNIVERSITIES = (await Data.searchIndex()).unis;
   $("#uni-province").insertAdjacentHTML("beforeend", [...new Set(UNIVERSITIES.map((u) => u.province))].sort((a, b) => a.localeCompare(b, "vi")).map((p) => `<option>${esc(p)}</option>`).join(""));
   renderUniGrid();

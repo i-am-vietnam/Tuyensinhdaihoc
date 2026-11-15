@@ -79,6 +79,7 @@ def export():
     write("data/coverage.json", api.coverage())
     write("data/dean.json", api.dean_index())
     write("data/career.json", api.career_data())
+    write("data/nv.json", api.nv_data())
     for year in meta["years"]:
         for u in idx["unis"]:
             write(
@@ -103,6 +104,8 @@ def export():
         "style.css",
         "career.js",
         "career.css",
+        "nv.js",
+        "nv.css",
         "favicon.svg",
         "vendor/vis-network.min.js",
         "vendor/LICENSE-MIT",

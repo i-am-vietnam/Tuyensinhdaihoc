@@ -19,6 +19,7 @@ from collections import Counter, OrderedDict
 from functools import lru_cache
 from pathlib import Path
 
+import numpy as np
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -451,6 +452,159 @@ def career_data(year: int | None = None) -> dict:
 @app.get("/api/career")
 def career(year: int | None = None):
     return career_data(year)
+
+
+@lru_cache(maxsize=4)
+def nv_data(year: int | None = None) -> dict:
+    """Điểm chuẩn và mô hình của tab Xếp nguyện vọng; chỉ đọc DB, không gọi advice."""
+    with con() as c:
+        years = sorted(
+            r[0]
+            for r in c.execute(
+                "SELECT DISTINCT year FROM admissions WHERE method='THPT' "
+                "AND flag='' AND scale_max=30 AND score IS NOT NULL AND year<=? "
+                "ORDER BY year DESC LIMIT 3",
+                (year if year is not None else 9999,),
+            )
+        )
+        if len(years) != 3:
+            raise HTTPException(503, "Cần ít nhất 3 năm điểm chuẩn THPT để tính mô hình")
+        rows = c.execute(
+            "SELECT id, uni_code, program_code, program_name, program_type, major_code, "
+            "year, score FROM admissions WHERE method='THPT' AND flag='' "
+            "AND scale_max=30",
+        ).fetchall()
+        rows = [r for r in rows if r["year"] in years]
+        ids = {r["id"] for r in rows}
+        combos: dict[int, list[str]] = {}
+        for aid, cb in c.execute("SELECT admission_id, combo FROM admission_combos ORDER BY rowid"):
+            if aid in ids:
+                combos.setdefault(aid, []).append(cb)
+        histories: dict[tuple, dict] = {}
+        for r in rows:
+            history = histories.setdefault((r["uni_code"], r["program_code"]), {"": {}})
+            if r["score"] is None:
+                continue
+            for cb in ["", *combos.get(r["id"], [])]:
+                h = history.setdefault(cb, {})
+                y, score = r["year"], r["score"]
+                h[y] = max(h.get(y, score), score)
+
+        def arr(h):
+            return [h.get(y) for y in years]
+
+        full, pairs = [], []
+        for h in histories.values():
+            a, b, d = arr(h[""])
+            if None not in (a, b, d):
+                full.append((a, b, d))
+            if b is not None and d is not None:
+                pairs.append((b, d))
+        if not full or not pairs:
+            raise HTTPException(503, "Chưa đủ lịch sử THPT liên tiếp để học mô hình")
+        A, one_year = np.array(full), np.array(pairs)
+        co2, *_ = np.linalg.lstsq(np.c_[np.ones(len(A)), A[:, :2]], A[:, 2], rcond=None)
+        co1, *_ = np.linalg.lstsq(
+            np.c_[np.ones(len(one_year)), one_year[:, 0]], one_year[:, 1], rcond=None
+        )
+        blend = 0.5
+        r2 = A[:, 2] - (
+            blend * (co2[0] + co2[1] * A[:, 0] + co2[2] * A[:, 1]) + (1 - blend) * A[:, 1]
+        )
+        r1 = one_year[:, 1] - (
+            blend * (co1[0] + co1[1] * one_year[:, 0]) + (1 - blend) * one_year[:, 0]
+        )
+        vol = np.abs(A[:, 1] - A[:, 0])
+        # 99 lớn hơn mọi độ dao động trên thang 30; JSON và bản mẫu dùng cận này thay vô cực.
+        bins = [[0, 0.5], [0.5, 1.5], [1.5, 99]]
+        masks = [(vol >= lo) & (vol < hi) for lo, hi in bins]
+        Q = np.linspace(0, 100, 41)
+        model = {
+            "blend": blend,
+            "co2": co2.round(4).tolist(),
+            "co1": co1.round(4).tolist(),
+            "bins": bins,
+            "q2": [np.percentile(r2[m] if m.any() else r2, Q).round(3).tolist() for m in masks],
+            "n2": [int(m.sum()) for m in masks],
+            "q1": np.percentile(r1, Q).round(3).tolist(),
+            "n1": len(one_year),
+            "n3": len(A),
+            "mae2": float(np.abs(r2).mean().round(3)),
+            "mae1": float(np.abs(r1).mean().round(3)),
+            "mae_last": float(np.abs(A[:, 2] - A[:, 1]).mean().round(3)),
+        }
+        idx = np.random.default_rng(0).permutation(len(A))
+        tr, te = idx[: len(A) // 2], idx[len(A) // 2 :]
+        cal = []
+        for p in (0.2, 0.4, 0.6, 0.75, 0.9):
+            ok, n = 0, 0
+            for m in masks:
+                mtr, mte = tr[m[tr]], te[m[te]]
+                if not len(mte):
+                    continue
+                errors = r2[mtr] if len(mtr) else r2[tr]
+                ok += int((r2[mte] <= np.percentile(errors, p * 100)).sum())
+                n += len(mte)
+            cal.append([p, round(ok / n, 3)])
+        model["calib"] = cal
+        progs = {}
+        # Cùng truy vấn/thứ tự với advice_candidates, kể cả các dòng bằng điểm.
+        latest = c.execute(
+            "SELECT a.* FROM admissions a JOIN universities u ON u.uni_code=a.uni_code "
+            "WHERE a.method=? AND a.year=? AND a.score<=? AND a.flag='' "
+            "AND a.scale_max=? ORDER BY a.score DESC",
+            ("THPT", years[-1], float("inf"), 30),
+        )
+        for r in latest:
+            key = r["uni_code"], r["program_code"]
+            p = progs.setdefault(
+                key,
+                [
+                    *key,
+                    r["program_name"],
+                    "" if r["program_type"] in (None, "CHUAN") else r["program_type"],
+                    r["major_code"] or "",
+                    [],
+                    [],
+                    {},
+                ],
+            )
+            for cb in combos.get(r["id"], []):
+                if cb not in p[5]:
+                    p[5].append(cb)
+        for key, p in progs.items():
+            h = histories[key]
+            p[6] = arr(h[""])
+            p[7] = {
+                cb: arr(h[cb])
+                for cb in p[5]
+                if cb in h and arr(h[cb]) != p[6] and h[cb].get(years[-1]) is not None
+            }
+        paths = seo_paths()
+        used = {p[0] for p in progs.values()}
+        unis = {
+            r["uni_code"]: [
+                r["short_name"] or r["uni_code"],
+                r["name"],
+                r["vnur_rank"],
+                paths.get(("truong", r["uni_code"]), ""),
+            ]
+            for r in c.execute("SELECT uni_code, name, short_name, vnur_rank FROM universities")
+            if r["uni_code"] in used
+        }
+    c.close()
+    return {
+        "years": years,
+        "next": years[-1] + 1,
+        "model": model,
+        "p": list(progs.values()),
+        "u": unis,
+    }
+
+
+@app.get("/api/nv")
+def nv(year: int | None = None):
+    return nv_data(year)
 
 
 @app.get("/api/meta")
