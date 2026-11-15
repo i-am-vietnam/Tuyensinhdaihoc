@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xếp nguyện vọng thông minh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Bố cục: cột trái nhập điểm + danh sách NV, cột phải là thứ tự đề xuất và giải thích; dưới 1000px xếp một cột.
+   Mọi class mới có tiền tố nv- để không đụng style.css của site. */
+:root{
+  color-scheme:light;
+  --bg:#f9fafb; --card:#fff; --ink:#1f2937; --muted:#4b5563; --line:#e5e7eb;
+  --accent:#2563eb; --accent-strong:#1d4ed8; --accent-deep:#1e3a8a; --accent-soft:#dbeafe; --accent-wash:#eff6ff;
+  --hero-a:#1e40af; --hero-b:#1d4ed8; --hero-c:#2563eb;
+  --safe:#15803d; --safe-soft:#dcfce7; --target:#1d4ed8; --target-soft:#dbeafe;
+  --reach:#b45309; --reach-soft:#fef3c7; --hard:#b42318; --hard-soft:#fde8e7;
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--font);-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+button,input,select,textarea{font:inherit;color:var(--ink)}
+input,select,textarea{background-color:#fff}
+::placeholder{color:#6b7280;opacity:1}
+:focus-visible{outline:3px solid #f59e0b;outline-offset:2px}
+.nv-wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+.nv-top{background:linear-gradient(120deg,var(--hero-a),var(--hero-b) 55%,var(--hero-c));color:#fff}
+.nv-top-row{display:flex;align-items:center;gap:20px;min-height:64px;flex-wrap:wrap}
+.nv-brand{font-weight:800;font-size:18px;display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;white-space:nowrap}
+.nv-dot{width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.22)}
+.nv-nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.nv-nav a{color:rgba(255,255,255,.85);padding:8px 13px;border-radius:999px;white-space:nowrap;text-decoration:none;font-weight:500}
+.nv-nav a:hover{background:rgba(255,255,255,.14);color:#fff}
+.nv-nav a.on{background:#fff;color:var(--accent-strong);font-weight:600}
+.nv-nav a.new::after{content:"Mới";font-size:10px;font-weight:700;text-transform:uppercase;background:#fbbf24;color:#1e3a8a;border-radius:999px;padding:1px 6px;margin-left:6px}
+.nv-hero{background:linear-gradient(135deg,var(--hero-a),var(--hero-b) 50%,var(--hero-c));color:#fff;border-top:1px solid rgba(255,255,255,.12)}
+.nv-hero .nv-wrap{padding-top:20px;padding-bottom:20px;display:grid;gap:6px}
+.nv-pill{justify-self:start;padding:4px 12px;border-radius:999px;background:#dbeafe;color:#1e40af;font-size:13px;font-weight:600}
+.nv-hero h1{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.2;margin:4px 0 0;text-wrap:balance}
+.nv-hero p{margin:0;color:#dbeafe;max-width:84ch}
+.nv-grid{display:grid;grid-template-columns:minmax(340px,420px) minmax(0,1fr);gap:20px;align-items:start;padding:20px 0 48px}
+@media (max-width:1000px){.nv-grid{grid-template-columns:minmax(0,1fr)}}
+.nv-card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+.nv-in{padding:16px;display:grid;gap:14px}
+.nv-h2{margin:0;font-size:17px;font-weight:700;color:var(--accent-deep)}
+.nv-help{margin:0;color:var(--muted);font-size:13.5px}
+.nv-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nv-field{display:grid;gap:4px;min-width:0}
+.nv-field label{font-size:13px;font-weight:600}
+.nv-field input,.nv-field select{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 11px;width:100%;min-width:0}
+.nv-field input[type=number]{font-variant-numeric:tabular-nums;font-weight:700;font-size:17px}
+.nv-search{position:relative}
+.nv-sugg{position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.14);z-index:5;max-height:420px;overflow:auto;padding:4px;display:none}
+.nv-sugg .hd{position:sticky;top:-4px;background:var(--card);padding:6px 10px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);z-index:1}
+.nv-sugg .more{width:100%;text-align:center;border:0;background:var(--accent-wash);color:var(--accent-strong);font-weight:600;padding:8px;border-radius:8px;cursor:pointer;margin-top:4px}
+.nv-sugg.open{display:block}
+.nv-sugg button{display:grid;grid-template-columns:1fr auto;gap:2px 10px;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+.nv-sugg button:hover,.nv-sugg button.sel{background:var(--accent-wash)}
+.nv-sugg .t{font-weight:600;font-size:14px}
+.nv-sugg .s{font-size:12px;color:var(--muted);grid-column:1}
+.nv-sugg .r{grid-row:1/span 2;grid-column:2;align-self:center}
+.nv-list{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.nv-item{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:7px 8px;background:var(--card)}
+.nv-item .no{font-weight:700;color:var(--muted);font-size:13px;text-align:center;font-variant-numeric:tabular-nums}
+.nv-item .nm{font-size:13.5px;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+.nv-item .sub{font-size:12px;color:var(--muted);font-weight:400}
+.nv-ctl{display:flex;gap:2px;align-items:center}
+.nv-ic{border:1px solid transparent;background:none;border-radius:6px;cursor:pointer;width:26px;height:26px;display:grid;place-items:center;color:var(--muted);font-size:13px}
+.nv-ic:hover{border-color:var(--line);color:var(--ink)}
+.nv-ic:disabled{opacity:.3;cursor:default}
+.nv-stars{display:flex;gap:0;grid-column:2/4}
+.nv-stars button{border:0;background:none;cursor:pointer;font-size:16px;line-height:1;padding:0 2px;color:#cbd5e1}
+.nv-stars button.on{color:#f59e0b}
+.nv-stars span{font-size:11.5px;color:var(--muted);margin-left:6px;align-self:center}
+.nv-btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:600}
+.nv-btn:hover{border-color:var(--accent);color:var(--accent)}
+.nv-btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.nv-btn.pri:hover{background:var(--accent-strong);color:#fff}
+.nv-btn.sm{padding:4px 10px;font-size:13px}
+.nv-acts{display:flex;flex-wrap:wrap;gap:8px}
+.nv-out{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0}
+.nv-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.nv-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.nv-tile{padding:12px 14px;display:grid;gap:2px}
+.nv-tile .k{font-size:12px;color:var(--muted);font-weight:600}
+.nv-tile .v{font-size:26px;font-weight:800;color:var(--accent-deep);font-variant-numeric:tabular-nums;line-height:1.15}
+.nv-tile .d{font-size:12px;color:var(--muted)}
+.nv-alerts{display:grid;gap:8px}
+.nv-alert{border-radius:12px;padding:10px 14px;font-size:14px;border:1px solid}
+.nv-alert.warn{background:var(--reach-soft);border-color:#fcd9a0;color:#7a3e05}
+.nv-alert.bad{background:var(--hard-soft);border-color:#f6c4c0;color:#8a1c12}
+.nv-alert.ok{background:var(--safe-soft);border-color:#b7e8c6;color:#14532d}
+.nv-alert b{font-weight:700}
+.nv-plan{padding:6px 0}
+.nv-plan h2{margin:10px 18px 2px;font-size:19px;color:var(--accent-deep)}
+.nv-plan>p{margin:0 18px 8px;color:var(--muted);font-size:13.5px}
+.nv-tbl{overflow-x:auto}
+.nv-tbl table{width:100%;border-collapse:collapse;font-size:14px}
+.nv-tbl th{font-size:12px;color:var(--muted);font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.nv-tbl td{padding:10px 10px 4px;vertical-align:top}
+.nv-tbl tr.nv-sub td{padding:0 10px 12px;border-bottom:1px solid var(--line)}
+.nv-tbl tr:last-child td{border-bottom:0}
+.nv-tbl td:nth-child(2){min-width:200px}
+.nv-tbl td:nth-child(3){min-width:150px}
+.nv-num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.nv-nvno{font-size:18px;font-weight:800;color:var(--accent-deep);white-space:nowrap}
+.nv-mv{display:block;font-size:11.5px;font-weight:600;margin-top:2px}
+.nv-mv.up{color:var(--safe)} .nv-mv.dn{color:var(--reach)} .nv-mv.eq{color:var(--muted);font-weight:500}
+.nv-prog{font-weight:600;line-height:1.35}
+.nv-meta{font-size:12.5px;color:var(--muted)}
+.nv-why{font-size:13px;color:var(--muted);max-width:90ch}
+.nv-tag{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.nv-tag.safe{background:var(--safe-soft);color:var(--safe)}
+.nv-tag.target{background:var(--target-soft);color:var(--target)}
+.nv-tag.reach{background:var(--reach-soft);color:var(--reach)}
+.nv-tag.hard{background:var(--hard-soft);color:var(--hard)}
+.nv-tag.na{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.nv-prob{display:grid;gap:4px;min-width:92px}
+.nv-prob b{font-size:16px;font-variant-numeric:tabular-nums}
+.nv-ptrack{height:7px;border-radius:4px;background:var(--bg);border:1px solid var(--line);overflow:hidden}
+.nv-ptrack i{display:block;height:100%}
+.nv-spark{display:block}
+.nv-flow{padding:16px 18px;display:grid;gap:10px}
+.nv-flow h2{margin:0;font-size:17px;color:var(--accent-deep)}
+.nv-fbar{display:grid;grid-template-columns:150px minmax(0,1fr) 52px;gap:10px;align-items:center;font-size:13px}
+@media (max-width:520px){.nv-fbar{grid-template-columns:96px minmax(0,1fr) 46px}}
+.nv-fbar .l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nv-fbar .tr{height:14px;background:var(--bg);border-radius:4px;overflow:hidden}
+.nv-fbar .tr i{display:block;height:100%;border-radius:4px}
+.nv-fbar .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.nv-sec{padding:16px 18px;display:grid;gap:10px}
+.nv-sec h2{margin:0;font-size:17px;color:var(--accent-deep)}
+.nv-sec p{margin:0}
+.nv-sec ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:14px}
+.nv-sugrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.nv-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted)}
+.nv-empty{padding:24px;color:var(--muted)}
+.nv-toast{font-size:13px;color:var(--safe);font-weight:600}
+.nv-copy{width:100%;min-height:160px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:13px/1.6 ui-monospace,Consolas,monospace;color:#111827;background:#f8fafc;resize:vertical;white-space:pre}
+</style>
+</head>
+<body>
+<header class="nv-top"><div class="nv-wrap nv-top-row">
+  <a class="nv-brand" href="https://diemthidaihoc.com/"><span class="nv-dot"></span>Tuyển Sinh Đại Học</a>
+  <nav class="nv-nav" aria-label="Điều hướng chính">
+    <a href="https://diemthidaihoc.com/#uni">Theo trường</a><a href="https://diemthidaihoc.com/#major">Theo ngành</a><a href="#" class="on new" aria-current="page">Xếp nguyện vọng</a><a href="https://diemthidaihoc.com/#career">Tư vấn chọn ngành</a><a href="https://diemthidaihoc.com/#network">Mạng SNA</a><a href="https://diemthidaihoc.com/#coverage">Độ phủ dữ liệu</a>
+  </nav>
+</div></header>
+<section class="nv-hero"><div class="nv-wrap">
+  <span class="nv-pill">Bản mẫu · Dựa trên điểm chuẩn THPT 2024–2026 · Quy chế tuyển sinh 2026</span>
+  <h1>Xếp nguyện vọng để không lãng phí điểm và không trượt oan</h1>
+  <p>Nhập điểm dự kiến và các ngành, trường bạn thích. Hệ thống ước tính xác suất đỗ từng nguyện vọng từ điểm chuẩn 3 năm gần nhất và độ dao động của chúng, chia thành Mạo hiểm, Vừa sức, An toàn, rồi đề xuất thứ tự đăng ký kèm lý do.</p>
+</div></section>
+
+<main class="nv-wrap nv-grid">
+  <section class="nv-card nv-in" aria-label="Thông tin của bạn">
+    <h2 class="nv-h2">1. Điểm của bạn</h2>
+    <div class="nv-row">
+      <div class="nv-field"><label for="nv-score">Điểm dự kiến (thang 30)</label><input id="nv-score" type="number" min="0" max="30" step="0.05" inputmode="decimal"></div>
+      <div class="nv-field"><label for="nv-combo">Tổ hợp xét tuyển</label><select id="nv-combo"></select></div>
+    </div>
+    <p class="nv-help">Điểm đã cộng ưu tiên khu vực, đối tượng. Chọn đúng tổ hợp để dùng điểm chuẩn riêng của tổ hợp đó khi trường công bố khác nhau.</p>
+    <h2 class="nv-h2">2. Ngành, trường bạn muốn đăng ký</h2>
+    <div class="nv-field nv-search"><label for="nv-q">Thêm nguyện vọng</label><input id="nv-q" type="search" placeholder="Tên hoặc mã trường, tên hoặc mã ngành. Ví dụ: BKA, 7480201, bách khoa máy tính" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="nv-sugg"><div class="nv-sugg" id="nv-sugg" role="listbox"></div></div>
+    <ol class="nv-list" id="nv-list"></ol>
+    <p class="nv-help" id="nv-listhelp"></p>
+    <div class="nv-acts"><button class="nv-btn sm" type="button" id="nv-sample">Dùng ví dụ mẫu</button><button class="nv-btn sm" type="button" id="nv-clear">Xóa danh sách</button></div>
+  </section>
+  <section class="nv-out" id="nv-out" aria-live="polite"></section>
+</main>
+
+<script>
+const D = __DATA__;
+/* ============ DỮ LIỆU ============ */
+const PROGS = D.p.map(p=>({u:p[0],c:p[1],n:p[2],t:p[3],m:p[4],cb:p[5],h:p[6],ov:p[7]}));
+const KEY = p=>p.u+'|'+p.c;
+const BYKEY = new Map(PROGS.map(p=>[KEY(p),p]));
+const UNI = c=>D.u[c]||[c,c,null,''];
+const YEARS = [2024,2025,2026], NEXT = 2027;
+const TYPE = {TIENG_ANH:'dạy bằng tiếng Anh',CLC:'chất lượng cao',LIEN_KET:'liên kết',TIEN_TIEN:'tiên tiến',PHAN_HIEU:'phân hiệu',TAI_NANG:'tài năng'};
+const unaccent=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase();
+PROGS.forEach(p=>{const u=UNI(p.u); p.k=unaccent(`${u[0]} ${u[1]} ${p.u} ${p.n} ${p.c} ${p.m}`);});
+const MAXNV=15, SP_MAX=5; // Thông tư 06/2026: tối đa 15 NV; ngành sư phạm chỉ xét ở NV1–5
+const isSP=p=>/^7140/.test(p.m||'');
+
+/* ============ MÔ HÌNH DỰ BÁO ============
+   Học từ dữ liệu của site: với chương trình có đủ 2024–2026, dự báo 2026 từ 2024–2025 rồi so với thực tế.
+   Điểm chuẩn năm sau = ½ × hồi quy (năm trước, năm gần nhất) + ½ × năm gần nhất.
+   Sai số không giả định phân phối chuẩn: dùng chính phân phối sai số thực tế (41 phân vị),
+   chia theo độ dao động giữa hai năm gần nhất. Chương trình chỉ có 1 năm dùng phân phối sai số riêng, rộng hơn. */
+const MD=D.model;
+function forecast(p,combo){
+  const h=(combo&&p.ov[combo])?p.ov[combo]:p.h;
+  const [a,b,c]=h; let pred,q,kind;
+  if(b!=null){ pred=MD.blend*(MD.co2[0]+MD.co2[1]*b+MD.co2[2]*c)+(1-MD.blend)*c;
+    const v=Math.abs(c-b); const i=MD.bins.findIndex(([lo,hi])=>v>=lo&&v<hi); q=MD.q2[i<0?2:i]; kind=['ổn định','dao động vừa','dao động mạnh'][i<0?2:i]; }
+  else { pred=MD.blend*(MD.co1[0]+MD.co1[1]*c)+(1-MD.blend)*c; q=MD.q1; kind='chỉ có 1 năm gần nhất'; }
+  return {h,pred,lo:pred+q[4],hi:pred+q[36],q,kind,own:!!(combo&&p.ov[combo])};
+}
+function cdf(q,z){ // P(sai số ≤ z) từ 41 phân vị
+  if(z<q[0]) return 0; if(z>=q[40]) return 1;
+  let k=0; while(k<40&&q[k+1]<=z) k++;
+  const lo=q[k],hi=q[k+1]; const f=hi>lo?(z-lo)/(hi-lo):0;
+  return (k+f)/40;
+}
+function assess(p,score,combo){
+  if(combo&&!p.cb.includes(combo)) return {ok:false,prob:0,grp:'na'};
+  const f=forecast(p,combo); let prob=cdf(f.q,score-f.pred); prob=Math.min(.99,Math.max(.01,prob));
+  return Object.assign(f,{ok:true,prob,grp:grpOf(prob)});
+}
+const GRP={safe:{n:'An toàn',c:'var(--safe)'},target:{n:'Vừa sức',c:'var(--target)'},reach:{n:'Mạo hiểm',c:'var(--reach)'},hard:{n:'Rất khó',c:'var(--hard)'},na:{n:'Không xét tổ hợp',c:'var(--muted)'}};
+function grpOf(p){return p>=.9?'safe':p>=.6?'target':p>=.2?'reach':'hard';}
+
+/* ============ TRẠNG THÁI ============ */
+const SAMPLE={score:26,combo:'A00',items:[['TLA','TLA121',3],['BVH','7480202',3],['BKA','IT1',3],['QHI','CN8',3],['KHA','7480101',3],['BVH','7480101',3],['BVH','7520216',3],['MHN','7480201',3]]};
+const SKEY='dtdh-xep-nv-v1';
+let S;
+try{S=JSON.parse(localStorage.getItem(SKEY)||'null');}catch(e){}
+if(!S||!Array.isArray(S.items)) S=JSON.parse(JSON.stringify(SAMPLE));
+S.items=S.items.filter(([u,c])=>BYKEY.has(u+'|'+c));
+function save(){try{localStorage.setItem(SKEY,JSON.stringify(S));}catch(e){}}
+const $=s=>document.querySelector(s);
+const fmt=(x,d=2)=>x==null||isNaN(x)?'–':(+x).toLocaleString('vi-VN',{minimumFractionDigits:0,maximumFractionDigits:d});
+const pct=x=>x>=.99?'>99%':x<=.01?'<1%':Math.round(x*100)+'%';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ============ NHẬP LIỆU ============ */
+const comboCount={}; PROGS.forEach(p=>p.cb.forEach(c=>comboCount[c]=(comboCount[c]||0)+1));
+$('#nv-combo').innerHTML='<option value="">Mọi tổ hợp (lấy điểm chuẩn cao nhất)</option>'+Object.entries(comboCount).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`<option value="${c}">${c} · ${n} chương trình</option>`).join('');
+$('#nv-score').value=S.score??''; $('#nv-combo').value=S.combo||'';
+$('#nv-score').addEventListener('input',e=>{S.score=e.target.value===''?null:Math.max(0,Math.min(30,+e.target.value)); save(); render();});
+$('#nv-combo').addEventListener('change',e=>{S.combo=e.target.value; save(); render();});
+let sugg=[], sel=-1, shown=50, total=0;
+/* Tìm đầy đủ: mọi chương trình khớp tất cả từ khóa (tên/mã trường, tên/mã ngành, mã chương trình).
+   Không lọc theo khả năng đỗ hay tổ hợp; chỉ xếp theo độ khớp rồi theo tên trường, tên chương trình. */
+function search(q){
+  const key=unaccent(q).trim(), ws=key.split(/\s+/).filter(Boolean); if(!ws.length) return [];
+  const sc=S.score, cb=S.combo;
+  const tier=p=>{const u=UNI(p.u), codes=[p.c,p.m,p.u].map(unaccent);
+    if(codes.includes(key)) return 0;
+    if(unaccent(u[0])===key||unaccent(p.n)===key) return 1;
+    if(unaccent(p.n).startsWith(key)||unaccent(u[0]).startsWith(key)||unaccent(u[1]).includes(key)) return 2;
+    return 3;};
+  return PROGS.filter(p=>ws.every(w=>p.k.includes(w))).map(p=>({p,t:tier(p)}))
+    .sort((x,y)=>x.t-y.t||UNI(x.p.u)[1].localeCompare(UNI(y.p.u)[1],'vi')||x.p.n.localeCompare(y.p.n,'vi'))
+    .map(x=>({p:x.p,a:sc!=null?assess(x.p,sc,cb):null}));
+}
+function drawSugg(){
+  const box=$('#nv-sugg'), list=sugg.slice(0,shown);
+  box.innerHTML=sugg.length?`<div class="hd">Tìm thấy ${sugg.length.toLocaleString('vi-VN')} chương trình${sugg.length>shown?`, đang hiện ${shown}`:''}</div>`+list.map(({p,a},i)=>{const u=UNI(p.u), inList=S.items.some(([x,y])=>x===p.u&&y===p.c);
+    return `<button type="button" role="option" data-i="${i}" class="${i===sel?'sel':''}" ${inList?'disabled':''}><span class="t">${esc(p.n)}</span><span class="s">${esc(u[1])} (${esc(p.u)}) · mã ${esc(p.c)}${p.m&&p.m!==p.c?' · ngành '+esc(p.m):''}${p.t?' · '+(TYPE[p.t]||p.t):''} · chuẩn 2026: ${fmt(p.h[2])}${inList?' · đã có trong danh sách':''}</span><span class="r">${a?(a.ok?`<span class="nv-tag ${a.grp}">${pct(a.prob)}</span>`:`<span class="nv-tag na">Không xét ${esc(S.combo)}</span>`):''}</span></button>`;}).join('')
+    +(sugg.length>shown?`<button type="button" class="more" data-more="1">Hiện thêm ${Math.min(50,sugg.length-shown)} chương trình</button>`:'')
+    :'<div class="nv-help" style="padding:8px 10px">Không tìm thấy. Thử tên viết tắt của trường (HUST, NEU, PTIT…), mã trường (BKA), mã ngành (7480201) hoặc bỏ bớt từ khóa.</div>';
+  box.classList.toggle('open',!!$('#nv-q').value.trim()); $('#nv-q').setAttribute('aria-expanded',box.classList.contains('open'));
+}
+$('#nv-q').addEventListener('input',e=>{sugg=search(e.target.value); sel=-1; shown=50; drawSugg();});
+$('#nv-q').addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'){sel=Math.min(Math.min(shown,sugg.length)-1,sel+1); drawSugg(); e.preventDefault();}
+  else if(e.key==='ArrowUp'){sel=Math.max(0,sel-1); drawSugg(); e.preventDefault();}
+  else if(e.key==='Enter'&&sugg[sel>=0?sel:0]){add(sugg[sel>=0?sel:0].p); e.preventDefault();}
+  else if(e.key==='Escape'){$('#nv-sugg').classList.remove('open');}
+});
+$('#nv-sugg').addEventListener('click',e=>{if(e.target.closest('[data-more]')){shown+=50; drawSugg(); return;} const b=e.target.closest('button[data-i]'); if(b&&!b.disabled) add(sugg[+b.dataset.i].p);});
+document.addEventListener('click',e=>{if(!e.target.closest('.nv-search')) $('#nv-sugg').classList.remove('open');});
+let msg='';
+function add(p){
+  if(S.items.length>=MAXNV){msg=`Quy chế 2026 cho đăng ký tối đa ${MAXNV} nguyện vọng.`; render(); return;}
+  if(!S.items.some(([u,c])=>u===p.u&&c===p.c)) S.items.push([p.u,p.c,3]);
+  $('#nv-q').value=''; sugg=[]; shown=50; drawSugg(); msg=''; save(); render(); $('#nv-q').focus();
+}
+$('#nv-list').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return; const i=+b.dataset.i;
+  if(b.dataset.a==='del') S.items.splice(i,1);
+  if(b.dataset.a==='up'&&i>0) [S.items[i-1],S.items[i]]=[S.items[i],S.items[i-1]];
+  if(b.dataset.a==='dn'&&i<S.items.length-1) [S.items[i+1],S.items[i]]=[S.items[i],S.items[i+1]];
+  if(b.dataset.a==='star') S.items[i][2]=+b.dataset.v;
+  save(); render();
+});
+$('#nv-sample').onclick=()=>{S=JSON.parse(JSON.stringify(SAMPLE)); $('#nv-score').value=S.score; $('#nv-combo').value=S.combo; save(); render();};
+$('#nv-clear').onclick=()=>{S.items=[]; save(); render();};
+
+/* ============ TỐI ƯU THỨ TỰ ============
+   Hệ thống chung xét mọi NV bình đẳng theo điểm và chỉ cho trúng NV có thứ tự cao nhất mà bạn đủ điểm.
+   Vì vậy đặt NV khó lên trên không làm giảm cơ hội của NV dưới, còn đặt NV an toàn lên trên sẽ "chặn" mọi NV phía sau.
+   Thứ tự đề xuất: mức mong muốn (sao) giảm dần; cùng mức thì NV khó (xác suất thấp) lên trước.
+   Sau đó đưa NV sư phạm vào 5 vị trí đầu theo quy chế 2026. */
+function optimize(list){
+  const rec=[...list].sort((x,y)=>y.star-x.star||(x.a.ok?x.a.prob:2)-(y.a.ok?y.a.prob:2)||x.idx-y.idx);
+  rec.slice(SP_MAX).filter(x=>isSP(x.p)).forEach(x=>{
+    if(rec.slice(0,SP_MAX).filter(y=>isSP(y.p)).length>=SP_MAX) return;
+    rec.splice(rec.indexOf(x),1); rec.splice(SP_MAX-1,0,x); x.spMoved=true;});
+  return rec;
+}
+function chain(order){ // xác suất được xét tới và trúng ở từng NV (giả định các NV độc lập)
+  let reach=1; return order.map(x=>{const p=x.a.ok?x.a.prob:0; const r={reach,land:reach*p}; reach*=1-p; return r;}).concat([{fail:reach}]);
+}
+function spark(h,f){
+  const pts=h.map((v,i)=>v==null?null:[i,v]).filter(Boolean); const all=[...pts.map(x=>x[1]),f.lo,f.hi,S.score??f.pred];
+  const mn=Math.min(...all)-.3, mx=Math.max(...all)+.3, W=104,H=40, X=i=>4+i*(W-12)/3, Y=v=>H-4-(v-mn)/(mx-mn)*(H-8);
+  const line=pts.map(([i,v],k)=>`${k?'L':'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join('');
+  const last=pts[pts.length-1];
+  return `<svg class="nv-spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Điểm chuẩn ${pts.map(([i,v])=>YEARS[i]+': '+fmt(v)).join(', ')}; dự báo ${NEXT}: ${fmt(f.lo,1)} đến ${fmt(f.hi,1)}">
+   <rect x="${X(3)-5}" y="${Y(f.hi)}" width="10" height="${Math.max(2,Y(f.lo)-Y(f.hi))}" rx="3" fill="var(--accent-soft)"/>
+   <line x1="${X(3)-7}" x2="${X(3)+7}" y1="${Y(f.pred)}" y2="${Y(f.pred)}" stroke="var(--accent)" stroke-width="2"/>
+   ${S.score!=null?`<line x1="2" x2="${W-2}" y1="${Y(S.score)}" y2="${Y(S.score)}" stroke="var(--safe)" stroke-dasharray="3 3" stroke-width="1.2"/>`:''}
+   <path d="${line}" fill="none" stroke="var(--accent-deep)" stroke-width="1.8"/>${pts.map(([i,v])=>`<circle cx="${X(i)}" cy="${Y(v)}" r="2.6" fill="var(--accent-deep)"/>`).join('')}
+   <path d="M${X(last[0])},${Y(last[1])}L${X(3)},${Y(f.pred)}" stroke="var(--accent)" stroke-dasharray="2 2" fill="none"/></svg>`;
+}
+function why(x,score){
+  const a=x.a; if(!a.ok) return `Chương trình này không xét tổ hợp ${S.combo}. Đổi tổ hợp hoặc bỏ nguyện vọng này.`;
+  const hs=a.h.map((v,i)=>v==null?null:`${YEARS[i]}: ${fmt(v)}`).filter(Boolean).join(' · ');
+  const vals=a.h.filter(v=>v!=null), sd=vals.length>1?Math.sqrt(vals.reduce((s,v)=>s+(v-vals.reduce((a,b)=>a+b,0)/vals.length)**2,0)/vals.length):null;
+  const d=score-a.pred;
+  return `Điểm chuẩn ${hs}${sd!=null?` (độ lệch chuẩn ${fmt(sd)})`:''}${a.own?`, theo riêng tổ hợp ${S.combo}`:''}. Dự báo ${NEXT} khoảng ${fmt(a.pred,1)}; 8/10 khả năng nằm trong ${fmt(a.lo,1)}–${fmt(a.hi,1)} (${a.kind}). Điểm bạn ${d>=0?'cao':'thấp'} hơn dự báo ${fmt(Math.abs(d),1)} điểm.`;
+}
+function moveText(x,i){
+  const d=x.idx-i; if(x.spMoved) return `<span class="nv-mv up">↑ ${d} · sư phạm phải ở NV1–5</span>`;
+  if(d>0) return `<span class="nv-mv up">↑ lên ${d} bậc</span>`; if(d<0) return `<span class="nv-mv dn">↓ xuống ${-d} bậc</span>`; return `<span class="nv-mv eq">giữ nguyên</span>`;
+}
+function moveReason(x,i,rec){
+  const d=x.idx-i; if(!d||!x.a.ok||x.spMoved) return '';
+  if(d>0){const over=rec.slice(i+1).filter(y=>y.idx<x.idx);
+    return over.every(y=>y.star<x.star)?' Đưa lên vì bạn chấm sao cao hơn các NV vừa bị vượt.':` Đưa lên vì khó đỗ hơn (${pct(x.a.prob)}) các NV giờ xếp sau nó: đặt NV khó trước không làm mất cơ hội của NV sau, còn đặt sau NV dễ hơn thì ít khi được xét tới.`;}
+  const over=rec.slice(0,i).filter(y=>y.idx>x.idx);
+  return over.every(y=>y.star>x.star)?' Đưa xuống vì bạn chấm sao thấp hơn.':` Đưa xuống vì dễ đỗ hơn (${pct(x.a.prob)}): nếu đứng trên, bạn sẽ trúng ngay NV này và các NV khó hơn phía sau không còn được xét.`;
+}
+
+/* ============ HIỂN THỊ ============ */
+function render(){
+  const score=S.score, list=S.items.map(([u,c,star],idx)=>{const p=BYKEY.get(u+'|'+c); return {p,star,idx,a:score!=null?assess(p,score,S.combo):{ok:false,prob:0,grp:'na'}};});
+  // danh sách bên trái
+  $('#nv-list').innerHTML=list.map((x,i)=>{const u=UNI(x.p.u); return `<li class="nv-item"><span class="no">${i+1}</span><span class="nm">${esc(x.p.n)}<br><span class="sub">${esc(u[0])} · ${x.p.c}${x.a.ok&&score!=null?` · <span class="nv-tag ${x.a.grp}">${pct(x.a.prob)}</span>`:''}</span></span>
+    <span class="nv-ctl"><button class="nv-ic" type="button" data-a="up" data-i="${i}" ${i?'':'disabled'} aria-label="Đưa lên">▲</button><button class="nv-ic" type="button" data-a="dn" data-i="${i}" ${i<list.length-1?'':'disabled'} aria-label="Đưa xuống">▼</button><button class="nv-ic" type="button" data-a="del" data-i="${i}" aria-label="Xóa">✕</button></span>
+    <span class="nv-stars" aria-label="Mức mong muốn">${[1,2,3,4,5].map(v=>`<button type="button" data-a="star" data-i="${i}" data-v="${v}" class="${v<=x.star?'on':''}" aria-label="${v} sao">★</button>`).join('')}<span>mức mong muốn</span></span></li>`;}).join('');
+  $('#nv-listhelp').innerHTML=(msg?`<b>${msg}</b> `:'')+(list.length?`${list.length}/${MAXNV} nguyện vọng. Thứ tự ở đây là thứ tự bạn định đăng ký; chấm thêm sao cho nơi bạn thật sự muốn học hơn.`:'Chưa có nguyện vọng nào. Gõ tên trường hoặc ngành để thêm, nên có 5–10 lựa chọn.');
+  const O=$('#nv-out');
+  if(score==null||!list.length){O.innerHTML=`<div class="nv-card nv-empty"><h2 class="nv-h2">Thứ tự đề xuất sẽ hiện ở đây</h2><p class="nv-help">Nhập điểm dự kiến và thêm ít nhất 1 nguyện vọng.</p></div>${rulesBox()}`; return;}
+  const rec=optimize(list), ch=chain(rec), mine=chain(list);
+  const any=1-ch[ch.length-1].fail, anyMine=1-mine[mine.length-1].fail;
+  const cnt={safe:0,target:0,reach:0,hard:0,na:0}; list.forEach(x=>cnt[x.a.grp]++);
+  const expRec=rec.reduce((s,x,i)=>s+ch[i].land*x.star,0), expMine=list.reduce((s,x,i)=>s+mine[i].land*x.star,0);
+  const firstSafe=rec.findIndex(x=>x.a.ok&&x.a.prob>=.9);
+  const blocked=rec.filter((x,i)=>rec.slice(0,i).some(y=>y.a.ok&&y.a.prob>=.95));
+  const anyLo=Math.max(0,...rec.map(x=>x.a.ok?x.a.prob:0));
+  // cảnh báo
+  const al=[];
+  if(!cnt.safe) al.push(['bad',`<b>Chưa có nguyện vọng an toàn (≥90%).</b> Nếu điểm chuẩn ${NEXT} tăng, bạn có thể trượt tất cả. Hãy thêm ít nhất 1–2 NV an toàn làm chốt chặn cuối; gợi ý ở bên dưới.`]);
+  if(cnt.hard) al.push(['warn',`<b>${cnt.hard} nguyện vọng rất khó (dưới 20%).</b> Giữ lại nếu bạn thật sự thích, vì đặt ở đầu không làm hại các NV khác; nhưng mỗi NV chiếm 1 trong ${MAXNV} suất đăng ký.`]);
+  if(cnt.na) al.push(['bad',`<b>${cnt.na} nguyện vọng không xét tổ hợp ${S.combo}.</b> Bạn sẽ không được xét ở các NV này.`]);
+  if(blocked.length) al.push(['warn',`<b>${blocked.length} nguyện vọng gần như không bao giờ được xét tới</b> vì đứng sau một NV gần chắc đỗ (từ 95%): ${blocked.map(x=>esc(x.p.n)+' – '+esc(UNI(x.p.u)[0])).join('; ')}. Nếu thích hơn, chấm thêm sao để đưa lên; nếu không, có thể bỏ để dành chỗ.`]);
+  if(list.filter(x=>isSP(x.p)).length>SP_MAX) al.push(['bad',`<b>Có hơn ${SP_MAX} NV ngành sư phạm.</b> Quy chế 2026 chỉ xét NV sư phạm ở thứ tự 1–5.`]);
+  if(cnt.safe>=1&&!blocked.length&&anyLo>=.9) al.push(['ok',`<b>Danh sách cân đối.</b> Có ${cnt.reach+cnt.hard} NV mạo hiểm để thử sức, ${cnt.target} NV vừa sức và ${cnt.safe} NV an toàn làm chốt chặn.`]);
+  const changed=rec.some((x,i)=>x.idx!==i);
+  let h=`<div class="nv-tiles">
+    <div class="nv-card nv-tile"><span class="k">Đỗ ít nhất 1 NV</span><span class="v">${Math.round(anyLo*100)===Math.round(any*100)||any-anyLo<.01?pct(any):`${Math.round(anyLo*100)}–${pct(any)}`}</span><span class="d">khoảng ước tính, xem cách tính</span></div>
+    <div class="nv-card nv-tile"><span class="k">Mạo hiểm / Rất khó</span><span class="v">${cnt.reach} / ${cnt.hard}</span><span class="d">xác suất dưới 60%</span></div>
+    <div class="nv-card nv-tile"><span class="k">Vừa sức</span><span class="v">${cnt.target}</span><span class="d">60% đến dưới 90%</span></div>
+    <div class="nv-card nv-tile"><span class="k">An toàn</span><span class="v">${cnt.safe}</span><span class="d">từ 90% trở lên</span></div></div>
+   <div class="nv-alerts">${al.map(([c,t])=>`<div class="nv-alert ${c}">${t}</div>`).join('')}</div>
+   <div class="nv-card nv-plan"><h2>Thứ tự đăng ký đề xuất</h2><p>${changed?`Đã sắp xếp lại ${rec.filter((x,i)=>x.idx!==i).length}/${rec.length} nguyện vọng so với thứ tự bạn nhập. Với cùng mức mong muốn, NV khó đứng trước, NV an toàn đứng cuối.`:'Thứ tự bạn nhập đã tối ưu, không cần đổi.'}</p>
+   <div class="nv-legend" style="margin:0 18px 6px"><span>Biểu đồ nhỏ: điểm chuẩn 2024–2026, ô xanh nhạt là khoảng dự báo ${NEXT}, nét đứt xanh lá là điểm của bạn.</span></div>
+   <div class="nv-tbl"><table><thead><tr><th>NV</th><th>Ngành, trường</th><th class="nv-num">Xác suất đỗ</th><th>Điểm chuẩn</th><th class="nv-num">Trúng ở NV này</th></tr></thead><tbody>
+   ${rec.map((x,i)=>{const u=UNI(x.p.u); return `<tr>
+     <td><span class="nv-nvno">NV${i+1}</span>${moveText(x,i)}</td>
+     <td><div class="nv-prog">${esc(x.p.n)}</div><div class="nv-meta">${u[3]?`<a href="https://diemthidaihoc.com/${u[3]}">${esc(u[1])}</a>`:esc(u[1])} · mã ${x.p.c}${x.p.t?' · '+(TYPE[x.p.t]||x.p.t):''}${u[2]?' · VNUR #'+u[2]:''} · ${'★'.repeat(x.star)}</div></td>
+     <td class="nv-num"><div class="nv-prob"><span><span class="nv-tag ${x.a.grp}">${GRP[x.a.grp].n}</span> <b>${x.a.ok?pct(x.a.prob):'–'}</b></span><span class="nv-ptrack"><i style="width:${Math.round(x.a.prob*100)}%;background:${GRP[x.a.grp].c}"></i></span></div></td>
+     <td>${x.a.ok?spark(x.a.h,x.a):''}</td>
+     <td class="nv-num">${pct(ch[i].land)}<div class="nv-meta">được xét tới: ${pct(ch[i].reach)}</div></td></tr>
+     <tr class="nv-sub"><td></td><td colspan="4"><div class="nv-why">${why(x,score)}${moveReason(x,i,rec)}</div></td></tr>`;}).join('')}
+   </tbody></table></div></div>`;
+  // phân bố kết quả
+  const rows=rec.map((x,i)=>({l:`NV${i+1} · ${UNI(x.p.u)[0]}`,v:ch[i].land,c:GRP[x.a.grp].c})).concat([{l:'Trượt tất cả',v:ch[ch.length-1].fail,c:'var(--hard)'}]);
+  const mx=Math.max(...rows.map(r=>r.v),.01);
+  h+=`<div class="nv-card nv-flow"><h2>Bạn có khả năng trúng ở đâu?</h2><p class="nv-help">Mỗi thí sinh chỉ trúng 1 nguyện vọng, là NV cao nhất mà bạn đủ điểm. Thanh dưới đây là xác suất kết quả cuối cùng rơi vào từng NV theo thứ tự đề xuất.</p>
+   ${rows.map(r=>`<div class="nv-fbar"><span class="l" title="${esc(r.l)}">${esc(r.l)}</span><span class="tr"><i style="width:${(r.v/mx*100).toFixed(1)}%;background:${r.c}"></i></span><span class="v">${pct(r.v)}</span></div>`).join('')}
+   <p class="nv-help">${new Set(list.map(x=>x.star)).size>1?`Mức mong muốn kỳ vọng (số sao trung bình của nơi trúng tuyển): thứ tự bạn nhập ${fmt(expMine,2)} sao, thứ tự đề xuất ${fmt(expRec,2)} sao. `:''}Đổi thứ tự không làm thay đổi khả năng đỗ ít nhất 1 NV; nó quyết định bạn trúng ở NV nào. Với thứ tự bạn nhập, khả năng trúng ngay NV1 là ${pct(mine[0].land)}${list[0]?` (${esc(list[0].p.n)} – ${esc(UNI(list[0].p.u)[0])})`:''}; với thứ tự đề xuất là ${pct(ch[0].land)} cho lựa chọn khó nhất, và các NV phía sau vẫn còn nguyên cơ hội.</p></div>`;
+  // gợi ý NV an toàn
+  if(cnt.safe<2) h+=safeSuggest(list,score);
+  // sao chép
+  h+=`<div class="nv-card nv-sec"><h2>Danh sách để nhập lên hệ thống</h2><p class="nv-help">Sao chép rồi đối chiếu khi đăng ký trên Cổng tuyển sinh của Bộ GD&ĐT.</p>
+   <textarea class="nv-copy" id="nv-copytext" readonly>${rec.map((x,i)=>`NV${i+1}: ${x.p.u} - ${x.p.c} - ${x.p.n} (${UNI(x.p.u)[1]})${S.combo?' - tổ hợp '+S.combo:''}`).join('\n')}</textarea>
+   <div><button class="nv-btn" type="button" id="nv-copy">Sao chép danh sách</button> <span class="nv-toast" id="nv-toast"></span></div></div>`;
+  h+=rulesBox()+methodBox();
+  O.innerHTML=h;
+  O.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>add(BYKEY.get(b.dataset.add)));
+  const cp=$('#nv-copy'); if(cp) cp.onclick=async()=>{try{await navigator.clipboard.writeText($('#nv-copytext').value); $('#nv-toast').textContent='Đã sao chép.';}catch(e){$('#nv-copytext').select(); $('#nv-toast').textContent='Trình duyệt chặn sao chép, hãy nhấn Ctrl+C.';}};
+}
+function safeSuggest(list,score){
+  const majors=new Set(list.map(x=>x.p.m).filter(Boolean)), groups=new Set([...majors].map(m=>m.slice(0,5)));
+  const have=new Set(list.map(x=>KEY(x.p)));
+  const cand=PROGS.filter(p=>!have.has(KEY(p))&&(majors.has(p.m)||groups.has((p.m||'').slice(0,5)))).map(p=>({p,a:assess(p,score,S.combo)})).filter(x=>x.a.ok&&x.a.prob>=.9)
+    .sort((x,y)=>(majors.has(y.p.m)?1:0)-(majors.has(x.p.m)?1:0)||(UNI(x.p.u)[2]??999)-(UNI(y.p.u)[2]??999)||y.p.h[2]-x.p.h[2]).slice(0,6);
+  if(!cand.length) return '';
+  return `<div class="nv-card nv-sec"><h2>Gợi ý thêm nguyện vọng an toàn</h2><p class="nv-help">Cùng ngành hoặc nhóm ngành với danh sách của bạn, xác suất đỗ từ 90%, ưu tiên trường xếp hạng VNUR cao.</p>
+   ${cand.map(({p,a})=>{const u=UNI(p.u); return `<div class="nv-sugrow"><span><b>${esc(p.n)}</b><br><span class="nv-meta">${esc(u[1])}${u[2]?' · VNUR #'+u[2]:''} · chuẩn 2026: ${fmt(p.h[2])}</span></span><span class="nv-tag safe">${pct(a.prob)}</span><button class="nv-btn sm" type="button" data-add="${KEY(p)}">+ Thêm</button></div>`;}).join('')}</div>`;
+}
+function rulesBox(){return `<div class="nv-card nv-sec"><h2>Quy tắc xét nguyện vọng cần nhớ</h2><ul>
+  <li>Mọi nguyện vọng được xét bình đẳng theo điểm; nếu đủ điểm nhiều NV, bạn chỉ trúng NV có thứ tự cao nhất. Vì vậy NV1 nên là nơi bạn muốn học nhất, kể cả khi khó đỗ.</li>
+  <li>Đặt NV an toàn lên trên là cách “lãng phí điểm” phổ biến nhất: bạn trúng ngay NV đó và các NV mong muốn hơn phía sau không còn được xét.</li>
+  <li>Quy chế tuyển sinh 2026 (Thông tư 06/2026/TT-BGDĐT): tối đa ${MAXNV} nguyện vọng; ngành sư phạm chỉ xét ở NV1–5. Quy chế ${NEXT} có thể thay đổi, hãy cập nhật khi Bộ công bố.</li>
+  <li>Luôn đối chiếu đề án tuyển sinh ${NEXT} của từng trường: chỉ tiêu, tổ hợp và cách quy đổi điểm có thể khác năm trước.</li></ul></div>`;}
+function methodBox(){const m=MD; return `<div class="nv-card nv-sec nv-method"><h2>Cách tính xác suất</h2>
+  <p class="nv-help">Site hiện có điểm chuẩn THPT 3 năm (2024–2026), chưa đủ 5 năm. Mô hình học từ chính dữ liệu này: với ${m.n3.toLocaleString('vi-VN')} chương trình có đủ 3 năm, dự báo điểm chuẩn 2026 từ 2024–2025 rồi so với điểm thật.</p>
+  <ul><li><b>Dự báo:</b> trung bình của điểm chuẩn năm gần nhất và một hồi quy có xu hướng kéo về mức trung bình (ngành điểm rất cao thường giảm nhẹ, ngành điểm thấp thường tăng nhẹ). Sai số tuyệt đối trung bình khi kiểm lại: ${fmt(m.mae2)} điểm, so với ${fmt(m.mae_last)} điểm nếu chỉ lấy điểm năm trước.</li>
+  <li><b>Xác suất:</b> không giả định phân phối chuẩn. Hệ thống dùng phân phối sai số dự báo thật, chia 3 nhóm theo mức dao động giữa hai năm gần nhất (${m.n2.map(n=>n.toLocaleString('vi-VN')).join(' / ')} chương trình). Chương trình chỉ có 1 năm dùng phân phối riêng, rộng hơn (${m.n1.toLocaleString('vi-VN')} cặp năm).</li>
+  <li><b>Kiểm định:</b> chia đôi dữ liệu, học ở một nửa rồi kiểm ở nửa còn lại; các mức xác suất ${m.calib.map(([p,o])=>`${Math.round(p*100)}% → thực tế ${Math.round(o*100)}%`).join(', ')}.</li>
+  <li><b>Nhóm:</b> Rất khó dưới 20%, Mạo hiểm 20% đến dưới 60%, Vừa sức 60% đến dưới 90%, An toàn từ 90%.</li>
+  <li><b>Giới hạn:</b> mô hình mới học từ một lần chuyển năm (2025 → 2026), và năm 2025 là năm đầu thi theo chương trình mới. “Đỗ ít nhất 1 NV” hiện dạng khoảng: cận dưới là xác suất của NV dễ nhất (khi điểm chuẩn mọi ngành cùng tăng giảm), cận trên là khi các NV độc lập với nhau. Thực tế nằm giữa hai mức này. Kết quả chỉ để tham khảo.</li></ul></div>`;}
+render();
+</script>
+</body>
+</html>

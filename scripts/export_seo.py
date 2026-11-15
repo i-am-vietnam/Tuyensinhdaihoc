@@ -171,7 +171,8 @@ def nav(prefix: str, active: str) -> str:
     links = [
         (f"{prefix}#uni", "Theo trường", ""),
         (f"{prefix}#major", "Theo ngành", ""),
-        (f"{prefix}#advice", "Tư vấn theo điểm", ""),
+        (f"{prefix}#nv", "Xếp nguyện vọng", ""),
+        (f"{prefix}#career", "Tư vấn chọn ngành", ""),
         (f"{prefix}#network", "Mạng SNA", ""),
         (f"{prefix}#coverage", "Độ phủ dữ liệu", ""),
         (f"{prefix}truong/", "DS Trường", "truong"),

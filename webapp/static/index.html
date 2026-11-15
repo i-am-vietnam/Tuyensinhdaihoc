@@ -4,20 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tuyển Sinh Đại Học — Điểm chuẩn đại học 2024–2026 và tư vấn chọn ngành</title>
-<meta name="description" content="Tra cứu điểm chuẩn đại học 2024–2026 theo trường và ngành, tham khảo học phí, tư vấn theo điểm và tổ hợp, khám phá mạng SNA Trường – Ngành.">
+<meta name="description" content="Tra cứu điểm chuẩn đại học 2024–2026 theo trường và ngành, tham khảo học phí, xếp nguyện vọng theo điểm và tổ hợp, khám phá mạng SNA Trường – Ngành.">
 <link rel="canonical" href="https://diemthidaihoc.com/">
 <link rel="icon" type="image/svg+xml" href="static/favicon.svg">
 <meta name="theme-color" content="#1e40af">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Tuyển Sinh Đại Học">
 <meta property="og:title" content="Tuyển Sinh Đại Học — Điểm chuẩn đại học 2024–2026 và tư vấn chọn ngành">
-<meta property="og:description" content="Tra cứu điểm chuẩn đại học 2024–2026, học phí, tư vấn theo điểm và tài liệu luyện thi MOS.">
+<meta property="og:description" content="Tra cứu điểm chuẩn đại học 2024–2026, học phí, xếp nguyện vọng và tài liệu luyện thi MOS.">
 <meta property="og:url" content="https://diemthidaihoc.com/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="static/style.css?v=light-20261108">
 <link rel="stylesheet" href="static/career.css?v=career-20261114">
+<link rel="stylesheet" href="static/nv.css?v=nv-20261115">
 </head>
 <body>
 <a class="skip-link" href="#main">Đến nội dung chính</a>
@@ -27,7 +28,7 @@
     <nav class="tabs" role="tablist">
       <button data-tab="uni" class="active">Theo trường</button>
       <button data-tab="major">Theo ngành</button>
-      <button data-tab="advice">Tư vấn theo điểm</button>
+      <button data-tab="nv">Xếp nguyện vọng</button>
       <button data-tab="career">Tư vấn chọn ngành</button>
       <button data-tab="network">Mạng SNA</button>
       <button data-tab="coverage">Độ phủ dữ liệu</button>
@@ -80,18 +81,26 @@
     <div id="major-out"></div>
   </section>
 
-  <!-- TU VAN -->
-  <section id="tab-advice" class="tab">
-    <h1>Tư vấn chọn ngành theo điểm</h1>
-    <form class="bar" id="advice-form">
-      <select id="adv-method" aria-label="Phương thức"></select>
-      <select id="adv-combo" class="combo-select" aria-label="Tổ hợp"><option value="">Mọi tổ hợp</option></select>
-      <input id="adv-score" type="number" step="0.01" min="0" placeholder="Điểm của bạn" aria-label="Điểm" required>
-      <select id="adv-year" aria-label="Năm tham chiếu"></select>
-      <button type="submit" class="primary">Gợi ý</button>
-    </form>
-    <p class="muted small">Hiện các ngành có điểm chuẩn ≤ điểm của bạn + 1. <b>Thử sức</b>: cao hơn điểm bạn tối đa 1 điểm · <b>Vừa sức</b>: thấp hơn dưới 1 điểm · <b>An toàn</b>: thấp hơn từ 1 điểm. Mốc 1 điểm tính trên thang 30 và quy đổi theo thang của phương thức (VD ĐGNL HCM thang 1200: 40 điểm). Kết quả xếp theo <b>độ hot</b> = 0,5 × điểm trường (hạng VNUR) + 0,3 × điểm ngành (mức tăng số trường mở ngành 2024→2026) + 0,2 × điểm xu hướng (thay đổi điểm chuẩn 2025→2026); chi tiết ở <a href="#coverage" onclick="showTab('coverage')">Độ phủ dữ liệu</a>.</p>
-    <div id="advice-out"></div>
+  <!-- XẾP NGUYỆN VỌNG (nv.js, nv.css) -->
+  <section id="tab-nv" class="tab">
+    <h1>Xếp nguyện vọng</h1>
+    <p class="nv-help">Ước tính khả năng đỗ và sắp xếp 5–15 nguyện vọng theo điểm, tổ hợp và mức mong muốn.</p>
+    <div class="nv-grid">
+  <section class="nv-card nv-in" aria-label="Thông tin của bạn">
+    <h2 class="nv-h2">1. Điểm của bạn</h2>
+    <div class="nv-row">
+      <div class="nv-field"><label for="nv-score">Điểm dự kiến (thang 30)</label><input id="nv-score" type="number" min="0" max="30" step="0.05" inputmode="decimal"></div>
+      <div class="nv-field"><label for="nv-combo">Tổ hợp xét tuyển</label><select id="nv-combo"></select></div>
+    </div>
+    <p class="nv-help">Điểm đã cộng ưu tiên khu vực, đối tượng. Chọn đúng tổ hợp để dùng điểm chuẩn riêng của tổ hợp đó khi trường công bố khác nhau.</p>
+    <h2 class="nv-h2">2. Ngành, trường bạn muốn đăng ký</h2>
+    <div class="nv-field nv-search"><label for="nv-q">Thêm nguyện vọng</label><input id="nv-q" type="search" placeholder="Tên hoặc mã trường, tên hoặc mã ngành. Ví dụ: BKA, 7480201, bách khoa máy tính" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="nv-sugg"><div class="nv-sugg" id="nv-sugg" role="listbox"></div></div>
+    <ol class="nv-list" id="nv-list"></ol>
+    <p class="nv-help" id="nv-listhelp"></p>
+    <div class="nv-acts"><button class="nv-btn nv-sm" type="button" id="nv-sample">Dùng ví dụ mẫu</button><button class="nv-btn nv-sm" type="button" id="nv-clear">Xóa danh sách</button></div>
+  </section>
+  <section class="nv-out" id="nv-out" aria-live="polite"></section>
+    </div>
   </section>
 
   <!-- TU VAN CHON NGANH (career.js, career.css) -->
@@ -139,5 +148,6 @@
 <script src="static/vendor/vis-network.min.js"></script>
 <script src="static/app.js"></script>
 <script src="static/career.js?v=career-20261114"></script>
+<script src="static/nv.js?v=nv-20261115"></script>
 </body>
 </html>
