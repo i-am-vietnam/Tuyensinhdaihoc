@@ -89,7 +89,7 @@ G2 top 5 eigenvector: 0,15: HUFLIT, HUB, BETU, UTM, BVU; 0,25: HUFLIT, HUB, GDU,
 
 G3: đỉnh betweenness cao nhất ở 0,25 là `M:7420101`; hạng ở 0,15 / 0,25 / 0,35 = 23 / 1 / 76.
 
-G3 top 5 eigenvector: 0,15: Địa tin học, Kỹ thuật địa vật lý, Đá quý Đá mỹ nghệ, Công nghệ số trong thăm dò và khai thác tài nguyên thiên nhiên, Xây dựng công trình ngầm thành phố và Hệ thống tàu điện ngầm; 0,25: Kỹ thuật địa vật lý, Kỹ thuật khí thiên nhiên, Công nghệ số trong thăm dò và khai thác tài nguyên thiên nhiên, An toàn, Vệ sinh lao động, Quản lý và phân tích dữ liệu khoa học; 0,35: Sư phạm Vật lý, Sư phạm Ngữ văn, Sư phạm Hóa học, Sư phạm Sinh học, Sư phạm Lịch sử.
+G3 top 5 eigenvector: 0,15: Quản lý và phân tích dữ liệu khoa học, Địa tin học, Kỹ thuật địa vật lý, Đá quý Đá mỹ nghệ, Kỹ thuật khí thiên nhiên; 0,25: Quản lý và phân tích dữ liệu khoa học, Địa tin học, Kỹ thuật địa vật lý, Đá quý Đá mỹ nghệ, Kỹ thuật khí thiên nhiên; 0,35: Sư phạm Vật lý, Sư phạm Ngữ văn, Sư phạm Hóa học, Sư phạm Sinh học, Sư phạm Lịch sử.
 
 ## Adamic–Adar G3 2024 → 2026 theo ngưỡng
 
