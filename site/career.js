@@ -384,7 +384,7 @@
      <li><b>Học lực 20%:</b> điểm trung bình có trọng số các môn ngành cần, và đó có phải môn mạnh tương đối của bạn không.</li>
      <li><b>Tính cách 15%:</b> 4 trục MBTI cộng trục vững vàng, dùng dạng phần trăm liên tục chứ không chỉ 4 chữ cái, để một câu trả lời sát vạch giữa không đẩy bạn sang hẳn một nhóm.</li>
      <li><b>Giá trị nghề nghiệp 15%</b> và <b>Điều kiện thực tế 15%:</b> môi trường làm việc, áp lực, số năm học, năng khiếu, sơ tuyển. Thiếu năng khiếu hoặc thể lực bắt buộc thì trừ thêm 15 điểm.</li></ul>
-     <p><b>Khả năng trúng tuyển</b> tính từ ${PROF.reduce((a,m)=>a+m.rows.length,0).toLocaleString('vi-VN')} dòng điểm chuẩn THPT ${YEAR} của site: lấy tổ hợp tốt nhất bạn đủ điều kiện ở từng chương trình (cộng điểm ưu tiên), xếp mức An toàn (hơn chuẩn ≥1 điểm), Vừa sức (0–1 điểm), Thử sức (thiếu dưới 1 điểm), giống tab Tư vấn theo điểm.</p>
+     <p><b>Khả năng trúng tuyển</b> tính từ ${PROF.reduce((a,m)=>a+m.rows.length,0).toLocaleString('vi-VN')} dòng điểm chuẩn THPT ${YEAR} của site: lấy tổ hợp tốt nhất bạn đủ điều kiện ở từng chương trình (cộng điểm ưu tiên), xếp mức An toàn (hơn chuẩn ≥1 điểm), Vừa sức (0–1 điểm), Thử sức (thiếu dưới 1 điểm).</p>
      <p>RIASEC là thang đo có nhiều bằng chứng nhất cho chọn nghề nên chiếm trọng số lớn nhất. MBTI chỉ bổ sung về cách bạn làm việc và được đối chiếu chéo với RIASEC; không ngành nào bị loại chỉ vì 4 chữ cái MBTI. Kết quả là gợi ý tham khảo, không thay cho trải nghiệm thực tế và tư vấn trực tiếp; nên làm lại sau 6–12 tháng.</p></div>`;
     R.innerHTML=h;
     $('#tv-more')&&($('#tv-more').onclick=()=>{showN=12; renderResults();});

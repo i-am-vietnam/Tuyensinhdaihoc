@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="static/style.css?v=light-20261108">
+<link rel="stylesheet" href="static/style.css?v=light-20261121">
 <link rel="stylesheet" href="static/career.css?v=career-20261114">
 <link rel="stylesheet" href="static/nv.css?v=nv-20261115">
 </head>
@@ -44,6 +44,7 @@
     <span class="pill">Điểm chuẩn đại học 2024–2026</span>
     <p class="hero-title">Tra cứu điểm chuẩn, học phí và tư vấn chọn ngành</p>
     <p id="stats"></p>
+    <p class="data-dates hero-dates"></p>
   </div>
 </section>
 
@@ -125,9 +126,14 @@
   <!-- MANG SNA -->
   <section id="tab-network" class="tab">
     <h1>Mạng xã hội Trường – Ngành</h1>
-    <form class="bar" id="net-form">
+    <p class="data-dates muted small"></p>
+    <form class="bar" id="net-form" autocomplete="off" onsubmit="return false">
       <select id="net-name" aria-label="Mạng"></select>
+      <input id="net-find" list="net-find-list" type="search" placeholder="Tìm nút trên hình: tên trường hoặc ngành" aria-label="Tìm nút">
+      <datalist id="net-find-list"></datalist>
+      <select id="net-comm" aria-label="Lọc theo cộng đồng"><option value="">Mọi cộng đồng</option></select>
     </form>
+    <p class="muted small">Bấm vào một nút để xem độ đo của nút trong khung thông tin mạng (bên phải; trên điện thoại ở dưới hình).</p>
     <div class="net-grid">
       <div id="net-canvas"></div>
       <aside id="net-side"></aside>
@@ -135,6 +141,7 @@
   </section>
   <section id="tab-coverage" class="tab">
     <h1>Độ phủ dữ liệu</h1>
+    <div id="coverage-how"></div>
     <div id="coverage-out"></div>
   </section>
 </main>
