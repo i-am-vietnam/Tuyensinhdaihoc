@@ -48,16 +48,16 @@ def main():
         number(
             "Dòng map ngành",
             scalar("SELECT COUNT(*) FROM admissions WHERE major_code IS NOT NULL"),
-            69276,
+            69112,
             "DB: admissions major_code NOT NULL",
         )
         number(
             "Dòng chưa map",
             scalar("SELECT COUNT(*) FROM admissions WHERE major_code IS NULL"),
-            1735,
+            1899,
             "DB: admissions major_code NULL",
         )
-        number("Mã ngành", scalar("SELECT COUNT(*) FROM majors"), 472, "DB: majors COUNT(*)")
+        number("Mã ngành", scalar("SELECT COUNT(*) FROM majors"), 455, "DB: majors COUNT(*)")
         number(
             "Lượt dòng–tổ hợp",
             scalar("SELECT COUNT(*) FROM admission_combos"),
@@ -99,7 +99,7 @@ def main():
         number(
             "ma_7_so",
             scalar("SELECT COUNT(*) FROM admissions WHERE match_how='ma_7_so'"),
-            56418,
+            56261,
             "DB: admissions.match_how",
         )
         number(
@@ -118,15 +118,15 @@ def main():
         summary = list(csv.DictReader(f))
     number("Dòng summary", len(summary), 12, "data/network/summary.csv: số dòng")
     for network, field, want in [
-        ("g2_uni_uni", "nodes", 249),
-        ("g2_uni_uni", "edges", 2531),
-        ("g2_uni_uni", "modularity_louvain", 0.4822),
-        ("g3_major_major", "nodes", 377),
-        ("g3_major_major", "edges", 1412),
+        ("g2_uni_uni", "nodes", 250),
+        ("g2_uni_uni", "edges", 2540),
+        ("g2_uni_uni", "modularity_louvain", 0.4845),
+        ("g3_major_major", "nodes", 370),
+        ("g3_major_major", "edges", 1391),
         ("g3_major_major", "modularity_louvain", 0.8363),
         ("g4_competition", "edges", 9215),
-        ("g4_competition", "spearman_authority_vs_avg_score", 0.2343),
-        ("g4_competition", "spearman_pagerank_vs_avg_score", 0.6069),
+        ("g4_competition", "spearman_authority_vs_avg_score", 0.2349),
+        ("g4_competition", "spearman_pagerank_vs_avg_score", 0.6075),
     ]:
         row = next(r for r in summary if r["network"] == network and r["year"] == "2026")
         number(
@@ -232,7 +232,7 @@ def main():
             + ["| " + " | ".join(str(v) for v in row) + " |" for row in rows]
         )
 
-    result = "# Kiểm tra báo cáo đồ án EduRadar\n\nNgày kiểm: 25/10/2026 (UTC+7). Chạy `python scripts/check_report.py` để tái kiểm dữ liệu và cấu trúc.\n\n"
+    result = "# Kiểm tra báo cáo đồ án EduRadar\n\nNgày kiểm: 21/11/2026 (UTC+7). Chạy `python scripts/check_report.py` để tái kiểm dữ liệu và cấu trúc.\n\n"
     result += "## 1. Đối chiếu yêu cầu đề bài\n\n"
     result += table(
         ["Yêu cầu", "Mục", "Bằng chứng và kết quả"],
@@ -255,24 +255,24 @@ def main():
             [
                 "(3')",
                 "4.1–4.6",
-                "Có Louvain, GN, HITS/PageRank, AA, độ nhạy, ứng dụng; AA23% là 2024→2026, đã thêm hai kiểm chứng năm liền kề.",
+                "Có Louvain, Girvan–Newman toàn đồ thị, HITS/PageRank, AA, độ nhạy, ứng dụng; AA 22,7% là 2024→2026, kèm hai kiểm chứng năm liền kề.",
             ],
             [
                 "(4)",
                 "Chương 5",
-                "Có mạng, phân bố, top betweenness, scatter, độ nhạy, web tương tác. Hai ảnh Gephi còn để người thực hiện bổ sung theo yêu cầu.",
+                "Có mạng NetworkX và hai hình Gephi (Hình 5.7–5.8), phân bố bậc CCDF log–log, top betweenness, scatter, độ nhạy, web tương tác.",
             ],
             [
                 "(5)",
                 "Chương 6",
-                "URL web thật; 5tab; ảnh1280px,375px; đề án+học phí; kịch bản demo5bước.",
+                "URL https://diemthidaihoc.com; 6 tab; ảnh 1280px, 375px; đề án + học phí; kịch bản demo 6 bước.",
             ],
         ],
     )
     result += "\n\n## 2. Kiểm từng độ đo\n\n" + table(
         ["Độ đo", "Mục", "Định nghĩa", "Công thức", "Số liệu/bảng", "Diễn giải"], metric_rows
     )
-    result += "\n\nCác hình phân bố: Hình3.2–3.7; mạng và cộng đồng: Hình5.1–5.2; betweenness: Hình5.3; PageRank: Hình5.4; độ nhạy: Hình5.5–5.6. Các độ đo toàn cục có bảng riêng, không cần thêm một hình lặp lại cùng số liệu.\n"
+    result += "\n\nCác hình phân bố bậc (CCDF log–log + đường khớp power-law): Hình 3.2–3.7; mạng và cộng đồng: Hình 5.1–5.2, Gephi 5.7–5.8; betweenness: Hình 5.3; PageRank: Hình 4.1; độ nhạy: Hình 5.4–5.5. Các độ đo toàn cục có bảng riêng.\n"
     result += "\n## 3. Số quan trọng và nguồn đối chiếu\n\n" + table(
         ["Chỉ tiêu", "Đọc lại từ nguồn", "Mốc trong báo cáo", "Nguồn", "Kết quả"], evidence
     )
@@ -280,7 +280,7 @@ def main():
     result += "\n## 4. Kiểm cấu trúc và bản Word\n\n" + table(
         ["Kiểm tra", "Kết quả"], [(k, "Đạt" if ok else "KHÔNG ĐẠT") for k, ok in checks]
     )
-    result += f"\n\nCó {len(image_paths)} tham chiếu hình nhúng, {len(tables)} bảng Word và {maths} công thức OMML. Bảng được kẻ ô, 100%vùng chữ, tiêu đề lặp; công thức không phải ảnh. Hai đường dẫn Gephi dự kiến chưa được nhúng nên không gây liên kết ảnh hỏng.\n"
+    result += f"\n\nCó {len(image_paths)} tham chiếu hình nhúng, {len(tables)} bảng Word và {maths} công thức OMML. Bảng được kẻ ô, 100%vùng chữ, tiêu đề lặp; công thức không phải ảnh. Hai hình Gephi đã được nhúng ở mục 5.4.\n"
     qa = ROOT / "tmp/report/render_qa.md"
     result += "\n### Kiểm tra hiển thị\n\n" + (
         qa.read_text(encoding="utf-8")
@@ -288,7 +288,7 @@ def main():
         else "Chưa hoàn tất kiểm tra hiển thị PDF; không coi kiểm XML là kiểm trang in.\n"
     )
     result += "\n## 5. Những chỗ người thực hiện cần tự điền\n\n"
-    result += "- Trang bìa: [Họ tên — MSSV], [Lớp], [Giảng viên], [Ngày nộp].\n- Mục2.6.2 và Phụ lụcC: kết quả __/20; để trống toàn bộ cột Đúng/Sai cho đến khi đối chiếu nguồn.\n- Mục5.4: xuất hai hình Gephi G2/G3 theo hướng dẫn, lưu docs/fig/gephi_g2_2026.png và gephi_g3_2026.png rồi thay hai khối đánh dấu, dựng lại Word.\n- Nếu hồ sơ nguồn gốc còn giữ: bổ sung ngày truy cập, URL từng bài đề án/học phí và nội dung robots.txt/Content-Signal lịch sử còn thiếu ở2.1. Các mục này chưa đủ bằng chứng trong nguồn số được phép dùng; không tự điền từ suy đoán.\n"
+    result += "- Trang bìa: [Họ tên — MSSV], [Lớp], [Giảng viên], [Ngày nộp].\n- Mục2.6.2 và Phụ lụcC: kết quả __/20; để trống toàn bộ cột Đúng/Sai cho đến khi đối chiếu nguồn.\n- Nếu hồ sơ nguồn gốc còn giữ: bổ sung ngày truy cập, URL từng bài đề án/học phí và nội dung robots.txt/Content-Signal lịch sử còn thiếu ở2.1. Các mục này chưa đủ bằng chứng trong nguồn số được phép dùng; không tự điền từ suy đoán.\n"
     result += "\n## 6. Phạm vi thay đổi\n\nKhông crawl, không sửa raw/clean/DB hoặc tính lại đè data/network; chỉ thêm báo cáo, hình và script. Không commit raw, DB, .venv hoặc tmp. Thực nghiệm bổ sung được tính đọc từ DB, không thay bộ summary gốc.\n"
     (DOCS / "kiem_tra_bao_cao.md").write_text(result, encoding="utf-8")
     failures = [k for k, ok in checks if not ok]
