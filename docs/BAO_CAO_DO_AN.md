@@ -751,28 +751,28 @@ $k_{min}$ chọn theo khoảng cách Kolmogorov–Smirnov nhỏ nhất, đuôi t
 
 **(2) Công thức.** $C_C(v)=\dfrac{n_v-1}{n-1}\cdot\dfrac{n_v-1}{\sum_{u}d(v,u)}$ (hiệu chỉnh Wasserman–Faust khi đồ thị không liên thông, $n_v$ là số đỉnh tới được). G4 dùng khoảng cách **đi vào** đỉnh.
 
-**(3) Cách tính.** `nx.closeness_centrality` cho G2–G4; `bipartite.closeness_centrality` cho G1.
+**(3) Cách tính.** `nx.closeness_centrality` cho cả bốn mạng (G1 tính trên toàn đồ thị hai phía, khoảng cách trường–ngành–trường; G4 theo khoảng cách đi vào).
 
 **(4) Kết quả.**
 
 **Bảng 3.9. Mười đỉnh closeness cao nhất năm 2026**
 
-| Hạng | G2 | G3 | G4 (theo khoảng cách đi vào) |
-| --- | --- | --- | --- |
-| 1 | Trường Đại Học Ngoại Ngữ Tin Học TPHCM (DNT) — 0,4312 | Sinh học (7420101) — 0,2359 | Trường Đại Học Công Đoàn (LDA) — 0,6788 |
-| 2 | Trường Đại Học Công Nghệ và Quản Lý Hữu Nghị (DCQ) — 0,4303 | Hải dương học (7440228) — 0,2242 | Trường Đại Học Thăng Long (DTL) — 0,6724 |
-| 3 | Trường Đại học Hùng Vương TPHCM (DHV) — 0,4235 | Nông học (7620109) — 0,2196 | Trường Đại Học Quy Nhơn (DQN) — 0,6703 |
-| 4 | Trường Đại Học Kinh Tế Kỹ Thuật Bình Dương (DKB) — 0,4235 | Lịch sử (7229010) — 0,2193 | Trường Đại Học Vinh (TDV) — 0,6682 |
-| 5 | Trường Đại Học Bà Rịa – Vũng Tàu (BVU) — 0,4145 | Khoa học đất (7620103) — 0,2189 | Trường Đại Học Hải Phòng (THP) — 0,6682 |
-| 6 | Trường Đại Học Kinh Tế Công Nghiệp Long An (DLA) — 0,4129 | Toán tin (7460117) — 0,2177 | Học Viện Nông Nghiệp Việt Nam (HVN) — 0,6599 |
-| 7 | Trường Đại Học Lạc Hồng (DLH) — 0,4082 | Địa lý học (7310501) — 0,2149 | Trường Đại Học Đồng Tháp (SPD) — 0,6599 |
-| 8 | Trường Đại học Sao Đỏ (SDU) — 0,4082 | Kỹ thuật trắc địa - bản đồ (7520503) — 0,2108 | Trường Đại học Thủ Dầu Một (TDM) — 0,6579 |
-| 9 | Trường Đại Học Trưng Vương (DVP) — 0,4074 | Hóa dược (7720203) — 0,2107 | Trường Đại Học Công Nghiệp TPHCM (IUH) — 0,6559 |
-| 10 | Trường Đại Học Đại Nam (DDN) — 0,4036 | Khí tượng và khí hậu học (7440222) — 0,2092 | Đại Học Cần Thơ (TCT) — 0,6519 |
+| Hạng | G1 (cả hai phía) | G2 | G3 | G4 (theo khoảng cách đi vào) |
+| --- | --- | --- | --- | --- |
+| 1 | Công nghệ thông tin (7480201) — 0,4570 | Trường Đại Học Ngoại Ngữ Tin Học TPHCM (DNT) — 0,4312 | Sinh học (7420101) — 0,2359 | Trường Đại Học Công Đoàn (LDA) — 0,6788 |
+| 2 | Quản trị kinh doanh (7340101) — 0,4506 | Trường Đại Học Công Nghệ và Quản Lý Hữu Nghị (DCQ) — 0,4303 | Hải dương học (7440228) — 0,2242 | Trường Đại Học Thăng Long (DTL) — 0,6724 |
+| 3 | Ngôn ngữ Anh (7220201) — 0,4449 | Trường Đại học Hùng Vương TPHCM (DHV) — 0,4235 | Nông học (7620109) — 0,2196 | Trường Đại Học Quy Nhơn (DQN) — 0,6703 |
+| 4 | Kế toán (7340301) — 0,4329 | Trường Đại Học Kinh Tế Kỹ Thuật Bình Dương (DKB) — 0,4235 | Lịch sử (7229010) — 0,2193 | Trường Đại Học Vinh (TDV) — 0,6682 |
+| 5 | Tài chính - Ngân hàng (7340201) — 0,4091 | Trường Đại Học Bà Rịa – Vũng Tàu (BVU) — 0,4145 | Khoa học đất (7620103) — 0,2189 | Trường Đại Học Hải Phòng (THP) — 0,6682 |
+| 6 | Đại Học Cần Thơ (TCT) — 0,3909 | Trường Đại Học Kinh Tế Công Nghiệp Long An (DLA) — 0,4129 | Toán tin (7460117) — 0,2177 | Học Viện Nông Nghiệp Việt Nam (HVN) — 0,6599 |
+| 7 | Quản trị dịch vụ du lịch và lữ hành (7810103) — 0,3897 | Trường Đại Học Lạc Hồng (DLH) — 0,4082 | Địa lý học (7310501) — 0,2149 | Trường Đại Học Đồng Tháp (SPD) — 0,6599 |
+| 8 | Ngôn ngữ Trung Quốc (7220204) — 0,3893 | Trường Đại học Sao Đỏ (SDU) — 0,4082 | Kỹ thuật trắc địa - bản đồ (7520503) — 0,2108 | Trường Đại học Thủ Dầu Một (TDM) — 0,6579 |
+| 9 | Trường Đại Học Văn Lang (DVL) — 0,3886 | Trường Đại Học Trưng Vương (DVP) — 0,4074 | Hóa dược (7720203) — 0,2107 | Trường Đại Học Công Nghiệp TPHCM (IUH) — 0,6559 |
+| 10 | Trường Đại học Công Nghệ TPHCM (DKC) — 0,3871 | Trường Đại Học Đại Nam (DDN) — 0,4036 | Khí tượng và khí hậu học (7440222) — 0,2092 | Đại Học Cần Thơ (TCT) — 0,6519 |
 
 *Nguồn: `data/network/metrics/<mạng>_2026.csv`, cột `closeness`.*
 
-**(5) Ý nghĩa.** G2 và G4 có closeness cao ở các trường đa ngành phía Nam (G2) và trường điểm trung bình được nhiều trường khác “nhắm lên” (G4: Công Đoàn, Thăng Long). G3 có closeness thấp hơn hẳn (≈ 0,21–0,24) vì đường đi trung bình 5,67 bước. Với G1, hàm hai phía của NetworkX chuẩn hoá theo phía đối diện nên ở thành phần nhỏ giá trị có thể vượt 1: 24 đỉnh G1 2026 có closeness > 1 (lớn nhất 1,6035), thuộc thành phần nhỏ: Biên phòng, CCE, Chỉ huy - Tham mưu Thông tin, Chỉ huy - Tham mưu đặc công, Chỉ huy Kỹ thuật hóa học, Chỉ huy Tham mưu Lục quân. Vì vậy báo cáo không xếp hạng closeness G1 toàn cục.
+**(5) Ý nghĩa.** G2 và G4 có closeness cao ở các trường đa ngành phía Nam (G2) và trường điểm trung bình được nhiều trường khác “nhắm lên” (G4: Công Đoàn, Thăng Long). G3 có closeness thấp hơn hẳn (≈ 0,21–0,24) vì đường đi trung bình 5,67 bước. Ở G1, closeness dùng công thức Wasserman–Faust như các mạng khác nên mọi giá trị ≤ 1 (lớn nhất 0,4570); năm đỉnh gần mọi đỉnh khác nhất đều là ngành đại trà: Công nghệ thông tin (7480201) — 0,4570; Quản trị kinh doanh (7340101) — 0,4506; Ngôn ngữ Anh (7220201) — 0,4449; Kế toán (7340301) — 0,4329; Tài chính - Ngân hàng (7340201) — 0,4091. Các ngành này được nhiều trường mở nên từ đó tới các đỉnh khác trong thành phần lớn nhất trung bình chỉ khoảng 2,1 bước (Công nghệ thông tin); trường đứng đầu là Đại học Cần Thơ (hạng 6). Bản hai phía `bipartite.closeness_centrality` trước đây chuẩn hoá theo phía đối diện nên ở thành phần nhỏ (khối ngành quân sự) có giá trị vượt 1 và đã được thay.
 
 ### 3.2.4. Eigenvector centrality
 
@@ -1697,7 +1697,7 @@ Các khối ngành tách rõ, giữa các khối có rất ít cạnh: khối ki
 
 Dữ liệu điểm đến từ một trang tổng hợp nên có thể kế thừa sai sót của nguồn. Thang điểm một phần là suy luận; dòng có cờ và 631 dòng trùng khoá khác điểm chưa được phân xử. Tỉ lệ 97,33% dòng có mã ngành là độ phủ ánh xạ, chưa phải độ chính xác đã đo; kết quả kiểm 20 dòng còn để người thực hiện điền.
 
-Phép chiếu Jaccard làm mất thông tin của mạng hai phía và tạo khối Jaccard = 1 ở ngành hiếm (nguyên nhân localization của eigenvector). Đường đi tính không trọng số, giới hạn trên LCC. Chưa kiểm định thế giới nhỏ với mô hình null; ước lượng power-law chưa so với phân bố thay thế (log-normal, mũ cắt). Louvain là heuristic; GN dừng ở 40 cộng đồng. Closeness hai phía của G1 không xếp hạng được toàn cục. Dự đoán liên kết lưu theo tên ngành nên có nguy cơ nhập nhằng tên–mã.
+Phép chiếu Jaccard làm mất thông tin của mạng hai phía và tạo khối Jaccard = 1 ở ngành hiếm (nguyên nhân localization của eigenvector). Đường đi tính không trọng số, giới hạn trên LCC. Chưa kiểm định thế giới nhỏ với mô hình null; ước lượng power-law chưa so với phân bố thay thế (log-normal, mũ cắt). Louvain là heuristic; GN dừng ở 40 cộng đồng. Dự đoán liên kết lưu theo tên ngành nên có nguy cơ nhập nhằng tên–mã.
 
 Đề án, học phí, xếp hạng và tỉnh có phạm vi và mốc thời gian khác nhau; chỉ dùng kèm các ghi chú đi cùng.
 

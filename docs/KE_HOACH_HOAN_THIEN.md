@@ -6,8 +6,8 @@
 
 ## 0. Trạng thái hiện tại (cập nhật liên tục)
 
-- **Đang ở bước:** 5 — Slide (bước 1–4 xong 21/11; đã commit trên v2-simple, CHƯA push/deploy)
-- **Việc tiếp theo:** 5.1 dàn ý slide; trước khi nộp: push v2-simple + deploy để diemthidaihoc.com có thẻ định nghĩa, phễu làm sạch (hỏi người dùng)
+- **Đang ở bước:** 6 — Hoàn thiện trước khi nộp (bước 1–5 xong 21/11; PR #7 đã merge + deploy; slide `docs/EduRadar_SNA.pptx`)
+- **Việc tiếp theo:** 6.1 điền bìa slide + báo cáo (người dùng); 6.3 kiểm 20 dòng (người dùng); 6.4 tập thuyết trình. 6.2 xong (closeness G1 ≤ 1); PR #8 (đồ thị đứng yên) đã merge + deploy; 6.2 + slide đang phát hành qua PR (xem nhật ký)
 - **Lưu ý:** `sna.build` chạy ~5,5 phút. Sau khi sửa web/dữ liệu: `scripts/export_static.py` → `check_static.py` (+ `--committed`)
   → `node scripts/check_static_browser.cjs`. Báo cáo: `report_sensitivity.py` → `report_sna_tables.py` (bảng chương 3–4)
   → `build_report_figures.py` → `node scripts/capture_report_web.cjs <url>` → `build_report_docx.py` → `check_report.py`.
@@ -30,7 +30,7 @@
 - [x] 2.3 Hiện 2 mốc thời gian: "Thu thập 23/10/2026 · Xử lý 09/11/2026" ở đầu trang + tab SNA
 - [x] 2.4 Tab Độ phủ: sơ đồ thu thập (nguồn, API, số request, độ trễ) + bảng phễu làm sạch 76.726 → 71.011
 - [x] 2.5 Đồ thị: ô tìm nút, click nút xem độ đo, lọc theo cộng đồng (nếu còn thời gian)
-- [x] 2.6 Kiểm tra FastAPI + bản tĩnh `site/` (scripts/check_static.py), commit nhánh v2-simple — deploy/push chờ người dùng
+- [x] 2.6 Kiểm tra FastAPI + bản tĩnh `site/` (scripts/check_static.py), commit nhánh v2-simple, deploy (PR #7, 21/11)
 
 ## 3. Gephi
 
@@ -55,8 +55,41 @@
 
 ## 5. Slide thuyết trình
 
-- [ ] 5.1 Dàn ý ~15–18 slide (có 1 slide "8 câu của thầy")
-- [ ] 5.2 Làm slide + kịch bản demo web 5 phút
+- [x] 5.1 Dàn ý: rút còn 14 slide cho 10–15 phút; câu của thầy gắn nhãn "Câu 1–4", "Câu 5 · 6", "Câu 7", "Câu 8"
+- [x] 5.2 Slide `docs/EduRadar_SNA.pptx` (14 trang, ~13 phút, ghi chú lời nói từng slide; kịch bản demo ~3 phút ở ghi chú slide 12). Số GN/Louvain không trọng số dùng bản đã sửa (G2 0,32/0,43; G3 0,81/0,82)
+
+> Bảng dàn ý 18 slide bên dưới là bản nháp ban đầu, đã thay bằng bản 14 slide trong file pptx.
+
+## 6. Hoàn thiện trước khi nộp
+
+- [ ] 6.1 Điền slide bìa (họ tên – MSSV, GVHD) và trang bìa báo cáo `[Họ tên — MSSV]`, `[Lớp]`, `[Giảng viên]`, `[Ngày nộp]`; xuất lại Word
+- [x] 6.2 (tuỳ chọn) Closeness G1: 24 ngành quân sự > 1 do chuẩn hoá hai phía → đổi sang `nx.closeness_centrality` (Wasserman–Faust, ≤ 1), chạy lại sna.build + script báo cáo + export_static
+- [ ] 6.3 Điền kết quả kiểm 20 dòng (Phụ lục C) — người dùng đối chiếu tay với trang trường
+- [ ] 6.4 Tập thuyết trình theo ghi chú slide; chuẩn bị trả lời: trọng số G1, ngưỡng Jaccard 0,25 (độ nhạy 4.5), localization eigenvector, authority đổi dấu
+- [x] 6.5 Commit file kế hoạch + slide, push, deploy nếu có sửa web
+
+### Dàn ý slide đề xuất (5.1 — chờ người dùng duyệt)
+
+| # | Slide | Nội dung / hình |
+|---|---|---|
+| 1 | Bìa | Tên đề tài, nhóm, GVHD, link diemthidaihoc.com |
+| 2 | Bài toán & mục tiêu | Câu hỏi nghiên cứu (chương 1) |
+| 3 | Quy trình tổng thể | crawler → clean → SQLite → SNA → web (docs/fig/data_flow.png) |
+| 4 | Thu thập dữ liệu | Nguồn, 2 API, 921 request = 307 trường × 3 năm, 0 lỗi, 23/10/2026 13:51–14:20, nghỉ ≥ 1,5 s, robots.txt |
+| 5 | Làm sạch & chuẩn hoá | Phễu 76.726 → 71.011 (cleaning_funnel.png), gán mã ngành 97,33%, cờ chất lượng |
+| 6 | Trả lời 8 câu trọng tâm | Bảng: đồ thị, nút, cạnh, trọng số, thu thập, thời gian, làm sạch, độ đo |
+| 7 | Bốn mạng G1–G4 | Định nghĩa + hình chiếu (projection.png) |
+| 8 | Bảng độ đo toàn mạng 2026 | density, path, diameter, clustering, modularity, assortativity × 4 mạng |
+| 9 | Centrality | Top degree/betweenness/PageRank; eigenvector localization |
+| 10 | Phân bố bậc | CCDF log-log, γ ≈ 2,4–3,0, đuôi nặng không scale-free thuần |
+| 11 | Cộng đồng G2 | Gephi G2 + Louvain vs Girvan–Newman |
+| 12 | Cộng đồng G3 | Gephi G3, các khối ngành |
+| 13 | Mạng cạnh tranh G4 | HITS/PageRank, Spearman với điểm chuẩn |
+| 14 | Dự đoán liên kết & độ hot | Adamic–Adar → ngành tương tự; công thức độ hot |
+| 15 | Thay đổi 2024–2026 | Xu hướng số cạnh, cộng đồng, ngành hot |
+| 16 | Ứng dụng web (demo) | 6 tab + QR; kịch bản demo 5 phút |
+| 17 | Kết luận & hạn chế | Hạn chế dữ liệu, hướng phát triển |
+| 18 | Hỏi đáp | |
 
 ### Kết quả bước 1 (để dùng cho báo cáo)
 
@@ -101,3 +134,8 @@
 | 21/11/2026 | Sửa lỗi bước 1: `girvan_newman_full` gọi `louvain_communities`/`modularity` không truyền `weight` nên cột “không trọng số” thực ra có trọng số (G2 2026 0,4845 trùng bản có trọng số); thêm `weight=None`, chạy lại `sna.build` | Chỉ đổi `gn_*`, `louvain_unweighted_*`, thời gian; mọi cột khác và metrics/*.csv giữ nguyên. G2 2026: GN 0,3795 → 0,3239, Louvain kt 0,4845 → 0,4347 (19 → 16 cụm); G3: GN 0,8255 → 0,8066, Louvain kt 0,8363 → 0,8167 (20 → 17 cụm) | sna/build.py, data/network/**, site/data/network/*.json |
 | 21/11/2026 | Kiểm trình duyệt: trang SEO YPB tràn ngang 417 px ở 375 px do ô ngày của bảng “Mốc thời gian” đề án không xuống dòng (lỗi có sẵn, CSS cũ cũng lỗi) | Thêm `table.timeline td.num{white-space:normal}` cho màn ≤ 640 px; quét 619 trang trường/ngành: 0 tràn; check_static_browser PASS toàn bộ | webapp/static/style.css, site/style.css |
 | 21/11/2026 | Bước 4: báo cáo theo số hiện tại. Script mới `report_sensitivity.py` (tính lại độ nhạy: G2/G3 × 5 ngưỡng, G4 × 3 khoảng, ARI/NMI, AA, dao động điểm), `report_sna_tables.py` (31 bảng chương 3–4 từ summary/metrics/definition); `build_report_figures.py` đọc độ nhạy từ JSON và dùng hình CCDF + power-law của sna.build; `capture_report_web.cjs` nhận URL, thêm tab Tư vấn chọn ngành. Báo cáo: mục “Trả lời 8 câu hỏi trọng tâm”, chương 3 rút gọn (12 độ đo, mỗi mục định nghĩa–công thức–kết quả–ý nghĩa), 4.2 GN toàn đồ thị, 4.5 độ nhạy mới, 5.4 hai hình Gephi, chương 6 sáu tab (nv.js, career.js), link diemthidaihoc.com, ngày 23/10 và 09/11 | Số trước → sau: G2 2026 249/2.531/20/0,4822 → 250/2.540/19/0,4845; G3 377/1.412/19 → 370/1.391/20; G1 705/5.058 → 697/5.046; mã ngành 472 → 455; dòng có mã 69.276 → 69.112 (97,56% → 97,33%); Spearman G4 2026 authority 0,2343 → 0,2349, PageRank 0,6069 → 0,6075. check_report: 11 lỗi → 0/58; docx 63 bảng, 29 hình, 93 công thức OMML | docs/BAO_CAO_DO_AN.md/.docx, docs/do_nhay_sna.md/.json, docs/kiem_tra_bao_cao.md, docs/fig/*, README.md, scripts/report_sensitivity.py, scripts/report_sna_tables.py, scripts/build_report_figures.py, scripts/check_report.py, scripts/capture_report_web.cjs |
+| 21/11/2026 | Push v2-simple (b4ff9f85 → ee328c70), tạo PR #7 v2-simple → main (check CI "EduRadar V2 checks" SUCCESS), merge (e5d8d8c2). Deploy Pages tự chạy (run 44892145678) lỗi ở bước deploy-pages: "No artifacts named github-pages" dù upload-pages-artifact đã upload xong (12.956.869 byte) — độ trễ phía GitHub, chạy lại job vẫn lỗi; chạy lượt mới bằng workflow_dispatch (run 44892357709) thì thành công, không sửa workflow | diemthidaihoc.com Last-Modified 21/11/2026 10:02 GMT; Edge headless: tab Mạng SNA có thẻ "Định nghĩa đồ thị" (G2 2026: 250 nút · 2.540 cạnh), hai mốc "Thu thập dữ liệu: 23/10/2026 · Xử lý/cập nhật: 09/11/2026", 0 lỗi JS; coverage.json có khối crawl | docs/KE_HOACH_HOAN_THIEN.md |
+| 21/11/2026 | Bước 5: Claude (chat) dựng slide 14 trang từ báo cáo + summary.csv + hình docs/fig (Gephi cắt viền) | Validate pptx đạt, kiểm hình từng slide | docs/EduRadar_SNA.pptx |
+| 21/11/2026 | Đồ thị tab Mạng SNA trôi/xoay mãi do physics vis-network chạy liên tục → ổn định 400 vòng rồi tắt physics (`stabilizationIterationsDone`), vẫn kéo thả nút được | Chưa commit/deploy; sửa cả webapp/static/app.js và site/app.js (giống hệt) | webapp/static/app.js, site/app.js |
+| 21/11/2026 | Phát hành sửa physics: export_static (site/app.js trùng webapp/static/app.js), check_static + --committed PASS, check_static_browser PASS; kiểm riêng 12 mạng trên bản tĩnh, FastAPI và diemthidaihoc.com: ổn định sau 0,9–3,3 s, vị trí nút không đổi sau đó, kéo thả/zoom/click chạy, 0 lỗi console. Commit de2c70d6, PR #8 (CI đạt) merge aa690d1f, Pages run 44893992063 thành công ngay lần đầu | Máy thiếu bộ nhớ ảo (commit còn ~1,5 GB) làm uvicorn lỗi OpenBLAS → tắt tiến trình kiểm cũ bị treo, chạy kiểm với OPENBLAS_NUM_THREADS=1 (không sửa code) | webapp/static/app.js, site/app.js |
+| 21/11/2026 | 6.2: closeness G1 đổi `bipartite.closeness_centrality` → `nx.closeness_centrality(g1)` (Wasserman–Faust); chạy lại sna.build, report_sensitivity, report_sna_tables, export_static | summary.csv: 0 cột lệch; metrics: chỉ cột closeness của g1_uni_major_{2024,2025,2026} đổi, 0 ô trống; số đỉnh G1 closeness > 1: 22/21/24 → 0, max 2026 1,6035 → 0,4570. Top 5 G1 2026: Công nghệ thông tin 0,4570, Quản trị kinh doanh 0,4506, Ngôn ngữ Anh 0,4449, Kế toán 0,4329, Tài chính – Ngân hàng 0,4091. report_sensitivity.py sửa cho tất định (làm tròn eigenvector, xếp AA theo điểm rồi tên cặp; trước đó cặp bằng điểm làm AA 0,35 dao động 57/58); báo cáo 3.2.3 + Bảng 3.9 có cột G1, bỏ câu “không xếp hạng được” ở 3.2.3 và 7.2. check_static + --committed PASS, check_report 58/58, docx 63 bảng | sna/build.py, scripts/report_sensitivity.py, scripts/report_sna_tables.py, docs/BAO_CAO_DO_AN.md/.docx, docs/do_nhay_sna.*, site/data/network/*.json |

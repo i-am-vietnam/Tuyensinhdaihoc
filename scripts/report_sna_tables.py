@@ -213,12 +213,12 @@ def main() -> None:
             ]
         ),
     )
-    # G1 khong xep hang closeness: bipartite.closeness_centrality chuan hoa theo phia ben kia nen o
-    # thanh phan nho co the > 1 (khoi nganh quan su) -> chi bao cao G2, G3, G4
+    # G1 dung nx.closeness_centrality (Wasserman-Faust, <= 1) tren ca hai phia
     blocks["clo"] = table(
-        ["Hạng", "G2", "G3", "G4 (theo khoảng cách đi vào)"],
+        ["Hạng", "G1 (cả hai phía)", "G2", "G3", "G4 (theo khoảng cách đi vào)"],
         side_by_side(
             [
+                top("g1_uni_major", "closeness"),
                 top("g2_uni_uni", "closeness"),
                 top("g3_major_major", "closeness"),
                 top("g4_competition", "closeness"),
@@ -226,11 +226,9 @@ def main() -> None:
         ),
     )
     g1c = M[("g1_uni_major", 2026)]
-    big = g1c[g1c.closeness > 1]
-    blocks["clo_g1_note"] = (
-        f"{len(big)} đỉnh G1 2026 có closeness > 1 (lớn nhất {vn(float(g1c.closeness.max()))}), "
-        f"thuộc thành phần nhỏ: " + ", ".join(sorted(big.label.astype(str))[:6])
-    )
+    assert (g1c.closeness <= 1).all(), "closeness G1 > 1"
+    blocks["clo_g1_top5"] = "; ".join(top("g1_uni_major", "closeness", k=5))
+    blocks["clo_g1_max"] = vn(float(g1c.closeness.max()))
     blocks["eig"] = table(
         ["Hạng", "G2 có trọng số", "G2 không trọng số", "G3 có trọng số", "G3 không trọng số"],
         side_by_side(

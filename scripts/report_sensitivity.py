@@ -94,7 +94,8 @@ def tops(g, labels) -> dict:
     vals = {
         "degree": dict(g.degree()),
         "betweenness": nx.betweenness_centrality(g, normalized=True),
-        "eigenvector": {n: ev.get(n, 0.0) for n in g},
+        # lam tron de cac dinh bang nhau (khoi Jaccard = 1) xep theo ten, khong theo sai so may
+        "eigenvector": {n: round(ev.get(n, 0.0), 10) for n in g},
         "pagerank": nx.pagerank(g, weight="weight"),
     }
     out = {}
@@ -131,7 +132,10 @@ def g4_stats(adm, gap) -> dict:
 
 
 def aa_hits(g_before, g_after, k=300) -> dict:
-    pred = sorted(nx.adamic_adar_index(g_before), key=lambda x: -x[2])[:k]
+    # xep theo diem roi theo cap ten (tat dinh khi nhieu cap bang diem o nguong cat)
+    pred = sorted(
+        nx.adamic_adar_index(g_before), key=lambda x: (-round(x[2], 10), min(x[:2]), max(x[:2]))
+    )[:k]
     after = {frozenset(e) for e in g_after.edges()}
     hits = sum(1 for a, b, _ in pred if frozenset((a, b)) in after)
     nodes = [n for n in g_before if n in g_after]

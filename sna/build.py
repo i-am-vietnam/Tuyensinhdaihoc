@@ -413,7 +413,9 @@ def main() -> None:
             "degree": deg,
             "degree_centrality": bipartite.degree_centrality(g1, U),
             "betweenness": bipartite.betweenness_centrality(g1, U),
-            "closeness": bipartite.closeness_centrality(g1, U),
+            # closeness Wasserman-Faust tren toan G1 (<= 1); ban hai phia chuan hoa theo phia ben kia
+            # nen o thanh phan nho (khoi nganh quan su) vuot 1, khong xep hang duoc
+            "closeness": nx.closeness_centrality(g1),
             "eigenvector": eig_full(g1, big1, "weight"),
             "eigenvector_unw": eig_full(g1, big1, None),
             "pagerank": nx.pagerank(g1, weight="weight"),
