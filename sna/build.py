@@ -51,7 +51,9 @@ def load(year: int) -> tuple[pd.DataFrame, dict, dict]:
             params=(year,),
         )
         unis = dict(
-            c.execute("SELECT uni_code, COALESCE(short_name, name) FROM universities").fetchall()
+            c.execute(
+                "SELECT uni_code, COALESCE(NULLIF(short_name, ''), name) FROM universities"
+            ).fetchall()
         )
         majors = dict(c.execute("SELECT major_code, major_name FROM majors").fetchall())
     return adm, unis, majors
@@ -111,6 +113,82 @@ def lcc(g: nx.Graph) -> nx.Graph:
     return g.subgraph(max(comps, key=len)).copy()
 
 
+def powerlaw_fit(degrees) -> dict:
+    """Uoc luong so mu luat luy thua P(k) ~ k^-gamma cho phan duoi k >= kmin.
+    MLE roi rac xap xi (Clauset, Shalizi & Newman 2009), kmin chon theo KS nho nhat,
+    duoi can it nhat max(30, 20% so dinh) de uoc luong on dinh (duoi qua ngan cho gamma ao)."""
+    import math
+
+    ks = sorted(int(d) for d in degrees if d > 0)
+    min_tail = max(30, int(0.2 * len(ks)))
+    best = None
+    for kmin in sorted(set(ks)):
+        tail = [k for k in ks if k >= kmin]
+        if len(tail) < min_tail:
+            break
+        s = sum(math.log(k / (kmin - 0.5)) for k in tail)
+        if s <= 0:
+            continue
+        a = 1 + len(tail) / s
+        # KS giua CDF thuc nghiem va CDF ly thuyet (lien tuc xap xi) tren duoi
+        n = len(tail)
+        uniq = sorted(set(tail))
+        D = 0.0
+        for k in uniq:
+            emp = sum(1 for x in tail if x <= k) / n
+            theo = 1 - ((k + 0.5) / (kmin - 0.5)) ** (1 - a)
+            D = max(D, abs(emp - theo))
+        if best is None or D < best["ks"]:
+            best = {"gamma": a, "kmin": kmin, "n_tail": n, "ks": D}
+    if not best:
+        return {}
+    return {
+        "powerlaw_gamma": r4(best["gamma"]),
+        "powerlaw_kmin": best["kmin"],
+        "powerlaw_tail_nodes": best["n_tail"],
+        "powerlaw_ks": r4(best["ks"]),
+    }
+
+
+def eig_full(g: nx.Graph, big: nx.Graph, weight) -> dict:
+    """Eigenvector tren LCC; dinh ngoai LCC = 0 (khong de trong)."""
+    ev = nx.eigenvector_centrality_numpy(big, weight=weight) if big.number_of_edges() else {}
+    return {n: float(ev.get(n, 0.0)) for n in g}
+
+
+def path_stats(big: nx.Graph, prefix: str = "") -> dict:
+    if big.number_of_nodes() < 2:
+        return {f"{prefix}avg_path_length_lcc": 0, f"{prefix}diameter_lcc": 0}
+    return {
+        f"{prefix}avg_path_length_lcc": r4(nx.average_shortest_path_length(big)),
+        f"{prefix}diameter_lcc": nx.diameter(big),
+    }
+
+
+def girvan_newman_full(g: nx.Graph, max_k: int = 40, time_cap: float = 300.0) -> dict:
+    """Girvan-Newman tren TOAN do thi (khong lay mau), dung khi du max_k cum hoac het gio.
+    Modularity khong trong so de so sanh cong bang voi Louvain khong trong so."""
+    t0 = time.time()
+    best_q, best_k, steps = -1.0, 0, 0
+    for parts in community.girvan_newman(g):
+        steps += 1
+        q = community.modularity(g, parts, weight=None)
+        if q > best_q:
+            best_q, best_k = q, len(parts)
+        if len(parts) >= max_k or time.time() - t0 > time_cap:
+            break
+    lv = community.louvain_communities(g, weight=None, seed=42)
+    return {
+        "gn_nodes": g.number_of_nodes(),
+        "gn_best_modularity": r4(best_q),
+        "gn_best_k": best_k,
+        "gn_max_k_checked": max_k,
+        "gn_seconds": r4(time.time() - t0),
+        "louvain_unweighted_modularity": r4(community.modularity(g, lv, weight=None)),
+        "louvain_unweighted_communities": len(lv),
+    }
+
+
 def undirected_metrics(g: nx.Graph) -> tuple[dict, dict]:
     t = time.time()
     big = lcc(g)
@@ -119,9 +197,8 @@ def undirected_metrics(g: nx.Graph) -> tuple[dict, dict]:
         "degree_centrality": nx.degree_centrality(g),
         "betweenness": nx.betweenness_centrality(g, normalized=True),
         "closeness": nx.closeness_centrality(g),
-        "eigenvector": nx.eigenvector_centrality_numpy(big, weight="weight")
-        if big.number_of_edges()
-        else {},
+        "eigenvector": eig_full(g, big, "weight"),
+        "eigenvector_unw": eig_full(g, big, None),
         "clustering": nx.clustering(g, weight=None),
         "pagerank": nx.pagerank(g, weight="weight"),
     }
@@ -145,34 +222,17 @@ def undirected_metrics(g: nx.Graph) -> tuple[dict, dict]:
         "louvain_communities": len(comms),
         "modularity_louvain": r4(community.modularity(g, comms, weight="weight")),
     }
-    # so sanh Girvan-Newman tren do thi con (60 dinh bac cao nhat) - thuat toan O(m^2 n) nen chi chay mau
-    sub = g.subgraph(sorted(g, key=lambda n: -g.degree(n))[:60]).copy()
-    if sub.number_of_edges() > 0:
-        t0 = time.time()
-        best_q, best_k = -1.0, 0
-        for k, parts in zip(range(2, 12), community.girvan_newman(sub)):
-            q = community.modularity(sub, parts)
-            if q > best_q:
-                best_q, best_k = q, len(parts)
-        gn_time = time.time() - t0
-        t0 = time.time()
-        lv = community.louvain_communities(sub, seed=42)
-        summary.update(
-            {
-                "gn_sample_nodes": sub.number_of_nodes(),
-                "gn_best_modularity": r4(best_q),
-                "gn_best_k": best_k,
-                "gn_seconds": r4(gn_time),
-                "louvain_sample_modularity": r4(community.modularity(sub, lv)),
-                "louvain_sample_seconds": r4(time.time() - t0),
-            }
-        )
+    # Girvan-Newman tren toan do thi (truoc day chi chay mau 60 dinh bac cao -> Q gan 0)
+    summary.update(girvan_newman_full(g))
+    summary.update(powerlaw_fit(dict(g.degree()).values()))
     summary["compute_seconds"] = r4(time.time() - t)
     return node, summary
 
 
 def directed_metrics(g: nx.DiGraph) -> tuple[dict, dict]:
     hubs, auths = nx.hits(g, max_iter=1000, normalized=True) if g.number_of_edges() else ({}, {})
+    scc = g.subgraph(max(nx.strongly_connected_components(g), key=len)).copy()
+    big = lcc(g)
     node = {
         "in_degree": dict(g.in_degree()),
         "out_degree": dict(g.out_degree()),
@@ -181,16 +241,41 @@ def directed_metrics(g: nx.DiGraph) -> tuple[dict, dict]:
         "hub": hubs,
         "authority": auths,
         "betweenness": nx.betweenness_centrality(g, normalized=True),
+        # closeness co huong: dua tren khoang cach DI VAO dinh (Wasserman-Faust khi khong lien thong)
+        "closeness": nx.closeness_centrality(g),
+        # eigenvector (theo canh vao) tren thanh phan lien thong manh lon nhat; ngoai SCC = 0
+        "eigenvector": eig_full(g, scc, "weight"),
+        # clustering co huong (Fagiolo 2007), khong trong so
+        "clustering": nx.clustering(g),
     }
-    big = lcc(g)
+    comms = community.louvain_communities(g, weight="weight", seed=42)
+    node["community"] = {
+        n: i for i, c in enumerate(sorted(comms, key=len, reverse=True)) for n in c
+    }
+    und = big.to_undirected()
     summary = {
         "nodes": g.number_of_nodes(),
         "edges": g.number_of_edges(),
         "density": r4(nx.density(g)),
+        "avg_degree": r4(g.number_of_edges() / max(g.number_of_nodes(), 1)),
         "weak_components": nx.number_weakly_connected_components(g),
         "strong_components": nx.number_strongly_connected_components(g),
         "reciprocity": r4(nx.reciprocity(g)) if g.number_of_edges() else 0,
         "lcc_nodes": big.number_of_nodes(),
+        "scc_nodes": scc.number_of_nodes(),
+        "avg_clustering": r4(nx.average_clustering(g)),
+        "transitivity": r4(nx.transitivity(g.to_undirected())),
+        # duong di co huong tren SCC lon nhat (moi cap deu toi duoc nhau)
+        **{
+            k.replace("_lcc", "").replace("avg", "scc_avg").replace("diameter", "scc_diameter"): v
+            for k, v in path_stats(scc).items()
+        },
+        # duong di khi bo huong, tren LCC yeu
+        **path_stats(und),
+        "assortativity": r4(nx.degree_assortativity_coefficient(g, x="in", y="in")),
+        "louvain_communities": len(comms),
+        "modularity_louvain": r4(community.modularity(g, comms, weight="weight")),
+        **{f"in_{k}": v for k, v in powerlaw_fit(dict(g.in_degree()).values()).items()},
     }
     return node, summary
 
@@ -211,15 +296,34 @@ def degree_plot(g, path: Path, title: str, nodes=None, kind: str = "") -> None:
     fig, ax = plt.subplots(1, 2, figsize=(9, 3.4))
     ax[0].hist(deg, bins=30, color="#1f5eff")
     ax[0].set(title=f"{title}: phân bố bậc", xlabel="bậc k", ylabel="số đỉnh")
-    ax[1].loglog(cnt.index, cnt.values / cnt.sum(), "o", ms=4, color="#e8590c")
-    ax[1].set(title="log–log P(k)", xlabel="k", ylabel="P(k)")
+    # CCDF P(K >= k) tren log-log: on dinh hon P(k) khi nhieu muc bac chi co 1 dinh
+    n_all = len(deg)
+    ccdf = [(k, sum(1 for d in deg if d >= k) / n_all) for k in cnt.index]
+    ax[1].loglog(
+        [k for k, _ in ccdf], [c for _, c in ccdf], "o", ms=4, color="#e8590c", label="dữ liệu"
+    )
+    fit = powerlaw_fit(deg)
+    if fit:
+        a, kmin, nt = fit["powerlaw_gamma"], fit["powerlaw_kmin"], fit["powerlaw_tail_nodes"]
+        xs = [k for k in cnt.index if k >= kmin]
+        ax[1].loglog(
+            xs,
+            [nt / n_all * (k / kmin) ** (1 - a) for k in xs],
+            "-",
+            color="#1f5eff",
+            label=f"luật lũy thừa γ = {a:.2f} (k ≥ {kmin})",
+        )
+        ax[1].legend(fontsize=8)
+    ax[1].set(title="log–log CCDF P(K ≥ k)", xlabel="k", ylabel="P(K ≥ k)")
     fig.tight_layout()
     fig.savefig(path, dpi=130)
     plt.close(fig)
 
 
 # ---------------------------------------------------------------- export
-def export(name, year, g, node_metrics, summary, labels, title, desc, size_key, top_keys):
+def export(
+    name, year, g, node_metrics, summary, labels, title, desc, size_key, top_keys, definition=None
+):
     for d in ("metrics", "gexf", "fig"):
         (OUT / d).mkdir(parents=True, exist_ok=True)
     df = pd.DataFrame(node_metrics).rename_axis("id").reset_index()
@@ -243,6 +347,9 @@ def export(name, year, g, node_metrics, summary, labels, title, desc, size_key, 
         "description": desc,
         "directed": g.is_directed(),
         "year": year,
+        # dinh nghia do thi cho the "Dinh nghia" tren web (dung voi code tao mang o tren)
+        "definition": definition or {},
+        "viz_edge_limit": VIZ_EDGE_LIMIT,
         "summary": summary,
         "top": {
             k: [
@@ -298,10 +405,25 @@ def main() -> None:
         U = [n for n, d in g1.nodes(data=True) if d["kind"] == "uni"]
         M = [n for n, d in g1.nodes(data=True) if d["kind"] == "major"]
         deg = dict(g1.degree())
+        t1 = time.time()
+        big1 = lcc(g1)
+        hub1, auth1 = nx.hits(big1, max_iter=1000)
+        comm1 = community.louvain_communities(g1, weight="weight", seed=42)
         m1 = {
             "degree": deg,
             "degree_centrality": bipartite.degree_centrality(g1, U),
             "betweenness": bipartite.betweenness_centrality(g1, U),
+            "closeness": bipartite.closeness_centrality(g1, U),
+            "eigenvector": eig_full(g1, big1, "weight"),
+            "eigenvector_unw": eig_full(g1, big1, None),
+            "pagerank": nx.pagerank(g1, weight="weight"),
+            # do thi vo huong: hub = authority; giu authority de doc nhu "uy tin"
+            "authority": {n: float(auth1.get(n, 0.0)) for n in g1},
+            # clustering hai phia (Latapy 2008): do trung lap lang gieng o phia ben kia
+            "clustering": bipartite.clustering(g1, mode="dot"),
+            "community": {
+                n: i for i, c in enumerate(sorted(comm1, key=len, reverse=True)) for n in c
+            },
         }
         s1 = {
             "nodes": g1.number_of_nodes(),
@@ -309,10 +431,23 @@ def main() -> None:
             "majors": len(M),
             "edges": g1.number_of_edges(),
             "bipartite_density": r4(bipartite.density(g1, U)),
+            "density": r4(nx.density(g1)),
+            "avg_degree": r4(2 * g1.number_of_edges() / g1.number_of_nodes()),
             "avg_majors_per_uni": r4(sum(deg[u] for u in U) / len(U)),
             "avg_unis_per_major": r4(sum(deg[m] for m in M) / len(M)),
             "components": nx.number_connected_components(g1),
+            "lcc_nodes": big1.number_of_nodes(),
+            "avg_clustering": r4(bipartite.average_clustering(g1, mode="dot")),
+            # transitivity kieu tam giac luon = 0 tren do thi hai phia -> dung clustering Latapy
+            "transitivity": 0.0,
+            **path_stats(big1),
+            "assortativity": r4(nx.degree_assortativity_coefficient(g1)),
+            "louvain_communities": len(comm1),
+            "modularity_louvain": r4(community.modularity(g1, comm1, weight="weight")),
+            **{f"uni_{k}": v for k, v in powerlaw_fit([deg[u] for u in U]).items()},
+            **{f"major_{k}": v for k, v in powerlaw_fit([deg[m] for m in M]).items()},
         }
+        s1["compute_seconds"] = r4(time.time() - t1)
         rows.append(
             export(
                 "g1_uni_major",
@@ -324,7 +459,15 @@ def main() -> None:
                 "G1 · Trường – Ngành (hai phía)",
                 "Cạnh nối trường với ngành trường đó tuyển. Kim cương = ngành, tròn = trường.",
                 "degree",
-                ["degree", "betweenness"],
+                ["degree", "betweenness", "closeness", "eigenvector", "pagerank", "clustering"],
+                definition={
+                    "type": "Hai phía (bipartite), vô hướng, có trọng số",
+                    "nodes": "Trường (hình tròn) và ngành theo mã 7 số Bộ GD&ĐT (hình kim cương)",
+                    "edges": "Trường có điểm chuẩn của ngành đó trong năm",
+                    "weight": "Số dòng điểm chuẩn của cặp (trường, ngành), tính mọi phương thức, "
+                    "chương trình, tổ hợp",
+                    "params": "Chỉ dùng dòng đã có mã ngành 7 số",
+                },
             )
         )
         # bac cua dinh nganh tinh tren G1 (= so truong mo nganh); truoc day dung subgraph(M) khong co canh
@@ -332,18 +475,22 @@ def main() -> None:
         degree_plot(g1, OUT / "fig" / f"g1_uni_degree_{year}.png", "Trường (G1)", nodes=set(U))
         degree_plot(g1, OUT / "fig" / f"g1_degree_{year}.png", "G1")
 
-        for name, side, title, desc in [
+        for name, side, title, desc, what, via in [
             (
                 "g2_uni_uni",
                 "uni",
                 "G2 · Trường – Trường",
                 "Hai trường nối nhau khi tập ngành giống nhau (Jaccard ≥ ngưỡng). Màu = cộng đồng Louvain.",
+                "Trường–Trường",
+                "tập ngành của 2 trường",
             ),
             (
                 "g3_major_major",
                 "major",
                 "G3 · Ngành – Ngành",
                 "Hai ngành nối nhau khi thường cùng được một trường mở. Màu = cộng đồng Louvain.",
+                "Ngành–Ngành",
+                "tập trường mở 2 ngành",
             ),
         ]:
             g = jaccard_projection(g1, side, args.jaccard)
@@ -362,6 +509,16 @@ def main() -> None:
                     desc,
                     "degree",
                     ["degree", "betweenness", "closeness", "eigenvector", "pagerank", "clustering"],
+                    definition={
+                        "type": f"Chiếu một phía {what} từ G1, vô hướng, có trọng số",
+                        "nodes": "Trường" if side == "uni" else "Ngành (mã 7 số)",
+                        "edges": f"Nối 2 nút khi Jaccard({via}) ≥ {args.jaccard:g}".replace(
+                            ".", ","
+                        ),
+                        "weight": "Hệ số Jaccard = |giao| / |hợp|",
+                        "params": f"Ngưỡng Jaccard {args.jaccard:g}".replace(".", ",")
+                        + "; bỏ nút cô lập (không có cạnh)",
+                    },
                 )
             )
             degree_plot(g, OUT / "fig" / f"{name}_degree_{year}.png", title.split("·")[1].strip())
@@ -418,7 +575,19 @@ def main() -> None:
                     "G4 · Mạng cạnh tranh (có hướng)",
                     f"A → B nếu cùng ngành, B có điểm THPT cao hơn A trong vòng {args.gap} điểm. Authority cao = trường được 'nhắm tới'.",
                     "authority",
-                    ["authority", "hub", "pagerank", "in_strength"],
+                    ["authority", "hub", "pagerank", "in_strength", "closeness", "betweenness"],
+                    definition={
+                        "type": "Có hướng Trường → Trường, có trọng số",
+                        "nodes": "Trường có điểm chuẩn THPT thang 30",
+                        "edges": f"A → B khi cùng một ngành, điểm B cao hơn A trong khoảng (0; {args.gap:g}] "
+                        "điểm",
+                        "weight": "Số ngành thỏa điều kiện",
+                        "params": "Chỉ phương thức THPT thang 30, dòng không gắn cờ; lấy điểm cao "
+                        "nhất của trường cho mỗi ngành; khoảng điểm "
+                        + f"{args.gap:g}".replace(".", ",")
+                        + "; bỏ nút cô lập",
+                        "reading": "Authority cao = trường được nhiều trường khác “nhắm lên”",
+                    },
                 )
             )
     summ = pd.DataFrame(rows)
