@@ -458,8 +458,10 @@ async function drawNetwork() {
   if (netObj) netObj.destroy();
   netNodes = new vis.DataSet(nodes);
   netObj = new vis.Network($("#net-canvas"), { nodes: netNodes, edges }, {
-    physics: { solver: "forceAtlas2Based", stabilization: { iterations: 250 } },
+    physics: { solver: "forceAtlas2Based", stabilization: { iterations: 400, fit: true } },
     nodes: { scaling: { min: 4, max: 40 } }, edges: { scaling: { min: 0.5, max: 4 }, smooth: false }, interaction: { hover: true, tooltipDelay: 80 } });
+  // Vat ly chi dung de tinh bo cuc ban dau; xong thi tat de hinh dung yen (keo tha nut van duoc).
+  netObj.once("stabilizationIterationsDone", () => { netObj.setOptions({ physics: false }); netObj.fit(); });
   netObj.on("click", (p) => { if (p.nodes.length) showNode(p.nodes[0]); });
   // tim nut + loc cong dong
   $("#net-find").value = ""; netLastFind = "";
