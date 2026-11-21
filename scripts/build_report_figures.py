@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+import shutil
 import sqlite3
 import sys
 from pathlib import Path
@@ -49,19 +51,6 @@ def diagram(name, labels):
                 xycoords="axes fraction",
                 arrowprops=dict(arrowstyle="->", color="#34668a"),
             )
-    save(fig, name)
-
-
-def degree(g, nodes, name, title, kind=""):
-    view = g.in_degree() if kind == "in" else g.out_degree() if kind == "out" else g.degree()
-    deg = [d for n, d in view if n in nodes]
-    cnt = pd.Series(deg).value_counts().sort_index()
-    fig, ax = plt.subplots(1, 2, figsize=(9, 3.1))
-    ax[0].hist(deg, bins=25, color="#2b718e")
-    ax[0].set(title=title, xlabel="Bậc k", ylabel="Số đỉnh")
-    positive = cnt[cnt.index > 0]
-    ax[1].loglog(positive.index, positive / len(deg), "o", color="#c45c27", ms=4)
-    ax[1].set(title="Phân bố log–log (k > 0)", xlabel="k", ylabel="P(k)")
     save(fig, name)
 
 
@@ -130,15 +119,22 @@ def main():
     save(fig, "mapping_share.png")
     data, _, _ = load(2026)
     g1 = g1_bipartite(data)
-    degree(g1, {n for n in g1 if n.startswith("U:")}, "g1_uni_degree_2026.png", "G1 — phía trường")
-    degree(g1, {n for n in g1 if n.startswith("M:")}, "g1_major_degree_2026.png", "G1 — phía ngành")
+    # Phan bo bac: dung hinh cua sna/build.py (histogram + CCDF log-log + duong khop power-law)
+    for name in (
+        "g1_uni_degree_2026.png",
+        "g1_major_degree_2026.png",
+        "g2_uni_uni_degree_2026.png",
+        "g3_major_major_degree_2026.png",
+        "g4_in_degree_2026.png",
+        "g4_out_degree_2026.png",
+    ):
+        shutil.copyfile(ROOT / "data/network/fig" / name, FIG / name)
     for name, side, label in [
         ("g2_uni_uni", "uni", "G2 — Trường–Trường"),
         ("g3_major_major", "major", "G3 — Ngành–Ngành"),
     ]:
         g = jaccard_projection(g1, side, 0.25)
         g.remove_nodes_from(list(nx.isolates(g)))
-        degree(g, set(g), f"{name}_degree_2026.png", label)
         metrics = pd.read_csv(ROOT / f"data/network/metrics/{name}_2026.csv").set_index("id")
         # Bo cuc tung thanh phan rieng de cac cum tach roi khong ep LCC thanh mot cham nho.
         comps = sorted(nx.connected_components(g), key=len, reverse=True)
@@ -175,8 +171,6 @@ def main():
         save(fig, f"{name}_net_2026.png")
     g4 = g4_competition(data, 2)
     g4.remove_nodes_from(list(nx.isolates(g4)))
-    degree(g4, set(g4), "g4_in_degree_2026.png", "G4 — bậc vào", "in")
-    degree(g4, set(g4), "g4_out_degree_2026.png", "G4 — bậc ra", "out")
     m = (
         pd.read_csv(ROOT / "data/network/metrics/g3_major_major_2026.csv")
         .nlargest(10, "betweenness")
@@ -187,7 +181,7 @@ def main():
     for i, v in enumerate(m.betweenness):
         ax.text(v + 0.002, i, f"{v:.4f}", va="center", fontsize=8)
     ax.set(
-        xlim=(0, 0.19),
+        xlim=(0, m.betweenness.max() * 1.25),
         xlabel="Betweenness chuẩn hoá, không trọng số",
         title="10 ngành có betweenness cao nhất G3 2026",
     )
@@ -215,41 +209,32 @@ def main():
         )
         ax.grid(alpha=0.2)
     save(fig, "g4_pagerank_score.png")
-    # Nguồn: các bảng mục 2 và 3 docs/do_nhay_sna.md, năm 2026.
-    x = [0.15, 0.20, 0.25, 0.30, 0.35]
+    # Nguon: docs/do_nhay_sna.json (scripts/report_sensitivity.py), nam 2026.
+    sens = json.loads((ROOT / "docs/do_nhay_sna.json").read_text(encoding="utf-8"))
+    keys = ["0.15", "0.20", "0.25", "0.30", "0.35"]
+    x = [float(k) for k in keys]
     fig, axes = plt.subplots(1, 3, figsize=(11, 3.2))
-    for name, lcc, q, edges in [
-        (
-            "G2",
-            [95.4, 94.6, 92.8, 83.5, 64.7],
-            [0.260, 0.360, 0.482, 0.614, 0.702],
-            [7453, 4437, 2531, 1326, 717],
-        ),
-        (
-            "G3",
-            [99, 98.2, 96.6, 63.8, 8.4],
-            [0.685, 0.773, 0.836, 0.880, 0.899],
-            [3461, 2164, 1412, 917, 589],
-        ),
-    ]:
-        for ax, values in zip(axes, [lcc, q, edges]):
-            ax.plot(x, values, "o-", label=name)
+    for name in ("g2", "g3"):
+        rows = [sens["jaccard"]["2026"][name][k] for k in keys]
+        for ax, field in zip(axes, ["lcc_pct", "modularity", "edges"]):
+            ax.plot(x, [r[field] for r in rows], "o-", label=name.upper())
     for ax, ylabel in zip(axes, ["LCC (%)", "Modularity Q", "Số cạnh"]):
         ax.axvline(0.25, color="gray", ls="--")
         ax.set(xlabel="Ngưỡng Jaccard", ylabel=ylabel)
         ax.legend()
         ax.grid(alpha=0.2)
     save(fig, "sensitivity_jaccard.png")
+    gaps = ["1", "2", "3"]
     fig, axes = plt.subplots(1, 2, figsize=(9, 3.2))
-    axes[0].plot([1, 2, 3], [6098, 9215, 11492], "o-", label="G4 2026")
+    axes[0].plot([1, 2, 3], [sens["gap"]["2026"][k]["edges"] for k in gaps], "o-", label="G4 2026")
     axes[0].set(xlabel="Khoảng điểm", ylabel="Số cạnh")
     axes[0].legend()
-    for label, vals in [
-        ("PageRank 2026", [0.527, 0.607, 0.664]),
-        ("Authority 2026", [0.233, 0.234, 0.248]),
-        ("Authority 2024", [-0.384, -0.401, -0.309]),
+    for label, year, field in [
+        ("PageRank 2026", "2026", "spearman_pagerank"),
+        ("Authority 2026", "2026", "spearman_authority"),
+        ("Authority 2024", "2024", "spearman_authority"),
     ]:
-        axes[1].plot([1, 2, 3], vals, "o-", label=label)
+        axes[1].plot([1, 2, 3], [sens["gap"][year][k][field] for k in gaps], "o-", label=label)
     axes[1].set(xlabel="Khoảng điểm", ylabel="Spearman với điểm TB")
     axes[1].legend(fontsize=8)
     for ax in axes:
@@ -259,7 +244,7 @@ def main():
         (FIG / p).exists()
         for p in ["g3_betweenness_top10.png", "g4_pagerank_score.png", "data_flow.png"]
     )
-    print("Created 17 report figures from DB, metrics and docs/do_nhay_sna.md.")
+    print("Created 17 report figures from DB, metrics, data/network/fig and docs/do_nhay_sna.json.")
 
 
 if __name__ == "__main__":

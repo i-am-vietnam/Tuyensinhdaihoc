@@ -1,0 +1,479 @@
+{
+ "jaccard": {
+  "2026": {
+   "g2": {
+    "0.15": {
+     "nodes": 262,
+     "edges": 7472,
+     "density": 0.2185,
+     "components": 5,
+     "lcc_nodes": 250,
+     "lcc_pct": 95.4,
+     "avg_path_lcc": 2.206,
+     "avg_clustering": 0.6569,
+     "modularity": 0.2567,
+     "communities": 10
+    },
+    "0.20": {
+     "nodes": 259,
+     "edges": 4446,
+     "density": 0.1331,
+     "components": 6,
+     "lcc_nodes": 245,
+     "lcc_pct": 94.6,
+     "avg_path_lcc": 2.6289,
+     "avg_clustering": 0.6097,
+     "modularity": 0.3632,
+     "communities": 11
+    },
+    "0.25": {
+     "nodes": 250,
+     "edges": 2540,
+     "density": 0.0816,
+     "components": 8,
+     "lcc_nodes": 232,
+     "lcc_pct": 92.8,
+     "avg_path_lcc": 3.2444,
+     "avg_clustering": 0.5485,
+     "modularity": 0.4845,
+     "communities": 19
+    },
+    "0.30": {
+     "nodes": 237,
+     "edges": 1332,
+     "density": 0.0476,
+     "components": 14,
+     "lcc_nodes": 201,
+     "lcc_pct": 84.8,
+     "avg_path_lcc": 3.7545,
+     "avg_clustering": 0.5227,
+     "modularity": 0.6145,
+     "communities": 22
+    },
+    "0.35": {
+     "nodes": 218,
+     "edges": 720,
+     "density": 0.0304,
+     "components": 23,
+     "lcc_nodes": 141,
+     "lcc_pct": 64.7,
+     "avg_path_lcc": 3.934,
+     "avg_clustering": 0.4394,
+     "modularity": 0.7027,
+     "communities": 30
+    }
+   },
+   "g3": {
+    "0.15": {
+     "nodes": 399,
+     "edges": 3429,
+     "density": 0.0432,
+     "components": 3,
+     "lcc_nodes": 395,
+     "lcc_pct": 99.0,
+     "avg_path_lcc": 3.278,
+     "avg_clustering": 0.538,
+     "modularity": 0.682,
+     "communities": 13
+    },
+    "0.20": {
+     "nodes": 392,
+     "edges": 2135,
+     "density": 0.0279,
+     "components": 4,
+     "lcc_nodes": 385,
+     "lcc_pct": 98.2,
+     "avg_path_lcc": 4.0276,
+     "avg_clustering": 0.5348,
+     "modularity": 0.7748,
+     "communities": 14
+    },
+    "0.25": {
+     "nodes": 370,
+     "edges": 1391,
+     "density": 0.0204,
+     "components": 7,
+     "lcc_nodes": 357,
+     "lcc_pct": 96.5,
+     "avg_path_lcc": 5.6705,
+     "avg_clustering": 0.5122,
+     "modularity": 0.8363,
+     "communities": 20
+    },
+    "0.30": {
+     "nodes": 330,
+     "edges": 906,
+     "density": 0.0167,
+     "components": 21,
+     "lcc_nodes": 211,
+     "lcc_pct": 63.9,
+     "avg_path_lcc": 12.8167,
+     "avg_clustering": 0.4835,
+     "modularity": 0.8788,
+     "communities": 32
+    },
+    "0.35": {
+     "nodes": 267,
+     "edges": 579,
+     "density": 0.0163,
+     "components": 50,
+     "lcc_nodes": 23,
+     "lcc_pct": 8.6,
+     "avg_path_lcc": 1.7154,
+     "avg_clustering": 0.5052,
+     "modularity": 0.8953,
+     "communities": 50
+    }
+   }
+  },
+  "2024": {
+   "g2": {
+    "0.15": {
+     "nodes": 261,
+     "edges": 7694,
+     "density": 0.2268,
+     "components": 4,
+     "lcc_nodes": 251,
+     "lcc_pct": 96.2,
+     "avg_path_lcc": 2.0505,
+     "avg_clustering": 0.6711,
+     "modularity": 0.2416,
+     "communities": 10
+    },
+    "0.25": {
+     "nodes": 249,
+     "edges": 2581,
+     "density": 0.0836,
+     "components": 11,
+     "lcc_nodes": 219,
+     "lcc_pct": 88.0,
+     "avg_path_lcc": 2.7499,
+     "avg_clustering": 0.5582,
+     "modularity": 0.4489,
+     "communities": 18
+    },
+    "0.35": {
+     "nodes": 214,
+     "edges": 723,
+     "density": 0.0317,
+     "components": 20,
+     "lcc_nodes": 163,
+     "lcc_pct": 76.2,
+     "avg_path_lcc": 4.4203,
+     "avg_clustering": 0.407,
+     "modularity": 0.6683,
+     "communities": 26
+    }
+   },
+   "g3": {
+    "0.15": {
+     "nodes": 392,
+     "edges": 2948,
+     "density": 0.0385,
+     "components": 5,
+     "lcc_nodes": 381,
+     "lcc_pct": 97.2,
+     "avg_path_lcc": 3.2912,
+     "avg_clustering": 0.5576,
+     "modularity": 0.7162,
+     "communities": 16
+    },
+    "0.25": {
+     "nodes": 374,
+     "edges": 1316,
+     "density": 0.0189,
+     "components": 13,
+     "lcc_nodes": 345,
+     "lcc_pct": 92.2,
+     "avg_path_lcc": 5.6952,
+     "avg_clustering": 0.5149,
+     "modularity": 0.8358,
+     "communities": 27
+    },
+    "0.35": {
+     "nodes": 271,
+     "edges": 532,
+     "density": 0.0145,
+     "components": 41,
+     "lcc_nodes": 28,
+     "lcc_pct": 10.3,
+     "avg_path_lcc": 2.9127,
+     "avg_clustering": 0.5147,
+     "modularity": 0.9046,
+     "communities": 42
+    }
+   }
+  }
+ },
+ "gap": {
+  "2024": {
+   "1": {
+    "nodes": 257,
+    "edges": 7107,
+    "density": 0.108,
+    "strong_components": 19,
+    "spearman_pagerank": 0.4501,
+    "spearman_authority": -0.3835,
+    "top_pr_overlap": 7,
+    "top_auth_overlap": 7
+   },
+   "2": {
+    "nodes": 259,
+    "edges": 10542,
+    "density": 0.1578,
+    "strong_components": 17,
+    "spearman_pagerank": 0.567,
+    "spearman_authority": -0.4013,
+    "top_pr_overlap": 10,
+    "top_auth_overlap": 10
+   },
+   "3": {
+    "nodes": 259,
+    "edges": 12731,
+    "density": 0.1905,
+    "strong_components": 16,
+    "spearman_pagerank": 0.6345,
+    "spearman_authority": -0.3089,
+    "top_pr_overlap": 9,
+    "top_auth_overlap": 10
+   }
+  },
+  "2026": {
+   "1": {
+    "nodes": 224,
+    "edges": 6098,
+    "density": 0.1221,
+    "strong_components": 50,
+    "spearman_pagerank": 0.5277,
+    "spearman_authority": 0.2331,
+    "top_pr_overlap": 6,
+    "top_auth_overlap": 5
+   },
+   "2": {
+    "nodes": 226,
+    "edges": 9215,
+    "density": 0.1812,
+    "strong_components": 35,
+    "spearman_pagerank": 0.6075,
+    "spearman_authority": 0.2349,
+    "top_pr_overlap": 10,
+    "top_auth_overlap": 10
+   },
+   "3": {
+    "nodes": 226,
+    "edges": 11492,
+    "density": 0.226,
+    "strong_components": 23,
+    "spearman_pagerank": 0.6644,
+    "spearman_authority": 0.2489,
+    "top_pr_overlap": 9,
+    "top_auth_overlap": 8
+   }
+  }
+ },
+ "stability": {
+  "g2": {
+   "0.15-0.25": {
+    "ari": 0.525,
+    "nmi": 0.725,
+    "common": 250
+   },
+   "0.35-0.25": {
+    "ari": 0.598,
+    "nmi": 0.804,
+    "common": 218
+   },
+   "0.15-0.35": {
+    "ari": 0.406,
+    "nmi": 0.663,
+    "common": 218
+   },
+   "seed_baseline": {
+    "ari_mean": 0.796,
+    "ari_min": 0.543,
+    "nmi_mean": 0.888
+   }
+  },
+  "g3": {
+   "0.15-0.25": {
+    "ari": 0.639,
+    "nmi": 0.774,
+    "common": 370
+   },
+   "0.35-0.25": {
+    "ari": 0.521,
+    "nmi": 0.808,
+    "common": 267
+   },
+   "0.15-0.35": {
+    "ari": 0.426,
+    "nmi": 0.753,
+    "common": 267
+   },
+   "seed_baseline": {
+    "ari_mean": 0.907,
+    "ari_min": 0.863,
+    "nmi_mean": 0.956
+   }
+  }
+ },
+ "tops": {
+  "g2": {
+   "0.15": {
+    "degree": 5,
+    "betweenness": 4,
+    "eigenvector": 8,
+    "pagerank": 7
+   },
+   "0.35": {
+    "degree": 6,
+    "betweenness": 2,
+    "eigenvector": 8,
+    "pagerank": 7
+   },
+   "betweenness_top1": {
+    "id": "U:VTT",
+    "rank": {
+     "0.15": 1,
+     "0.25": 1,
+     "0.35": 74
+    }
+   },
+   "eigenvector_top_labels": {
+    "0.15": [
+     "HUFLIT",
+     "HUB",
+     "BETU",
+     "UTM",
+     "BVU"
+    ],
+    "0.25": [
+     "HUFLIT",
+     "HUB",
+     "GDU",
+     "BVU",
+     "DNU"
+    ],
+    "0.35": [
+     "HUFLIT",
+     "HUB",
+     "GDU",
+     "BETU",
+     "HVUH"
+    ]
+   }
+  },
+  "g3": {
+   "0.15": {
+    "degree": 2,
+    "betweenness": 1,
+    "eigenvector": 10,
+    "pagerank": 3
+   },
+   "0.35": {
+    "degree": 4,
+    "betweenness": 0,
+    "eigenvector": 0,
+    "pagerank": 1
+   },
+   "betweenness_top1": {
+    "id": "M:7420101",
+    "rank": {
+     "0.15": 23,
+     "0.25": 1,
+     "0.35": 76
+    }
+   },
+   "eigenvector_top_labels": {
+    "0.15": [
+     "Địa tin học",
+     "Kỹ thuật địa vật lý",
+     "Đá quý Đá mỹ nghệ",
+     "Công nghệ số trong thăm dò và khai thác tài nguyên thiên nhiên",
+     "Xây dựng công trình ngầm thành phố và Hệ thống tàu điện ngầm"
+    ],
+    "0.25": [
+     "Kỹ thuật địa vật lý",
+     "Kỹ thuật khí thiên nhiên",
+     "Công nghệ số trong thăm dò và khai thác tài nguyên thiên nhiên",
+     "An toàn, Vệ sinh lao động",
+     "Quản lý và phân tích dữ liệu khoa học"
+    ],
+    "0.35": [
+     "Sư phạm Vật lý",
+     "Sư phạm Ngữ văn",
+     "Sư phạm Hóa học",
+     "Sư phạm Sinh học",
+     "Sư phạm Lịch sử"
+    ]
+   }
+  }
+ },
+ "aa": {
+  "0.15": {
+   "hits": 121,
+   "k": 300,
+   "base_rate": 0.01426,
+   "lift": 28.3
+  },
+  "0.25": {
+   "hits": 68,
+   "k": 300,
+   "base_rate": 0.00532,
+   "lift": 42.6
+  },
+  "0.35": {
+   "hits": 57,
+   "k": 300,
+   "base_rate": 0.00361,
+   "lift": 52.6
+  }
+ },
+ "medical": {
+  "0.15": {
+   "present": 10,
+   "same_community": 10,
+   "external_edge_pct": 24.6
+  },
+  "0.20": {
+   "present": 10,
+   "same_community": 10,
+   "external_edge_pct": 10.9
+  },
+  "0.25": {
+   "present": 10,
+   "same_community": 10,
+   "external_edge_pct": 6.6
+  },
+  "0.30": {
+   "present": 10,
+   "same_community": 10,
+   "external_edge_pct": 1.4
+  },
+  "0.35": {
+   "present": 10,
+   "same_community": 10,
+   "external_edge_pct": 0.9
+  }
+ },
+ "score_change": [
+  {
+   "from": 2024,
+   "to": 2025,
+   "pairs": 3985,
+   "median": 1.0,
+   "le1": 54.7,
+   "le2": 76.3,
+   "le3": 87.6
+  },
+  {
+   "from": 2025,
+   "to": 2026,
+   "pairs": 3957,
+   "median": 0.95,
+   "le1": 61.1,
+   "le2": 79.5,
+   "le3": 88.8
+  }
+ ]
+}

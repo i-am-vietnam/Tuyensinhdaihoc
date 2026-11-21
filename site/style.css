@@ -47,6 +47,23 @@ tr:last-child td{border-bottom:0}tfoot td{background:var(--bg);font-weight:500}
 #net-side{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;max-height:640px;overflow:auto;font-size:13px}
 #net-side h3{font-size:14px;margin:12px 0 6px}#net-side table{font-size:12px}
 @media (max-width:860px){.net-grid{grid-template-columns:1fr}#net-canvas{height:440px}}
+.hero .hero-dates{color:#dbeafe;margin:4px 0 0;font-size:13px}
+#net-find{flex:1 1 260px;min-width:0}
+.net-def{background:var(--accent-wash);border:1px solid var(--accent-soft);border-radius:10px;padding:8px 10px;margin:8px 0}
+.net-def h3{margin-top:0!important}.net-def dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0 0 6px}
+.net-def dt{color:var(--muted);font-weight:600}.net-def dd{margin:0;min-width:0}
+.net-node-card{background:var(--card)}.net-node-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.net-node-head button{border:1px solid var(--line);background:var(--card);border-radius:6px;cursor:pointer;padding:0 6px;color:var(--muted)}
+#net-side h4.net-group{font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--accent-deep);margin:12px 0 4px}
+#net-side td span[title]{text-decoration:underline dotted var(--muted);cursor:help}
+.net-note{background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:6px 8px;margin:6px 0 0}
+#coverage-how h3{font-size:15px;margin:16px 0 6px}
+.kv th{text-align:left;font-weight:600;color:var(--muted);white-space:nowrap;vertical-align:top}
+.flow{display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:4px 0 12px;list-style:none;counter-reset:f}
+.flow li{counter-increment:f;background:var(--accent-wash);border:1px solid var(--accent-soft);border-radius:999px;padding:3px 10px;font-size:13px}
+.flow li::before{content:counter(f) ". ";font-weight:700;color:var(--accent)}
+.funnel-strong td{font-weight:700}
+@media (max-width:640px){.kv th{white-space:normal}}
 .site-footer{background:var(--foot-bg);color:var(--foot-ink);font-size:13px;padding:28px 0 36px;margin-top:40px;border-top:1px solid #1f2937}.site-footer a{color:#93c5fd}.site-footer p{margin:0 0 6px}.site-footer .foot-brand{color:#fff;font-weight:700;font-size:15px;margin-bottom:8px}
 td.code{white-space:nowrap;color:var(--muted);font-size:12px}td.combo{min-width:150px;color:var(--muted);font-size:12px}
 td.prog{min-width:220px}
@@ -112,7 +129,7 @@ table.timeline{font-size:14px}table.timeline td{padding:4px 8px}table.timeline t
 .tuition-old .tuition-notes li:first-child{color:var(--warn);font-weight:600}
 .tuition-convert{color:var(--muted);font-style:italic}
 .tuition-missing-list{columns:2 280px;font-size:14px}
-@media(max-width:640px){.tuition-items td.num{white-space:normal}}
+@media(max-width:640px){.tuition-items td.num{white-space:normal}table.timeline td.num{white-space:normal;min-width:7.5em}}
 
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}.uni-card:hover,.mos-card:hover,.mos-feature:hover{transform:none!important}}
 /* ---------- Trang Thi MOS ---------- */

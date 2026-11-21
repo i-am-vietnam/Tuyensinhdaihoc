@@ -16,7 +16,7 @@ lang: vi-VN
 
 # Bảng đối chiếu yêu cầu đề bài
 
-Báo cáo trình bày việc thu thập và chuẩn hoá dữ liệu tuyển sinh, xây dựng mạng quan hệ giữa trường và ngành, áp dụng thuật toán mạng và đưa kết quả vào ứng dụng EduRadar. Kết quả xử lý ngày 25/10/2026 gồm 71.011 dòng điểm chuẩn của 292 trường; bốn mô hình mạng được khảo sát riêng cho từng năm 2024–2026. Mạng biểu diễn quan hệ đào tạo và cạnh tranh theo điểm, không biểu diễn quan hệ bạn bè hoặc hành vi đăng ký nguyện vọng của từng thí sinh.
+Báo cáo trình bày việc thu thập và chuẩn hoá dữ liệu tuyển sinh, xây dựng mạng quan hệ giữa trường và ngành, áp dụng thuật toán mạng và đưa kết quả vào ứng dụng EduRadar. Dữ liệu được thu thập ngày 23/10/2026 và xử lý (làm sạch, chuẩn hoá mã ngành) lần cuối ngày 09/11/2026, gồm 71.011 dòng điểm chuẩn của 292 trường; bốn mô hình mạng được khảo sát riêng cho từng năm 2024–2026. Mạng biểu diễn quan hệ đào tạo và cạnh tranh theo điểm, không biểu diễn quan hệ bạn bè hoặc hành vi đăng ký nguyện vọng của từng thí sinh.
 
 Nguồn: `docs/TONG_KET_DU_LIEU.md`; `data/clean/quality_report.md`; `data/network/summary.csv`.
 
@@ -26,31 +26,78 @@ Nguồn: `docs/TONG_KET_DU_LIEU.md`; `data/clean/quality_report.md`; `data/netwo
 | --- | --- | --- |
 | (1) Chọn chủ đề, lấy được dữ liệu | Chương 1 | 292 trường, ba năm; câu hỏi nghiên cứu; Hình 2.1 |
 | (2) Crawl ít nhất 20.000 record; mô tả làm sạch và chuẩn hoá | 2.1–2.6; Phụ lục A–C | 921 request; 76.726 dòng thô → 71.011 dòng sạch; log, DB; Hình 2.1–2.4 |
-| (3) Tính các độ đo SNA | 3.1–3.4; bảng ĐC.2 dưới đây | `summary.csv` đủ bốn mạng × ba năm; `metrics/*.csv`; Hình 3.1–3.7, 5.1–5.4 |
-| (3') Chọn thuật toán áp dụng | 4.1–4.6 | Louvain, Girvan–Newman, HITS, PageRank, Adamic–Adar; kiểm chứng thời gian và độ nhạy |
-| (4) Trực quan và mô phỏng | Chương 5 | NetworkX, Matplotlib; sơ đồ, phân bố, mạng tương tác; Hình 5.1–5.7; vị trí chèn hình Gephi đánh dấu rõ |
-| (5) Ứng dụng minh hoạ | Chương 6 | Web GitHub Pages đang hoạt động; FastAPI; năm tab; Hình 6.1–6.8; kịch bản demo |
+| (3) Tính các độ đo SNA | 3.1–3.4; bảng ĐC.2 dưới đây | `summary.csv` đủ bốn mạng × ba năm (G1–G4 đủ độ đo); `metrics/*.csv` không ô trống; Hình 3.1–3.7 |
+| (3') Chọn thuật toán áp dụng | 4.1–4.6 | Louvain, Girvan–Newman toàn đồ thị, HITS, PageRank, Adamic–Adar; kiểm chứng theo thời gian và độ nhạy |
+| (4) Trực quan và mô phỏng | Chương 5 | NetworkX, Matplotlib, Gephi (ForceAtlas2); phân bố bậc log–log, mạng tương tác; Hình 5.1–5.8 |
+| (5) Ứng dụng minh hoạ | Chương 6 | Web https://diemthidaihoc.com; FastAPI; sáu tab; Hình 6.1–6.9; kịch bản demo |
 
-Nguồn: đối chiếu đề bài với các tệp kết quả nêu trong từng chương. Hai hình Gephi là phần người thực hiện cần bổ sung trước khi nộp.
+Nguồn: đối chiếu đề bài với các tệp kết quả nêu trong từng chương.
 
 **Bảng ĐC.2. Đối chiếu riêng từng độ đo bắt buộc và bổ sung.**
 
 | Độ đo | Tiểu mục | Bảng và hình đối chiếu |
 | --- | --- | --- |
-| Degree centrality và Degree distribution | 3.2.1 | Bảng kết quả trong 3.2.1; Hình 3.2–3.7 |
-| Betweenness centrality | 3.2.2 | Bảng top 10 trong 3.2.2; Hình 5.3 |
-| CC = Closeness centrality | 3.2.3 | Bảng top 10 trong 3.2.3; mạng G3 Hình 5.2 |
-| Eigenvector centrality | 3.2.4 | Bảng top 10 trong 3.2.4; cấu trúc clique giải thích kèm Hình 5.2 |
-| PageRank | 3.2.5 | Bảng top 10 trong 3.2.5; bảng Spearman ở 4.3; Hình 5.4 |
-| HITS hub và authority | 3.2.6 | Bảng top 10 trong 3.2.6; bảng 4.3; Hình 5.6 |
-| Density | 3.2.7 | Bảng ba năm tại 3.2.7 và 3.3; Hình 5.5–5.6 |
-| Average shortest path length | 3.2.8 | Bảng ba năm tại 3.2.8 và 3.3; phân tích LCC ở 4.5 |
-| Diameter | 3.2.9 | Bảng ba năm tại 3.2.9 và 3.3 |
-| Clustering coefficient và Transitivity | 3.2.10 | Bảng kết quả cục bộ/toàn cục tại 3.2.10; bảng 3.3 |
-| Modularity | 3.2.11 | Bảng ba năm tại 3.2.11 và 3.3; cộng đồng 4.1; Hình 5.1–5.2, 5.5 |
-| Thành phần liên thông, LCC, assortativity, reciprocity | 3.2.12 | Bảng ba năm tại 3.2.12 và 3.3; Hình 5.5 |
+| Degree centrality và Degree distribution (kèm γ luật lũy thừa) | 3.2.1 | Bảng 3.3–3.6; Hình 3.2–3.7 |
+| Betweenness centrality | 3.2.2 | Bảng 3.7–3.8; Hình 5.3 |
+| Closeness centrality | 3.2.3 | Bảng 3.9 |
+| Eigenvector centrality (có và không trọng số, localization) | 3.2.4 | Bảng 3.10–3.11 |
+| PageRank | 3.2.5 | Bảng 3.12; Bảng 4.4; Hình 4.1 |
+| HITS hub và authority | 3.2.6 | Bảng 3.13; Bảng 4.4–4.5 |
+| Density | 3.2.7 | Bảng 3.14 |
+| Average shortest path length | 3.2.8 | Bảng 3.15 |
+| Diameter | 3.2.9 | Bảng 3.15 |
+| Clustering coefficient và Transitivity | 3.2.10 | Bảng 3.16 |
+| Modularity | 3.2.11 | Bảng 3.17; Bảng 4.1–4.3; Hình 5.1–5.2, 5.7–5.8 |
+| Thành phần liên thông, LCC, assortativity, reciprocity | 3.2.12 | Bảng 3.18 |
 
-Nguồn: `sna/build.py` cho cách tính; `data/network/summary.csv`, `data/network/metrics/*.csv` cho kết quả; `docs/do_nhay_sna.md` cho độ nhạy. Mỗi tiểu mục 3.2 tách định nghĩa, công thức, cách tính, kết quả và ý nghĩa.
+Nguồn: `sna/build.py` cho cách tính; `data/network/summary.csv`, `data/network/metrics/*.csv` cho kết quả; `docs/do_nhay_sna.md` cho độ nhạy. Mỗi tiểu mục 3.2 tách định nghĩa, công thức, cách tính, kết quả và ý nghĩa; bảng toàn bộ chỉ tiêu ba năm ở mục 3.3.
+
+# Trả lời 8 câu hỏi trọng tâm
+
+Mục này trả lời trực tiếp tám câu hỏi về mô hình và dữ liệu; chi tiết ở các chương sau. Định nghĩa đồ thị lấy từ trường `definition` của `data/network/*_2026.json` (cũng là nội dung thẻ “Định nghĩa đồ thị” trên web).
+
+**Câu 1. Đồ thị gì?** Bốn đồ thị, mỗi năm 2024, 2025, 2026 một bản:
+
+| Mạng | Loại đồ thị | Câu hỏi trả lời |
+| --- | --- | --- |
+| G1 Trường–Ngành | Hai phía (bipartite), vô hướng, có trọng số | Trường mở ngành nào, ngành nào phổ biến |
+| G2 Trường–Trường | Chiếu một phía từ G1, vô hướng, có trọng số | Trường nào có danh mục ngành giống nhau |
+| G3 Ngành–Ngành | Chiếu một phía từ G1, vô hướng, có trọng số | Ngành nào thường được mở cùng nhau |
+| G4 Cạnh tranh | Có hướng Trường → Trường, có trọng số | Trường nào cạnh tranh trực tiếp theo điểm |
+
+**Câu 2. Nút là gì?** G1: trường (292 mã trường trong toàn kỳ; mỗi năm 276–278 trường có dòng đã gán mã ngành) và ngành theo mã 7 số Bộ GD&ĐT (413–421 ngành mỗi năm). G2, G4: trường. G3: ngành. G2, G3, G4 bỏ nút cô lập.
+
+**Câu 3. Cạnh là gì?** G1: trường có ít nhất một dòng điểm chuẩn của ngành trong năm (mọi phương thức). G2: hai trường có Jaccard(tập ngành) ≥ 0,25. G3: hai ngành có Jaccard(tập trường mở ngành) ≥ 0,25. G4: A → B khi ở cùng một ngành, điểm THPT thang 30 cao nhất của B cao hơn A trong khoảng (0; 2] điểm (dòng không cờ).
+
+**Câu 4. Trọng số là gì?** G1: số dòng điểm chuẩn của cặp (trường, ngành), tính mọi phương thức, chương trình, tổ hợp. G2, G3: hệ số Jaccard $|A\cap B|/|A\cup B|$. G4: số ngành thỏa điều kiện cạnh. Năm 2026 các mạng có lần lượt 697/5.046, 250/2.540, 370/1.391, 226/9.215 nút/cạnh (Bảng 3.1–3.2).
+
+**Câu 5. Thu thập dữ liệu thế nào?** Chương trình `crawler/fetch.py` (thư viện chuẩn Python) gọi API JSON công khai của diemthi.tuyensinh247.com: `/api/school/search` lấy danh mục 587 cơ sở, chọn 307 trường đại học (`level = 2`); `/api/common/cutoff-score?school_id=&year=` lấy điểm chuẩn mỗi trường × mỗi năm 2024–2026, tổng **921 request**, 0 lỗi, 833 trang có điểm, 292 trường có điểm, **76.726 dòng thô**. Crawler kiểm `robots.txt` trước mỗi request, nghỉ tối thiểu 1,5 giây giữa hai request (cộng ngẫu nhiên 0–0,5 giây), thử lại tối đa 3 lần khi lỗi mạng, lưu JSON gốc vào `data/raw/cutoff/<năm>/<mã>.json` và ghi nhật ký `data/raw/fetch_log.csv`. Thông tin bổ trợ: VNUR 2026, đề án HOCMAI, học phí (mục 2.1).
+
+**Câu 6. Thời gian lấy dữ liệu?** Điểm chuẩn tải ngày **23/10/2026**, từ 13:51:00 đến 14:20:33 (29 phút 33 giây theo nhật ký), cho ba năm tuyển sinh 2024, 2025, 2026. Dữ liệu được xử lý (làm sạch, chuẩn hoá mã ngành) lần cuối ngày **09/11/2026**; mạng và độ đo tính lại ngày 21/11/2026 trên cùng dữ liệu. Web hiển thị hai mốc “Thu thập dữ liệu: 23/10/2026 · Xử lý/cập nhật: 09/11/2026” lấy từ DB.
+
+**Câu 7. Làm sạch thế nào?**
+
+| Bước | Thay đổi | Còn lại |
+| --- | ---: | ---: |
+| Dòng thô từ API | 76.726 | 76.726 |
+| Bỏ dòng không có điểm hoặc điểm ≤ 0 | − 69 | 76.657 |
+| Bỏ dòng không có tên ngành | − 0 | 76.657 |
+| Gộp cặp điểm gốc + điểm quy đổi thành 1 dòng | − 4.961 | 71.696 |
+| Bỏ dòng trùng hoàn toàn | − 685 | **71.011** |
+
+Ngoài ra: chuẩn Unicode, mã tổ hợp, phương thức và thang điểm; gắn cờ chất lượng (1.113 dòng thang khác 30, 3 dòng THPT dưới 12, 2 outlier) thay vì xoá; giữ 631 dòng trùng khoá khác điểm để không tự chọn; gán mã ngành 7 số cho 69.112 dòng (97,33%) qua 7 quy tắc và bảng sửa tay `data/manual/major_map.csv` (Bảng 2.7, 2.9). Nguồn: `data/clean/quality_report.md`.
+
+**Câu 8. Đã tính các độ đo nào?**
+
+| Nhóm | Độ đo | Mạng | Mục |
+| --- | --- | --- | --- |
+| Quy mô | Số nút, cạnh, mật độ (thường và hai phía), bậc trung bình | G1–G4 | 3.2.7 |
+| Trung tâm | Degree, betweenness, closeness, eigenvector (có và không trọng số), PageRank | G1–G4 | 3.2.1–3.2.5 |
+| Trung tâm có hướng | HITS hub/authority, bậc vào/ra, cường độ vào | G4 (authority cả G1) | 3.2.6 |
+| Liên thông & đường đi | Thành phần (yếu/mạnh), LCC, SCC, đường đi trung bình, đường kính | G1–G4 | 3.2.8–3.2.9, 3.2.12 |
+| Phân cụm & cộng đồng | Clustering (Latapy cho G1, có hướng cho G4), transitivity, assortativity, reciprocity, modularity | G1–G4 | 3.2.10–3.2.12 |
+| Phân bố bậc | Histogram, CCDF log–log, ước lượng γ luật lũy thừa (MLE, KS) | G1–G4 | 3.2.1 |
+| Thuật toán | Louvain, Girvan–Newman toàn đồ thị, Spearman, Adamic–Adar, độ nhạy ARI/NMI | G2–G4 | Chương 4 |
 
 # Chương 1. Chủ đề và mục tiêu
 
@@ -74,11 +121,11 @@ Các câu hỏi nghiên cứu được trả lời ở Chương 7:
 
 ## 1.3. Phạm vi và sản phẩm
 
-Phạm vi thực nghiệm gồm 292 mã trường có điểm trong ít nhất một năm thuộc giai đoạn 2024–2026. Danh mục nguồn chọn được 307 trường đại học, trong đó 15 trường chưa có dòng điểm. Số trường có điểm theo năm lần lượt là 279, 278 và 276; đây là các tập giao nhau, không cộng thành tổng trường. Có 472 mã ngành khác nhau trong toàn kỳ; mạng từng năm chỉ dùng các dòng map được mã ngành.
+Phạm vi thực nghiệm gồm 292 mã trường có điểm trong ít nhất một năm thuộc giai đoạn 2024–2026. Danh mục nguồn chọn được 307 trường đại học, trong đó 15 trường chưa có dòng điểm. Số trường có điểm theo năm lần lượt là 279, 278 và 276; đây là các tập giao nhau, không cộng thành tổng trường. Có 455 mã ngành 7 số khác nhau trong toàn kỳ; mạng từng năm chỉ dùng các dòng map được mã ngành.
 
 Nguồn: `docs/TONG_KET_DU_LIEU.md`, mục Điểm chuẩn và tổ hợp; `data/eduradar.db`, bảng `admissions`.
 
-Sản phẩm gồm dữ liệu chuẩn hoá trong SQLite, các tệp độ đo và GEXF, các biểu đồ, báo cáo và ứng dụng EduRadar. Bản công khai tại [EduRadar trên GitHub Pages](https://tiennguyen2406.github.io/Tuyensinhdaihoc/) phục vụ tra cứu bằng dữ liệu tĩnh; bản FastAPI phục vụ trực tiếp từ dữ liệu trên máy. Phạm vi này phản ánh mẫu đã thu thập, không được xem là điều tra toàn bộ hệ thống đại học hay xác suất trúng tuyển.
+Sản phẩm gồm dữ liệu chuẩn hoá trong SQLite, các tệp độ đo và GEXF, các biểu đồ, báo cáo và ứng dụng EduRadar. Bản công khai tại [https://diemthidaihoc.com](https://diemthidaihoc.com) phục vụ tra cứu bằng dữ liệu tĩnh; bản FastAPI phục vụ trực tiếp từ dữ liệu trên máy. Phạm vi này phản ánh mẫu đã thu thập, không được xem là điều tra toàn bộ hệ thống đại học hay xác suất trúng tuyển.
 
 
 # Chương 2. Thu thập và xử lý dữ liệu
@@ -87,7 +134,7 @@ Sản phẩm gồm dữ liệu chuẩn hoá trong SQLite, các tệp độ đo v
 
 Bộ dữ liệu của EduRadar V2 được xây dựng để tra cứu điểm chuẩn các năm 2024–2026, tư vấn theo điểm và tạo mạng phục vụ phân tích SNA. Nguồn chính là API công khai của Tuyensinh247; các thông tin bổ trợ gồm danh mục tổ hợp, xếp hạng VNUR 2026, đề án tuyển sinh HOCMAI, học phí và địa bàn của trường. Đây là tập dữ liệu đã thu thập phục vụ đồ án, không đại diện cho toàn bộ cơ sở giáo dục hoặc mọi thông báo tuyển sinh đang tồn tại trên Internet.
 
-Mốc thu thập phải phân biệt với mốc xử lý. Điểm chuẩn được tải ngày **23/10/2026**. Lần chạy lại pipeline dùng dữ liệu thô đã có diễn ra ngày **25/10/2026**, với `meta.updated_on = 2026-10-25` theo tài liệu tổng kết. Mốc xử lý này không chứng minh các trang học phí, đề án hoặc bảng xếp hạng đều vừa được tải trong ngày 25/10.
+Mốc thu thập phải phân biệt với mốc xử lý. Điểm chuẩn được tải ngày **23/10/2026** (`MAX(crawled_at)` trong `admissions`, nhật ký 13:51–14:20). Lần chạy lại pipeline gần nhất trên dữ liệu thô đã có diễn ra ngày **09/11/2026** (`meta.updated_on = 2026-11-09`; `quality_report.md` tạo 09/11/2026 08:09), sau khi bổ sung bảng sửa mã ngành thủ công. Web hiển thị cả hai mốc ở đầu trang. Mốc xử lý không chứng minh các trang học phí, đề án hoặc bảng xếp hạng đều vừa được tải trong ngày đó.
 
 **Bảng 2.1. Danh mục nguồn, cách truy cập và khả năng truy nguyên**
 
@@ -114,7 +161,7 @@ Crawler hiện kiểm tra robots trước khi gọi API và dừng nếu `can_fe
 | Lớp dữ liệu | Số lượng và cách hiểu |
 | --- | --- |
 | Danh mục trường API | 587 mục mọi loại hình; chọn 307 trường `level = 2`; 292 trường có ít nhất một dòng điểm, 15 trường chưa có điểm ở cả ba năm |
-| Điểm chuẩn | 76.726 dòng thô; 71.011 dòng sạch; 472 mã ngành được sử dụng; 69.276 dòng có mã ngành |
+| Điểm chuẩn | 76.726 dòng thô; 71.011 dòng sạch; 455 mã ngành được sử dụng; 69.112 dòng có mã ngành |
 | Tổ hợp | 385 mã xuất hiện trong điểm; 264.630 lượt gắn dòng–tổ hợp; danh mục nguồn có tên môn cho 298 mã; giao giữa hai tập là 253 mã |
 | VNUR 2026 | 149/292 trường có hạng: 95 hạng trực tiếp và 54 đơn vị kế thừa; 143 chưa gắn hạng |
 | Đề án HOCMAI | 271 bài nguồn; 268 bài ghép vào 267 mã trường; 3 bài chưa ghép; 1.190 mục phương thức và 8.208 gạch đầu dòng dữ kiện |
@@ -123,7 +170,7 @@ Crawler hiện kiểm tra robots trước khi gọi API và dừng nếu `can_fe
 | Học phí hợp hai bộ | Hai bộ không trùng mã trường; 285/292 trường có mức tiền tham khảo; 7 trường chỉ có thông báo chưa xác minh |
 | Địa bàn | Theo lớp hợp cuối trong tổng kết: 292/292 trường, 30 tỉnh/thành; nguồn gồm 90 địa chỉ chính thức, 95 VNUR, 107 HOCMAI. DB nền mới lưu tỉnh rõ cho 185 trường; phân biệt này được giải thích ở mục 2.6 |
 
-Nguồn: `docs/TONG_KET_DU_LIEU.md`, `data/clean/quality_report.md`; đối chiếu số điểm, tổ hợp và hạng với `data/eduradar.db` ngày 25/10/2026.
+Nguồn: `docs/TONG_KET_DU_LIEU.md`, `data/clean/quality_report.md`; đối chiếu số điểm, mã ngành, tổ hợp và hạng với `data/eduradar.db` (bản xử lý 09/11/2026).
 
 ## 2.2. Kiến trúc và quy trình crawler
 
@@ -215,7 +262,7 @@ Nguồn: `data/clean/quality_report.md`.
 | **Dòng sạch** | **18.590** | **24.234** | **28.187** | **71.011** |
 | Dòng thô từ log | 18.757 | 25.758 | 32.211 | 76.726 |
 | Trường có dữ liệu sạch | 279 | 278 | 276 | 292 trường phân biệt |
-| Mã ngành được dùng | 428 | 434 | 429 | 472 mã phân biệt |
+| Mã ngành được dùng | 413 | 419 | 421 | 455 mã phân biệt |
 
 Nguồn: `data/clean/quality_report.md`, `data/raw/fetch_log.csv`, truy vấn nhóm `year`, `method` từ `data/eduradar.db`. Hai hàng cuối là số phần tử phân biệt, không cộng dọc thành tổng ba năm.
 
@@ -250,7 +297,7 @@ Nguồn: `admissions` JOIN `universities` theo `uni_code`, GROUP BY mã trườn
 
 Pipeline đọc toàn bộ phản hồi đã lưu, gắn thông tin trường, năm, URL và thời điểm thu thập. Nếu trường `year` của dòng thiếu, chương trình dùng năm của file rồi ép về số nguyên. Cột `mark` được ép sang kiểu số; giá trị không chuyển được thành số trở thành thiếu. Các bước tiếp theo được thực hiện theo thứ tự cố định trong Bảng 2.7.
 
-**Bảng 2.7. Nhật ký làm sạch của lần chạy 25/10/2026**
+**Bảng 2.7. Nhật ký làm sạch của lần chạy 09/11/2026**
 
 | Bước | Vấn đề và quy tắc | Dòng bị giảm hoặc được ghi nhận | Số dòng còn lại |
 | --- | --- | ---: | ---: |
@@ -262,7 +309,7 @@ Pipeline đọc toàn bộ phản hồi đã lưu, gắn thông tin trường, n
 | Thang điểm và cờ | Gán thang theo phương thức hoặc suy từ giá trị; gắn cảnh báo | Không loại dòng ở bước này | 71.696 |
 | Loại trùng hoàn toàn | Trùng khóa nghiệp vụ và cùng `score` thì giữ một | −685 | 71.011 |
 | Phát hiện mâu thuẫn | Cùng khóa nghiệp vụ nhưng khác điểm | 631 dòng được giữ, không phải 631 khóa | 71.011 |
-| Loại chương trình, map ngành | Phân loại chương trình; gán mã ngành và cách gán | 69.276 dòng có mã, 1.735 dòng chưa có mã | 71.011 |
+| Loại chương trình, map ngành | Phân loại chương trình; gán mã ngành và cách gán (Bảng 2.9) | 69.112 dòng có mã, 1.899 dòng chưa có mã | 71.011 |
 
 Nguồn: `data/clean/quality_report.md`; thứ tự và khóa xử lý đối chiếu `pipeline/clean.py`. Báo cáo hiện hành không có thống kê riêng số ô sửa Unicode, tiền tố hoặc khoảng trắng trong mã, nên không dùng các số thống kê của lần chạy cũ.
 
@@ -321,22 +368,25 @@ Danh mục ngành được dựng từ chính dữ liệu điểm: lấy tiền 
 
 Với dòng chưa nhận diện được mã bảy số, pipeline tạo `name_key` bằng cách bỏ dấu, viết thường, bỏ phần trong ngoặc và một số từ chỉ chương trình, gộp dấu cách. Các từ như “quốc tế” hoặc “tiếng Anh” không bị xóa như những từ đơn lẻ không có nghĩa; tuy nhiên một số cụm mô tả chương trình đã quy định trong biểu thức chuẩn hóa vẫn có thể bị loại. Việc giữ nội dung phân biệt ngành giúp tránh gộp “Kinh doanh quốc tế” vào một ngành kinh doanh khác chỉ vì cùng có phần tên chung.
 
-Thứ tự thực hiện là **`ma_7_so` → `thu_cong` → `ten_khop` → `dau_ten_chuan` → `ten_gan_dung` → `chua_ten_chuan`**. Dừng ở quy tắc khớp đầu tiên. `thu_cong_bo` là nhánh của bước thủ công: dấu `-` trong bảng map yêu cầu để trống mã, ngăn những phép gán tự động chưa đáng tin. Các số liệu và tỉ lệ ở Bảng 2.9 lấy trực tiếp từ DB, tính trên mẫu số 71.011 và làm tròn hai chữ số thập phân.
+Thứ tự thực hiện là **`ma_7_so` → sửa mã nguồn (`doi_ma_nguon`/`bo_ma_nguon`) → `thu_cong` → `ten_khop` → `dau_ten_chuan` → `ten_gan_dung` → `chua_ten_chuan`**, dừng ở quy tắc khớp đầu tiên; cuối cùng `ten_tu_ma` thay tên chương trình chỉ gồm chữ số bằng tên ngành chuẩn. Dòng `ma:<mã>` hoặc `ma:<mã>@<TRƯỜNG>` trong `data/manual/major_map.csv` đổi (`doi_ma_nguon`) hoặc bỏ (`bo_ma_nguon`, giá trị `-`) mã 7 số mà nguồn ghi sai. `thu_cong_bo` là nhánh của bước thủ công theo tên: dấu `-` yêu cầu để trống mã, ngăn những phép gán tự động chưa đáng tin. Các số liệu và tỉ lệ ở Bảng 2.9 lấy trực tiếp từ DB, tính trên mẫu số 71.011 và làm tròn hai chữ số thập phân.
 
 **Bảng 2.9. Kết quả gán mã ngành theo quy tắc**
 
 | Thứ tự | Cách gán | Quy tắc | Số dòng | Tỉ lệ |
 | --- | --- | --- | ---: | ---: |
-| 1 | `ma_7_so` | Dùng tiền tố `7\d{6}` của mã chương trình | 56.418 | 79,45% |
-| 2 | `thu_cong` | Tra `name_key` trong bảng map thủ công | 2.055 | 2,89% |
-| 2b | `thu_cong_bo` | Chủ động để trống mã theo dấu `-` | 55 | 0,08% |
-| 3 | `ten_khop` | Khớp `name_key` với tên đã biết mã | 9.425 | 13,27% |
+| 1 | `ma_7_so` | Dùng tiền tố `7\d{6}` của mã chương trình | 56.261 | 79,23% |
+| 1a | `doi_ma_nguon` | Mã nguồn ghi sai, đổi theo dòng `ma:<mã>` của bảng map | 5 | 0,01% |
+| 1b | `bo_ma_nguon` | Mã nguồn ghi sai, bỏ theo dòng `ma:<mã>` có giá trị `-` | 152 | 0,21% |
+| 2 | `thu_cong` | Tra `name_key` trong bảng map thủ công | 2.040 | 2,87% |
+| 2b | `thu_cong_bo` | Chủ động để trống mã theo dấu `-` | 61 | 0,09% |
+| 3 | `ten_khop` | Khớp `name_key` với tên đã biết mã | 9.413 | 13,26% |
 | 4 | `dau_ten_chuan` | Bắt đầu bằng tên chuẩn có ít nhất hai từ | 1.182 | 1,66% |
 | 5 | `ten_gan_dung` | `difflib` có độ giống tối thiểu 0,9 | 83 | 0,12% |
 | 6 | `chua_ten_chuan` | Chứa cụm tên chuẩn, đủ điều kiện và chiếm ít nhất 60% số từ cốt lõi | 113 | 0,16% |
-| — | Chưa khớp | Không có kết quả từ các quy tắc trên | 1.680 | 2,37% |
-| | **Có mã** | Không tính `thu_cong_bo` và chưa khớp | **69.276** | **97,56%** |
-| | **Chưa có mã** | 1.680 chưa khớp + 55 chủ động bỏ | **1.735** | **2,44%** |
+| 7 | `ten_tu_ma` | Tên chương trình chỉ là mã số, thay bằng tên ngành chuẩn | 15 | 0,02% |
+| — | Chưa khớp | Không có kết quả từ các quy tắc trên | 1.686 | 2,37% |
+| | **Có mã** | Không tính `bo_ma_nguon`, `thu_cong_bo` và chưa khớp | **69.112** | **97,33%** |
+| | **Chưa có mã** | 1.686 chưa khớp + 152 bỏ mã nguồn + 61 chủ động bỏ | **1.899** | **2,67%** |
 
 Nguồn: `SELECT match_how, COUNT(*) FROM admissions GROUP BY match_how` và kiểm tra `major_code` trong `data/eduradar.db`; mô tả quy tắc từ `pipeline/clean.py`. Các tỉ lệ thành phần có thể không cộng đúng 100,00% do làm tròn.
 
@@ -363,7 +413,7 @@ Nguồn: truy vấn `admissions` LEFT JOIN `majors` trong `data/eduradar.db`. Đ
 
 Lỗi đã được sửa trong cách dựng từ điển tên là chọn **mã xuất hiện trội** thay cho mã gặp đầu tiên. Nếu nhiều mã dùng cùng một tên, `key_to_code` đếm lượt xuất hiện của cặp tên–mã; khi dựng tên danh mục và cụm từ chuẩn, hàm `dominant` ưu tiên mã có nhiều dòng sử dụng. Ví dụ DB đồng thời có `7310120` và `7340120` mang tên Kinh doanh quốc tế; `7340002` và `7340101` cùng mang tên Quản trị kinh doanh. Quy tắc đa số giảm sự phụ thuộc thứ tự đọc dữ liệu, nhưng không xác thực được mã ít gặp là sai hay mã trội là mã pháp lý đúng. Những trường hợp bất định cần sửa qua `data/manual/major_map.csv`.
 
-Ví dụ `CH-E11` cho thấy khớp gần đúng có thể gộp một tên chuyên biệt vào ngành rộng hơn. Các phép khớp tên, đặc biệt tiền tố, gần đúng và chứa cụm, là heuristic. Tỉ lệ 97,56% vì vậy là **độ phủ gán mã**, không phải độ chính xác 97,56%. Báo cáo hiện hành ghi 175 khóa tên chưa map; tổng số dòng chưa có mã là 1.735, trong đó đã bao gồm nhánh bỏ map có chủ đích.
+Ví dụ `CH-E11` cho thấy khớp gần đúng có thể gộp một tên chuyên biệt vào ngành rộng hơn. Các phép khớp tên, đặc biệt tiền tố, gần đúng và chứa cụm, là heuristic. Tỉ lệ 97,33% vì vậy là **độ phủ gán mã**, không phải độ chính xác 97,33%. Báo cáo chất lượng hiện hành ghi 168 khóa tên chưa map (`data/interim/major_unmatched.csv`); tổng số dòng chưa có mã là 1.899, trong đó đã bao gồm hai nhánh bỏ mã có chủ đích. Lần xử lý 09/11/2026 thêm các dòng sửa mã nguồn (`doi_ma_nguon`, `bo_ma_nguon`) và rà lại bảng map thủ công; các mã nguồn bị xác định là ghi sai được để trống thay vì giữ.
 
 ### 2.5.3. Loại chương trình và địa bàn
 
@@ -462,7 +512,7 @@ Nguồn: `data/eduradar.db`, `data/raw/fetch_log.csv`. Có **259/292 trường**
 
 | Lớp thông tin | Độ phủ | Điều kiện diễn giải |
 | --- | --- | --- |
-| Gán mã ngành | 69.276/71.011 dòng = 97,56% | Độ phủ tự động/thủ công, chưa phải độ chính xác đã kiểm tay |
+| Gán mã ngành | 69.112/71.011 dòng = 97,33% | Độ phủ tự động/thủ công, chưa phải độ chính xác đã kiểm tay |
 | Đề án HOCMAI | 267/292 trường = 91,44% | Còn 25 trường chưa có; năm trong bài có thể không đồng nhất |
 | Học phí có mức tiền | 285/292 trường = 97,60% | Nguồn, năm và đơn vị khác nhau; 7 mục không có mức đã xác minh |
 | VNUR, gồm kế thừa | 149/292 trường = 51,03% | Chỉ 95 hạng trực tiếp; 54 đơn vị dùng quan hệ với đại học mẹ |
@@ -478,875 +528,698 @@ Lược đồ SQLite hiện có bốn bảng lõi `universities`, `majors`, `adm
 
 Hồ sơ kiểm chứng trước đây đề xuất chọn 20 dòng, phân tầng hai dòng cho mỗi trong mười phương thức và dùng seed 42. Tuy nhiên kết quả số dòng khớp trong báo cáo làm sạch vẫn để **\_\_/20**; các nguồn kiểm chứng được chốt cho chương này chưa cung cấp kết quả đối chiếu hoàn tất với trang nguồn. Vì vậy, báo cáo **chưa công bố tỉ lệ chính xác của mẫu 20 dòng**, không tự điền 20/20. Đếm số record, tính độ phủ và kiểm tra quy tắc trong DB là kiểm chứng tính nhất quán nội bộ; chúng không thay cho việc xác minh giá trị với thông báo tuyển sinh gốc.
 
-Các giới hạn chính gồm: (i) phụ thuộc một trang tổng hợp cho điểm chuẩn, có thể kế thừa thiếu hoặc sai từ nguồn; (ii) thang điểm một phần là suy luận từ giá trị, chưa bao quát mọi bài thi; (iii) 631 dòng cùng khóa khác điểm chưa được phân xử; (iv) danh mục ngành dựng từ dữ liệu có mã đồng tên, và các phép map tên chưa đo độ chính xác riêng; (v) 1.735 dòng chưa gán mã sẽ không tạo quan hệ trường–ngành ở bước cần mã ngành; (vi) thiếu trường–năm làm thay đổi tập nút giữa các năm; (vii) học phí, đề án và VNUR không đồng nhất về mốc thời gian hoặc phạm vi; (viii) chưa có hồ sơ URL/ngày truy cập đầy đủ đến từng bài cho mọi nguồn bổ trợ trong bộ bằng chứng của chương.
+Các giới hạn chính gồm: (i) phụ thuộc một trang tổng hợp cho điểm chuẩn, có thể kế thừa thiếu hoặc sai từ nguồn; (ii) thang điểm một phần là suy luận từ giá trị, chưa bao quát mọi bài thi; (iii) 631 dòng cùng khóa khác điểm chưa được phân xử; (iv) danh mục ngành dựng từ dữ liệu có mã đồng tên, và các phép map tên chưa đo độ chính xác riêng; (v) 1.899 dòng chưa gán mã sẽ không tạo quan hệ trường–ngành ở bước cần mã ngành; (vi) thiếu trường–năm làm thay đổi tập nút giữa các năm; (vii) học phí, đề án và VNUR không đồng nhất về mốc thời gian hoặc phạm vi; (viii) chưa có hồ sơ URL/ngày truy cập đầy đủ đến từng bài cho mọi nguồn bổ trợ trong bộ bằng chứng của chương.
 
-Với các giới hạn đó, tập dữ liệu vẫn đạt các kết quả đo được cho đồ án: **71.011 record sạch, 292 trường, 472 mã ngành, 97,56% dòng được gán mã**; dữ liệu đủ để xây mạng và hỗ trợ tra cứu. Các kết quả SNA ở chương sau cần được diễn giải là cấu trúc của tập dữ liệu đã thu thập, không là bức tranh đầy đủ về hành vi chọn trường, chỉ tiêu hoặc xác suất trúng tuyển của thí sinh.
+Với các giới hạn đó, tập dữ liệu vẫn đạt các kết quả đo được cho đồ án: **71.011 record sạch, 292 trường, 455 mã ngành, 97,33% dòng được gán mã**; dữ liệu đủ để xây mạng và hỗ trợ tra cứu. Các kết quả SNA ở chương sau cần được diễn giải là cấu trúc của tập dữ liệu đã thu thập, không là bức tranh đầy đủ về hành vi chọn trường, chỉ tiêu hoặc xác suất trúng tuyển của thí sinh.
 
 
 # Chương 3. Mô hình mạng và các độ đo SNA
 
 ## 3.1. Xây dựng bốn mạng trường – ngành
 
-Đầu vào của phân tích là các dòng trong bảng `admissions` đã có `major_code`, tách theo năm 2024, 2025 và 2026. Việc chưa có mã ngành khiến một dòng không tham gia cả bốn mạng; vì vậy độ phủ mạng khác với độ phủ toàn bộ dữ liệu điểm chuẩn. Dữ liệu sạch có 71.011 dòng, trong đó 69.276 dòng được map ngành (97,56%), còn 1.735 dòng chưa map. Đây là cấu trúc của tập điểm đã thu thập, không phải toàn bộ hệ thống giáo dục đại học.
+Đầu vào là các dòng `admissions` đã có `major_code` (69.112/71.011 dòng, 97,33%), tách theo năm 2024, 2025, 2026. Dòng chưa có mã ngành không tham gia mạng. Định nghĩa dưới đây lấy từ trường `definition` mà `sna/build.py` ghi vào `data/network/<mạng>_2026.json`; web hiển thị đúng nội dung này trong thẻ “Định nghĩa đồ thị”.
 
-**G1 — Trường – Ngành.** Đây là đồ thị hai phía vô hướng $G_1=(U\cup M,E)$; cạnh $(u,m)$ tồn tại nếu trường $u$ có ít nhất một dòng tuyển ngành $m$ trong năm, với bất kỳ phương thức nào. Trọng số $w_{um}$ bằng số dòng điểm của cặp trường–ngành; nhiều phương thức/chương trình có thể làm trọng số tăng nhưng không tạo thêm cạnh. G1 giữ quan hệ gốc để đo số ngành một trường mở và số trường mở một ngành. Hàm `g1_bipartite` dùng `groupby(["uni_code", "major_code"]).size()`.
+**Bảng 3.1. Định nghĩa bốn mạng**
 
-**G2 — Trường – Trường.** Chiếu G1 lên phía trường: mỗi trường $u$ có tập ngành $N(u)$. Với hai trường có ít nhất một ngành chung, tính
+| Mạng | Loại đồ thị | Nút | Cạnh | Trọng số | Ngưỡng / tham số | Nút / cạnh 2026 |
+| --- | --- | --- | --- | --- | --- | --- |
+| G1 Trường–Ngành | Hai phía (bipartite), vô hướng, có trọng số | Trường (hình tròn) và ngành theo mã 7 số Bộ GD&ĐT (hình kim cương) | Trường có điểm chuẩn của ngành đó trong năm | Số dòng điểm chuẩn của cặp (trường, ngành), tính mọi phương thức, chương trình, tổ hợp | Chỉ dùng dòng đã có mã ngành 7 số | 697 / 5.046 |
+| G2 Trường–Trường | Chiếu một phía Trường–Trường từ G1, vô hướng, có trọng số | Trường | Nối 2 nút khi Jaccard(tập ngành của 2 trường) ≥ 0,25 | Hệ số Jaccard = \|giao\| / \|hợp\| | Ngưỡng Jaccard 0,25; bỏ nút cô lập (không có cạnh) | 250 / 2.540 |
+| G3 Ngành–Ngành | Chiếu một phía Ngành–Ngành từ G1, vô hướng, có trọng số | Ngành (mã 7 số) | Nối 2 nút khi Jaccard(tập trường mở 2 ngành) ≥ 0,25 | Hệ số Jaccard = \|giao\| / \|hợp\| | Ngưỡng Jaccard 0,25; bỏ nút cô lập (không có cạnh) | 370 / 1.391 |
+| G4 Cạnh tranh | Có hướng Trường → Trường, có trọng số | Trường có điểm chuẩn THPT thang 30 | A → B khi cùng một ngành, điểm B cao hơn A trong khoảng (0; 2] điểm | Số ngành thỏa điều kiện | Chỉ phương thức THPT thang 30, dòng không gắn cờ; lấy điểm cao nhất của trường cho mỗi ngành; khoảng điểm 2; bỏ nút cô lập | 226 / 9.215 |
 
-$$J(u,v)=\frac{|N(u)\cap N(v)|}{|N(u)\cup N(v)|}.$$
+*Nguồn: `data/network/*_2026.json`, trường `definition`; số nút/cạnh từ `data/network/summary.csv`.*
 
-Giữ cạnh khi $J\ge0{,}25$; `weight` là Jaccard làm tròn bốn chữ số, `shared` là số ngành chung. Phép chiếu chỉ dùng tập hàng xóm của G1, không dùng số dòng điểm làm trọng số đầu vào. Sau khi lọc, loại đỉnh bậc 0. Một trường có trong G1 nhưng không xuất hiện ở G2 nghĩa là không còn quan hệ vượt ngưỡng, không có nghĩa là trường không tuyển sinh.
+**G1** là đồ thị hai phía $G_1=(U\cup M,E)$, trọng số $w_{um}$ là số dòng điểm của cặp trường–ngành. **G2/G3** là phép chiếu một phía của G1 với hệ số Jaccard
 
-**G3 — Ngành – Ngành.** Chiếu lên phía ngành, thay tập ngành của trường bằng tập trường mở ngành. Giữ cạnh khi Jaccard của hai tập trường đạt 0,25, rồi bỏ đỉnh cô lập. G3 đo sự cùng xuất hiện trong danh mục đào tạo. Hai ngành có quan hệ mạnh trong G3 chưa chắc gần nhau về nội dung môn học.
+$$J(a,b)=\frac{|N(a)\cap N(b)|}{|N(a)\cup N(b)|},$$
 
-Hàm `jaccard_projection` sinh các cặp ứng viên qua hàng xóm chung ở phía đối diện và dùng `seen` để không xét lại một cặp. Cách này tránh duyệt mọi cặp hoàn toàn không có giao nhau, nhưng chi phí vẫn tăng nếu nhiều ngành hoặc trường có bậc lớn.
+trong đó $N(a)$ là tập ngành của trường $a$ (G2) hoặc tập trường mở ngành $a$ (G3); giữ cạnh khi $J\ge0{,}25$. **G4** có cạnh $A\to B$ với trọng số
+
+$$w_{AB}=\sum_m\mathbf1\{0<s_{B,m}-s_{A,m}\le2\},$$
+
+với $s_{X,m}$ là điểm THPT thang 30 cao nhất (dòng không cờ) của trường $X$ ở ngành $m$. Cạnh G4 biểu diễn khả năng lựa chọn gần nhau theo điểm trong mô hình, không phải hành vi chuyển nguyện vọng đã quan sát. Hai tham số 0,25 và 2 được kiểm độ nhạy ở mục 4.5.
 
 ![Hình 3.1. Minh họa G1 và hai phép chiếu Jaccard](fig/projection.png)
 
-*Hình 3.1. Nguyên lý chiếu mạng hai phía; sơ đồ chỉ mô tả quan hệ giữa ba mô hình, không đưa thêm dữ liệu trường giả định. Nguồn phương pháp: `sna/build.py`, hàm `g1_bipartite` và `jaccard_projection`.*
+*Hình 3.1. Nguyên lý chiếu mạng hai phía. Nguồn phương pháp: `sna/build.py`, hàm `g1_bipartite`, `jaccard_projection`, `g4_competition`.*
 
-**G4 — Mạng cạnh tranh.** Đây là đồ thị có hướng trên các trường. Chỉ nhận các dòng `method='THPT'`, `scale_max=30`, `flag=''`, đã có mã ngành; lấy `MAX(score)` theo từng cặp trường–ngành. Với mỗi ngành, nếu $0<s_{B,m}-s_{A,m}\le2$, tạo $A\to B$. Trọng số là số ngành thỏa điều kiện ấy:
+**Bảng 3.2. Quy mô bốn mạng qua ba năm**
 
-$$w_{AB}=\sum_m\mathbf1\{0<s_{B,m}-s_{A,m}\le2\}.$$
-
-Điểm bằng nhau không tạo cạnh; hai trường có thể có cạnh hai chiều khi thứ tự điểm đảo giữa các ngành. Sau dựng mạng cũng bỏ đỉnh cô lập. Cạnh biểu diễn khả năng lựa chọn gần nhau theo điểm trong mô hình, chưa phải hành vi chuyển nguyện vọng đã quan sát. `g4_competition` không tách tổ hợp hay chương trình, nên `MAX` có thể đại diện chương trình cao điểm nhất của cùng ngành.
-
-**Bảng 3.1. Quy mô bốn mạng qua ba năm**
-
-| Mạng | Năm | Số đỉnh | Số cạnh | Diễn giải đỉnh |
+| Mạng | Năm | Số đỉnh | Số cạnh | Đỉnh là |
 | --- | --- | --- | --- | --- |
-| g1_uni_major | 2024 | 707 | 4.447 | 279 trường + 428 ngành |
-| g2_uni_uni | 2024 | 251 | 2.566 | trường |
-| g3_major_major | 2024 | 387 | 1.360 | ngành |
-| g4_competition | 2024 | 259 | 10.541 | trường |
-| g1_uni_major | 2025 | 712 | 4.680 | 278 trường + 434 ngành |
-| g2_uni_uni | 2025 | 250 | 2.455 | trường |
-| g3_major_major | 2025 | 387 | 1.431 | ngành |
-| g4_competition | 2025 | 260 | 10.789 | trường |
-| g1_uni_major | 2026 | 705 | 5.058 | 276 trường + 429 ngành |
-| g2_uni_uni | 2026 | 249 | 2.531 | trường |
-| g3_major_major | 2026 | 377 | 1.412 | ngành |
-| g4_competition | 2026 | 226 | 9.215 | trường |
+| G1 Trường–Ngành | 2024 | 689 | 4.429 | 276 trường + 413 ngành |
+| G2 Trường–Trường | 2024 | 249 | 2.581 | trường |
+| G3 Ngành–Ngành | 2024 | 374 | 1.316 | ngành |
+| G4 Cạnh tranh | 2024 | 259 | 10.542 | trường |
+| G1 Trường–Ngành | 2025 | 697 | 4.662 | 278 trường + 419 ngành |
+| G2 Trường–Trường | 2025 | 251 | 2.478 | trường |
+| G3 Ngành–Ngành | 2025 | 371 | 1.381 | ngành |
+| G4 Cạnh tranh | 2025 | 260 | 10.788 | trường |
+| G1 Trường–Ngành | 2026 | 697 | 5.046 | 276 trường + 421 ngành |
+| G2 Trường–Trường | 2026 | 250 | 2.540 | trường |
+| G3 Ngành–Ngành | 2026 | 370 | 1.391 | ngành |
+| G4 Cạnh tranh | 2026 | 226 | 9.215 | trường |
 
-*Nguồn: `data/network/summary.csv`; phạm vi dữ liệu: `docs/TONG_KET_DU_LIEU.md`.*
+*Nguồn: `data/network/summary.csv`.*
 
-## 3.2. Định nghĩa, cách tính và diễn giải các độ đo
+## 3.2. Định nghĩa, công thức, kết quả và ý nghĩa các độ đo
 
-Ký hiệu $n=|V|$, $m=|E|$, $k_v$ là bậc không trọng số, $s_v=\sum_u w_{vu}$ là strength, $d(u,v)$ là khoảng cách theo số cạnh. Các đường đi, betweenness, closeness, clustering và assortativity trong bản chạy hiện tại không dùng trọng số. Jaccard là độ giống nhau, chưa được đổi thành độ dài. Eigenvector, PageRank và Louvain dùng `weight`. Mỗi độ đo dưới đây tách định nghĩa, công thức, cách tính, kết quả và ý nghĩa để tránh đồng nhất các khái niệm.
+Ký hiệu $n=|V|$, $m=|E|$, $k_v$ là bậc, $d(u,v)$ là khoảng cách theo số cạnh. Đường đi, betweenness, closeness, clustering và assortativity tính **không trọng số** (Jaccard là độ giống, chưa đổi thành độ dài); eigenvector, PageRank, HITS và Louvain dùng `weight`. Mọi độ đo nút có giá trị cho **mọi** đỉnh (đỉnh ngoài thành phần lớn nhất nhận 0 ở eigenvector), nên `metrics/*.csv` không còn ô trống. Bảng top 10 dưới đây là năm 2026; số ba năm ở mục 3.3.
 
 ### 3.2.1. Degree centrality và Degree distribution
 
-**(1) Định nghĩa.** Degree centrality đánh giá số quan hệ trực tiếp của một đỉnh, sau chuẩn hóa theo số đỉnh có thể nối. Degree distribution là phân bố số đỉnh có từng mức bậc. Bậc G1 phía trường là số ngành; bậc G1 phía ngành là số trường. Bậc G2/G3 là số đối tác vượt ngưỡng Jaccard; bậc vào/ra G4 là số trường cạnh tranh theo hướng tương ứng.
+**(1) Định nghĩa.** Bậc là số quan hệ trực tiếp; degree distribution là phân bố số đỉnh theo bậc. Bậc G1 phía trường là số ngành mở, phía ngành là số trường mở; G2/G3 là số đối tác vượt ngưỡng Jaccard; G4 tách bậc vào (số trường “nhắm lên” mình) và bậc ra.
 
-**(2) Công thức.** Với đồ thị một phía, $C_D(v)=k_v/(n-1)$. Với G1, $C_D(u)=k_u/|M|$ và $C_D(m)=k_m/|U|$. Phân bố $P(k)=n_k/n$, trong đó $n_k$ là số đỉnh bậc $k$. G4 phân biệt $k^{in}$ và $k^{out}$; không thay chúng bằng tổng trọng số cạnh.
+**(2) Công thức.** $C_D(v)=k_v/(n-1)$; G1 chuẩn hoá theo phía đối diện $C_D(u)=k_u/|M|$, $C_D(m)=k_m/|U|$. Phân bố $P(k)=n_k/n$ và hàm phân phối bù $P(K\ge k)$. Đuôi được khớp luật lũy thừa $P(k)\propto k^{-\gamma}$ với $k\ge k_{min}$ bằng MLE rời rạc (Clauset, Shalizi & Newman 2009):
 
-**(3) Cách tính và xử lý liên thông.** G1 dùng `bipartite.degree_centrality(g1,U)`; G2/G3 dùng `nx.degree_centrality(g)` và `dict(g.degree())`. G4 lưu `in_degree`, `out_degree`, `in_strength`, không lưu centrality chuẩn hóa cho hai hướng. Các phép tính này thực hiện trên toàn mạng, không cần mạng liên thông. Hàm `degree_plot` vẽ histogram và log–log của $P(k)$; script hình báo cáo giữ bậc 0 trong histogram, còn phần log–log chỉ dùng bậc dương vì log(0) không xác định.
+$$\hat\gamma=1+n_{tail}\Big[\sum_{i:\,k_i\ge k_{min}}\ln\frac{k_i}{k_{min}-0{,}5}\Big]^{-1},$$
 
-**(4) Kết quả.** Các bảng sau cho thấy khác biệt giữa mở nhiều ngành và có nhiều đối tác giống nhau.
+$k_{min}$ chọn theo khoảng cách Kolmogorov–Smirnov nhỏ nhất, đuôi tối thiểu $\max(30;\,20\%\,n)$ đỉnh.
 
-**Bảng 3.2. Mười trường có bậc cao nhất ở G1 năm 2026**
+**(3) Cách tính.** `bipartite.degree_centrality`, `nx.degree_centrality`, `in_degree`/`out_degree`; `powerlaw_fit` và `degree_plot` trong `sna/build.py` (histogram + CCDF log–log có đường khớp).
 
-| Hạng | degree | degree_centrality |
+**(4) Kết quả.**
+
+**Bảng 3.3. Mười trường và mười ngành có bậc cao nhất ở G1 năm 2026**
+
+| Hạng | Trường (số ngành mở) | Ngành (số trường mở) |
 | --- | --- | --- |
-| 1 | Đại Học Cần Thơ (TCT) — 97 | Đại Học Cần Thơ (TCT) — 0,22611 |
-| 2 | Đại Học Phenikaa (PKA) — 66 | Đại Học Phenikaa (PKA) — 0,15385 |
-| 3 | Trường Đại Học Văn Lang (DVL) — 64 | Trường Đại Học Văn Lang (DVL) — 0,14918 |
-| 4 | Trường Đại Học Vinh (TDV) — 64 | Trường Đại Học Vinh (TDV) — 0,14918 |
-| 5 | Đại Học Duy Tân (DDT) — 62 | Đại Học Duy Tân (DDT) — 0,14452 |
-| 6 | Trường Đại Học Đông Á (DAD) — 61 | Trường Đại Học Đông Á (DAD) — 0,14219 |
-| 7 | Trường Đại học Công Nghệ TPHCM (DKC) — 60 | Trường Đại học Công Nghệ TPHCM (DKC) — 0,13986 |
-| 8 | Trường Đại Học Đồng Tháp (SPD) — 58 | Trường Đại Học Đồng Tháp (SPD) — 0,13520 |
-| 9 | Trường Đại Học Nguyễn Tất Thành (NTT) — 57 | Trường Đại Học Nguyễn Tất Thành (NTT) — 0,13287 |
-| 10 | Trường Đại Học Quy Nhơn (DQN) — 52 | Trường Đại Học Quy Nhơn (DQN) — 0,12121 |
+| 1 | Đại Học Cần Thơ (TCT) — 97 | Quản trị kinh doanh (7340101) — 157 |
+| 2 | Đại Học Phenikaa (PKA) — 66 | Công nghệ thông tin (7480201) — 154 |
+| 3 | Trường Đại Học Văn Lang (DVL) — 64 | Kế toán (7340301) — 137 |
+| 4 | Trường Đại Học Vinh (TDV) — 64 | Ngôn ngữ Anh (7220201) — 136 |
+| 5 | Đại Học Duy Tân (DDT) — 62 | Tài chính - Ngân hàng (7340201) — 114 |
+| 6 | Trường Đại Học Đông Á (DAD) — 60 | Quản trị dịch vụ du lịch và lữ hành (7810103) — 81 |
+| 7 | Trường Đại học Công Nghệ TPHCM (DKC) — 60 | Ngôn ngữ Trung Quốc (7220204) — 80 |
+| 8 | Trường Đại Học Đồng Tháp (SPD) — 58 | Luật (7380101) — 79 |
+| 9 | Trường Đại Học Nguyễn Tất Thành (NTT) — 57 | Marketing (7340115) — 77 |
+| 10 | Trường Đại Học Quy Nhơn (DQN) — 52 | Logistics và quản lý chuỗi cung ứng (7510605) — 76 |
 
-*Nguồn: `data/network/metrics/g1_uni_major_2026.csv`; tên trường/ngành đối chiếu bảng `universities` và `majors` của `data/eduradar.db`.*
+**Bảng 3.4. Mười đỉnh bậc cao nhất ở G2 và G3 năm 2026**
 
-**Bảng 3.3. Mười ngành có bậc cao nhất ở G1 năm 2026**
-
-| Hạng | degree | degree_centrality |
+| Hạng | G2: trường (bậc) | G3: ngành (bậc) |
 | --- | --- | --- |
-| 1 | Quản trị kinh doanh (7340101) — 157 | Quản trị kinh doanh (7340101) — 0,56884 |
-| 2 | Công nghệ thông tin (7480201) — 154 | Công nghệ thông tin (7480201) — 0,55797 |
-| 3 | Kế toán (7340301) — 137 | Kế toán (7340301) — 0,49638 |
-| 4 | Ngôn ngữ Anh (7220201) — 136 | Ngôn ngữ Anh (7220201) — 0,49275 |
-| 5 | Tài chính - Ngân hàng (7340201) — 114 | Tài chính - Ngân hàng (7340201) — 0,41304 |
-| 6 | Quản trị dịch vụ du lịch và lữ hành (7810103) — 81 | Quản trị dịch vụ du lịch và lữ hành (7810103) — 0,29348 |
-| 7 | Ngôn ngữ Trung Quốc (7220204) — 80 | Ngôn ngữ Trung Quốc (7220204) — 0,28986 |
-| 8 | Luật (7380101) — 79 | Luật (7380101) — 0,28623 |
-| 9 | Marketing (7340115) — 77 | Marketing (7340115) — 0,27899 |
-| 10 | Logistics và quản lý chuỗi cung ứng (7510605) — 76 | Logistics và quản lý chuỗi cung ứng (7510605) — 0,27536 |
+| 1 | Trường Đại Học Ngoại Ngữ Tin Học TPHCM (DNT) — 73 | Sư phạm Địa lý (7140219) — 25 |
+| 2 | Đại học Kinh Tế TPHCM - Phân hiệu Vĩnh Long (KSV) — 70 | Giáo dục Chính trị (7140205) — 23 |
+| 3 | Trường Đại Học Công Nghệ và Quản Lý Hữu Nghị (DCQ) — 67 | Logistics và quản lý chuỗi cung ứng (7510605) — 23 |
+| 4 | Trường Đại Học Ngân Hàng TPHCM (NHS) — 67 | Giáo dục Công dân (7140204) — 22 |
+| 5 | Trường Đại học Hùng Vương TPHCM (DHV) — 66 | Tài chính - Ngân hàng (7340201) — 22 |
+| 6 | Trường Đại Học Kinh Tế Kỹ Thuật Bình Dương (DKB) — 66 | Quản trị khách sạn (7810201) — 22 |
+| 7 | Trường Đại Học Bà Rịa – Vũng Tàu (BVU) — 65 | Sư phạm Lịch sử - Địa lý (7140249) — 21 |
+| 8 | Trường Đại Học Lạc Hồng (DLH) — 65 | Truyền thông đa phương tiện (7320104) — 21 |
+| 9 | Trường Đại Học Đại Nam (DDN) — 64 | Kỹ thuật trắc địa - bản đồ (7520503) — 21 |
+| 10 | Học Viện Ngân Hàng (NHH) — 60 | Sư phạm Tin học (7140210) — 20 |
 
-*Nguồn: `data/network/metrics/g1_uni_major_2026.csv`; tên trường/ngành đối chiếu bảng `universities` và `majors` của `data/eduradar.db`.*
+**Bảng 3.5. Mười trường có bậc vào, bậc ra và cường độ vào cao nhất ở G4 năm 2026**
 
-**Bảng 3.4. Mười trường có bậc cao nhất ở G2 năm 2026**
+| Hạng | Bậc vào | Bậc ra | Cường độ vào (tổng số ngành) |
+| --- | --- | --- | --- |
+| 1 | Trường Đại Học Công Đoàn (LDA) — 128 | Trường Đại Học Vinh (TDV) — 100 | Trường Đại Học Kiến Trúc Đà Nẵng (KTD) — 554 |
+| 2 | Trường Đại Học Thăng Long (DTL) — 126 | Trường Đại Học Đồng Tháp (SPD) — 97 | Trường Đại Học Công Đoàn (LDA) — 418 |
+| 3 | Học Viện Nông Nghiệp Việt Nam (HVN) — 124 | Đại Học Cần Thơ (TCT) — 96 | Trường Đại Học Sư Phạm Kỹ Thuật Hưng Yên (SKH) — 405 |
+| 4 | Trường Đại Học Quy Nhơn (DQN) — 122 | Trường Đại học Thủ Dầu Một (TDM) — 94 | Đại Học Cần Thơ (TCT) — 402 |
+| 5 | Trường Đại Học Đồng Tháp (SPD) — 121 | Trường Đại Học Quy Nhơn (DQN) — 92 | Trường Đại Học Công Nghiệp Việt - Hung (VHD) — 366 |
+| 6 | Trường Đại Học Vinh (TDV) — 121 | Trường Đại Học Văn Lang (DVL) — 92 | Trường Đại học Nghệ An (CEA) — 355 |
+| 7 | Trường Đại Học Hải Phòng (THP) — 120 | Đại Học Phenikaa (PKA) — 87 | Trường Đại Học Hồng Đức (HDT) — 353 |
+| 8 | Trường Đại Học Hồng Đức (HDT) — 118 | Trường Đại Học Hải Phòng (THP) — 86 | Trường Đại Học Vinh (TDV) — 352 |
+| 9 | Trường Đại học Thủ Dầu Một (TDM) — 117 | Trường Đại Học Hùng Vương (THV) — 82 | Trường Đại Học Quy Nhơn (DQN) — 322 |
+| 10 | Trường Đại Học Công Thương TPHCM (DCT) — 115 | Trường Đại Học Tây Nguyên (TTN) — 81 | Trường Đại Học Nông Lâm Thái Nguyên (DTN) — 304 |
 
-| Hạng | degree | degree_centrality |
-| --- | --- | --- |
-| 1 | Trường Đại Học Ngoại Ngữ Tin Học TPHCM (DNT) — 72 | Trường Đại Học Ngoại Ngữ Tin Học TPHCM (DNT) — 0,29032 |
-| 2 | Đại học Kinh Tế TPHCM - Phân hiệu Vĩnh Long (KSV) — 70 | Đại học Kinh Tế TPHCM - Phân hiệu Vĩnh Long (KSV) — 0,28226 |
-| 3 | Trường Đại Học Công Nghệ và Quản Lý Hữu Nghị (DCQ) — 67 | Trường Đại Học Công Nghệ và Quản Lý Hữu Nghị (DCQ) — 0,27016 |
-| 4 | Trường Đại học Hùng Vương TPHCM (DHV) — 66 | Trường Đại học Hùng Vương TPHCM (DHV) — 0,26613 |
-| 5 | Trường Đại Học Kinh Tế Kỹ Thuật Bình Dương (DKB) — 66 | Trường Đại Học Kinh Tế Kỹ Thuật Bình Dương (DKB) — 0,26613 |
-| 6 | Trường Đại Học Ngân Hàng TPHCM (NHS) — 66 | Trường Đại Học Ngân Hàng TPHCM (NHS) — 0,26613 |
-| 7 | Trường Đại Học Bà Rịa – Vũng Tàu (BVU) — 65 | Trường Đại Học Bà Rịa – Vũng Tàu (BVU) — 0,26210 |
-| 8 | Trường Đại Học Lạc Hồng (DLH) — 65 | Trường Đại Học Lạc Hồng (DLH) — 0,26210 |
-| 9 | Trường Đại Học Đại Nam (DDN) — 64 | Trường Đại Học Đại Nam (DDN) — 0,25806 |
-| 10 | Học Viện Ngân Hàng (NHH) — 60 | Học Viện Ngân Hàng (NHH) — 0,24194 |
+*Nguồn Bảng 3.3–3.5: `data/network/metrics/<mạng>_2026.csv`; tên đối chiếu bảng `universities`, `majors` của DB.*
 
-*Nguồn: `data/network/metrics/g2_uni_uni_2026.csv`; tên trường/ngành đối chiếu bảng `universities` và `majors` của `data/eduradar.db`.*
+**Bảng 3.6. Ước lượng luật lũy thừa của phân bố bậc**
 
-**Bảng 3.5. Mười ngành có bậc cao nhất ở G3 năm 2026**
+| Mạng / chỉ tiêu | 2024 | 2025 | 2026 |
+| --- | --- | --- | --- |
+| G1: Power-law γ (bậc trường) | 2,9250 | 2,6632 | 2,8732 |
+| G1: Power-law k_min (bậc trường) | 17 | 14 | 17 |
+| G1: Power-law số đỉnh ở đuôi (bậc trường) | 103 | 140 | 130 |
+| G1: Power-law KS (bậc trường) | 0,1006 | 0,1008 | 0,0883 |
+| G1: Power-law γ (bậc ngành) | 2,4595 | 2,3878 | 2,4384 |
+| G1: Power-law k_min (bậc ngành) | 16 | 14 | 17 |
+| G1: Power-law số đỉnh ở đuôi (bậc ngành) | 85 | 105 | 92 |
+| G1: Power-law KS (bậc ngành) | 0,0856 | 0,0948 | 0,0976 |
+| G2: Power-law γ | 4,5467 | 2,5747 | 2,6435 |
+| G2: Power-law k_min | 38 | 16 | 16 |
+| G2: Power-law số đỉnh ở đuôi | 50 | 134 | 143 |
+| G2: Power-law KS | 0,1137 | 0,1108 | 0,0938 |
+| G3: Power-law γ | 2,9230 | 2,5054 | 2,8913 |
+| G3: Power-law k_min | 7 | 6 | 8 |
+| G3: Power-law số đỉnh ở đuôi | 170 | 193 | 145 |
+| G3: Power-law KS | 0,1030 | 0,1255 | 0,1197 |
+| G4: Power-law γ (bậc vào) | 6,2016 | 5,2177 | 3,8357 |
+| G4: Power-law k_min (bậc vào) | 77 | 69 | 59 |
+| G4: Power-law số đỉnh ở đuôi (bậc vào) | 50 | 64 | 77 |
+| G4: Power-law KS (bậc vào) | 0,1458 | 0,0866 | 0,1252 |
 
-| Hạng | degree | degree_centrality |
-| --- | --- | --- |
-| 1 | Sư phạm Địa lý (7140219) — 25 | Sư phạm Địa lý (7140219) — 0,06649 |
-| 2 | Logistics và quản lý chuỗi cung ứng (7510605) — 23 | Logistics và quản lý chuỗi cung ứng (7510605) — 0,06117 |
-| 3 | Giáo dục Chính trị (7140205) — 23 | Giáo dục Chính trị (7140205) — 0,06117 |
-| 4 | Tài chính - Ngân hàng (7340201) — 22 | Tài chính - Ngân hàng (7340201) — 0,05851 |
-| 5 | Quản trị khách sạn (7810201) — 22 | Quản trị khách sạn (7810201) — 0,05851 |
-| 6 | Giáo dục Công dân (7140204) — 22 | Giáo dục Công dân (7140204) — 0,05851 |
-| 7 | Truyền thông đa phương tiện (7320104) — 21 | Truyền thông đa phương tiện (7320104) — 0,05585 |
-| 8 | Sư phạm Lịch sử - Địa lý (7140249) — 21 | Sư phạm Lịch sử - Địa lý (7140249) — 0,05585 |
-| 9 | Kỹ thuật trắc địa - bản đồ (7520503) — 21 | Kỹ thuật trắc địa - bản đồ (7520503) — 0,05585 |
-| 10 | Công nghệ thông tin (7480201) — 20 | Công nghệ thông tin (7480201) — 0,05319 |
-
-*Nguồn: `data/network/metrics/g3_major_major_2026.csv`; tên trường/ngành đối chiếu bảng `universities` và `majors` của `data/eduradar.db`.*
+*Nguồn: `data/network/summary.csv`, các cột `*powerlaw_*`.*
 
 ![Hình 3.2. Bậc phía trường G1 năm 2026](fig/g1_uni_degree_2026.png)
 
-*Hình 3.2. Bậc trường trong G1: histogram và log–log. Nguồn: degree trong `data/network/metrics/g1_uni_major_2026.csv`.*
+*Hình 3.2. Bậc trường trong G1 2026: histogram (trái) và CCDF log–log với đường khớp luật lũy thừa (phải). Nguồn: `data/network/fig/g1_uni_degree_2026.png` do `sna/build.py` vẽ.*
 
 ![Hình 3.3. Bậc phía ngành G1 năm 2026](fig/g1_major_degree_2026.png)
 
-*Hình 3.3. Bậc ngành trong G1: histogram và log–log. Nguồn: cùng tệp metrics G1 năm 2026.*
+*Hình 3.3. Bậc ngành trong G1 2026 (số trường mở ngành). Nguồn: như Hình 3.2.*
 
 ![Hình 3.4. Phân bố bậc G2 năm 2026](fig/g2_uni_uni_degree_2026.png)
 
-*Hình 3.4. Histogram và log–log của G2. Nguồn: `data/network/metrics/g2_uni_uni_2026.csv`.*
+*Hình 3.4. Phân bố bậc G2 2026. Nguồn: `data/network/fig/g2_uni_uni_degree_2026.png`.*
 
 ![Hình 3.5. Phân bố bậc G3 năm 2026](fig/g3_major_major_degree_2026.png)
 
-*Hình 3.5. Histogram và log–log của G3. Nguồn: `data/network/metrics/g3_major_major_2026.csv`.*
+*Hình 3.5. Phân bố bậc G3 2026. Nguồn: `data/network/fig/g3_major_major_degree_2026.png`.*
 
 ![Hình 3.6. Bậc vào G4 năm 2026](fig/g4_in_degree_2026.png)
 
-*Hình 3.6. Histogram bậc vào G4 có cả bậc 0; phần log–log chỉ vẽ k > 0. Nguồn: `data/network/metrics/g4_competition_2026.csv`.*
+*Hình 3.6. Bậc vào G4 2026. Nguồn: `data/network/fig/g4_in_degree_2026.png`.*
 
 ![Hình 3.7. Bậc ra G4 năm 2026](fig/g4_out_degree_2026.png)
 
-*Hình 3.7. Histogram bậc ra G4 có cả bậc 0; phần log–log chỉ vẽ k > 0. Nguồn: cùng tệp metrics G4 năm 2026.*
+*Hình 3.7. Bậc ra G4 2026. Nguồn: `data/network/fig/g4_out_degree_2026.png`.*
 
-**(5) Ý nghĩa.** Quản trị kinh doanh và Công nghệ thông tin xuất hiện ở nhiều trường nên có bậc G1 cao; điều đó khác với Sư phạm Địa lý có nhiều ngành đồng hành trong G3. Phía ngành G1 có đuôi dài: nhiều ngành chỉ được một số ít trường mở, trong khi vài ngành phổ biến liên kết nhiều trường. Histogram và log–log giúp quan sát sự không đồng đều, nhưng đồ án chưa fit mô hình và chưa kiểm định goodness-of-fit, nên không kết luận phân bố power law hoặc cơ chế ưu tiên gắn kết. Trong tư vấn, bậc thể hiện độ rộng lựa chọn; nó không phải chất lượng đào tạo hay cơ hội việc làm.
+**(5) Ý nghĩa.** Quản trị kinh doanh (157 trường) và Công nghệ thông tin (154 trường) có bậc G1 cao nhất: đây là các ngành “đại trà”. Bậc G3 cao lại thuộc khối sư phạm (Sư phạm Địa lý), tức ngành có nhiều ngành đồng hành trong cùng tập trường. Phân bố bậc có đuôi nặng: γ năm 2026 khoảng 2,4–2,9 ở G1, G2, G3 và 3,84 ở bậc vào G4, nhưng KS 0,09–0,13 và $k_{min}$ khá lớn (chỉ 20–40% số đỉnh ở đuôi). Vì vậy kết luận là **đuôi nặng, gần luật lũy thừa ở phần đuôi, không phải mạng scale-free thuần**; báo cáo không suy ra cơ chế gắn kết ưu tiên. Trong tư vấn, bậc là độ rộng lựa chọn, không phải chất lượng đào tạo.
 
 ### 3.2.2. Betweenness centrality
 
-**(1) Định nghĩa.** Betweenness đo mức một đỉnh nằm trên các đường đi ngắn nhất giữa những đỉnh khác. Một đỉnh ít cạnh vẫn có thể có betweenness lớn nếu nối các khối vốn xa nhau.
+**(1) Định nghĩa.** Mức một đỉnh nằm trên các đường đi ngắn nhất giữa những đỉnh khác; đỉnh ít cạnh vẫn có thể cao nếu nối các khối xa nhau.
 
-**(2) Công thức.** Gọi $\sigma_{st}$ là số đường đi ngắn nhất từ $s$ đến $t$, $\sigma_{st}(v)$ là số đường đi ấy qua $v$:
+**(2) Công thức.** $C_B(v)=\dfrac{2}{(n-1)(n-2)}\sum_{s\ne v\ne t}\dfrac{\sigma_{st}(v)}{\sigma_{st}}$ (vô hướng; có hướng chia $(n-1)(n-2)$), với $\sigma_{st}$ là số đường ngắn nhất $s\to t$, $\sigma_{st}(v)$ số đường qua $v$.
 
-$$C_B(v)=\sum_{s\ne v\ne t}\frac{\sigma_{st}(v)}{\sigma_{st}}.$$
+**(3) Cách tính.** `nx.betweenness_centrality(normalized=True)` không trọng số (thuật toán Brandes, $O(nm)$); G1 dùng `bipartite.betweenness_centrality`.
 
-Với đồ thị vô hướng một phía, chuẩn hóa bằng $2/[(n-1)(n-2)]$ nếu tổng xét cặp không thứ tự; có hướng dùng $1/[(n-1)(n-2)]$. G1 dùng chuẩn hóa riêng cho đồ thị hai phía của NetworkX, phụ thuộc kích thước hai tập đỉnh; do đó không so trực tiếp trị số G1 với G2/G3.
+**(4) Kết quả.**
 
-**(3) Cách tính và xử lý liên thông.** G1 gọi `bipartite.betweenness_centrality(g1,U)`. G2/G3/G4 gọi `nx.betweenness_centrality(g,normalized=True)` trên toàn mạng, `weight=None`, không lấy mẫu đỉnh. Cặp không có đường đi không đóng góp. G4 tôn trọng hướng; mọi đường ngắn được tính theo số cạnh, không theo số ngành cạnh tranh.
+**Bảng 3.7. Mười đỉnh betweenness cao nhất ở G2, G3, G4 năm 2026**
 
-**(4) Kết quả.** Bảng dưới trình bày các trường/ngành cầu nối của hai phép chiếu. Biểu đồ top 10 G3 được trình bày tiếp ở Hình 5.3 để kết hợp với bố trí mạng.
+| Hạng | G2 | G3 | G4 |
+| --- | --- | --- | --- |
+| 1 | Trường Đại Học Võ Trường Toản (VTT) — 0,1004 | Sinh học (7420101) — 0,1624 | Đại Học Phenikaa (PKA) — 0,0593 |
+| 2 | Trường Đại Học Hải Phòng (THP) — 0,0685 | Kỹ thuật vật liệu (7520309) — 0,0802 | Trường Đại Học Y Dược Thái Bình (YTB) — 0,0552 |
+| 3 | Trường Đại Học Quốc Tế Hồng Bàng (HIU) — 0,0614 | Khoa học đất (7620103) — 0,0762 | Đại Học Cần Thơ (TCT) — 0,0286 |
+| 4 | Trường Đại Học Hà Tĩnh (HHT) — 0,0551 | Địa lý học (7310501) — 0,0709 | Trường Đại Học Vinh (TDV) — 0,0271 |
+| 5 | Trường Đại Học Kiến Trúc Đà Nẵng (KTD) — 0,0475 | Vật lý Y khoa (7520403) — 0,0702 | Trường Đại Học Đồng Tháp (SPD) — 0,0204 |
+| 6 | Trường Đại Học Kiến Trúc Hà Nội (KTA) — 0,0438 | Kỹ thuật xây dựng (7580201) — 0,0684 | Đại Học Trà Vinh (DVT) — 0,0184 |
+| 7 | Trường Đại học Nghệ An (CEA) — 0,0421 | Hán Nôm (7220104) — 0,0659 | Trường Đại Học Quy Nhơn (DQN) — 0,0174 |
+| 8 | Trường Đại Học Luật TPHCM (LPS) — 0,0372 | Kỹ thuật công nghiệp (7520117) — 0,0643 | Trường Đại học Thủ Dầu Một (TDM) — 0,0166 |
+| 9 | Học Viện Phụ Nữ Việt Nam (HPN) — 0,0369 | Ngôn ngữ Đức (7220205) — 0,0626 | Trường Đại học Y Dược Buôn Ma Thuột (BMU) — 0,0165 |
+| 10 | Trường Đại Học Kiến Trúc TPHCM (KTS) — 0,0366 | Hải dương học (7440228) — 0,0623 | Trường Đại Học Công Nghiệp TPHCM (IUH) — 0,0163 |
 
-**Bảng 3.6. Top 10 betweenness G2 năm 2026**
+**Bảng 3.8. Betweenness hai phía của G1 năm 2026**
 
-| Hạng | betweenness |
-| --- | --- |
-| 1 | Trường Đại Học Võ Trường Toản (VTT) — 0,09457 |
-| 2 | Trường Đại Học Hải Phòng (THP) — 0,06863 |
-| 3 | Trường Đại Học Quốc Tế Hồng Bàng (HIU) — 0,06183 |
-| 4 | Trường Đại Học Hà Tĩnh (HHT) — 0,05390 |
-| 5 | Trường Đại Học Kiến Trúc Đà Nẵng (KTD) — 0,04782 |
-| 6 | Trường Đại Học Kiến Trúc Hà Nội (KTA) — 0,04397 |
-| 7 | Trường Đại học Nghệ An (CEA) — 0,04276 |
-| 8 | Trường Đại học Công nghiệp Vinh (DCV) — 0,04079 |
-| 9 | Trường Sĩ Quan Thông Tin - Hệ Dân Sự - Đại Học Thông Tin Liên Lạc (TCU) — 0,03838 |
-| 10 | Trường Đại Học Luật TPHCM (LPS) — 0,03729 |
+| Hạng | G1 phía trường | G1 phía ngành |
+| --- | --- | --- |
+| 1 | Đại Học Cần Thơ (TCT) — 0,0454 | Công nghệ thông tin (7480201) — 0,0968 |
+| 2 | Trường Đại Học Mỏ Địa Chất (MDA) — 0,0429 | Ngôn ngữ Anh (7220201) — 0,0784 |
+| 3 | Trường Đại Học Văn Lang (DVL) — 0,0398 | Quản trị kinh doanh (7340101) — 0,0714 |
+| 4 | Trường Đại Học Công nghệ Kỹ thuật TP HCM (SPK) — 0,0254 | Kế toán (7340301) — 0,0487 |
+| 5 | Đại Học Trà Vinh (DVT) — 0,0247 | Tài chính - Ngân hàng (7340201) — 0,0307 |
+| 6 | Trường Đại Học Khoa Học Xã Hội và Nhân Văn TPHCM (QSX) — 0,0230 | Luật (7380101) — 0,0253 |
+| 7 | Trường Đại Học Nguyễn Tất Thành (NTT) — 0,0227 | Quản trị dịch vụ du lịch và lữ hành (7810103) — 0,0252 |
+| 8 | Đại Học Phenikaa (PKA) — 0,0217 | Ngôn ngữ Trung Quốc (7220204) — 0,0231 |
+| 9 | Trường Đại học Công Nghệ TPHCM (DKC) — 0,0214 | Điều dưỡng (7720301) — 0,0163 |
+| 10 | Trường Đại Học Đông Á (DAD) — 0,0209 | Marketing (7340115) — 0,0159 |
 
-*Nguồn: `data/network/metrics/g2_uni_uni_2026.csv`; tên trường/ngành đối chiếu bảng `universities` và `majors` của `data/eduradar.db`.*
+*Nguồn: `data/network/metrics/<mạng>_2026.csv`, cột `betweenness`.*
 
-**Bảng 3.7. Top 10 betweenness G3 năm 2026**
-
-| Hạng | betweenness |
-| --- | --- |
-| 1 | Sinh học (7420101) — 0,16239 |
-| 2 | Kỹ thuật vật liệu (7520309) — 0,07800 |
-| 3 | Địa lý học (7310501) — 0,07751 |
-| 4 | Khoa học đất (7620103) — 0,07460 |
-| 5 | Vật lý y khoa (7520403) — 0,06888 |
-| 6 | Hán Nôm (7220104) — 0,06638 |
-| 7 | Kỹ thuật xây dựng (7580201) — 0,06596 |
-| 8 | Ngôn ngữ Đức (7220205) — 0,06493 |
-| 9 | Ngôn ngữ Pháp (7220203) — 0,06019 |
-| 10 | Hải dương học (7440228) — 0,05962 |
-
-*Nguồn: `data/network/metrics/g3_major_major_2026.csv`; tên trường/ngành đối chiếu bảng `universities` và `majors` của `data/eduradar.db`.*
-
-**(5) Ý nghĩa.** Đại học Võ Trường Toản dẫn G2 theo betweenness nhưng không dẫn bảng bậc: hai độ đo phản ánh vai trò khác nhau. Sinh học dẫn G3 ở ngưỡng 0,25, phù hợp vai trò kết nối các nhóm khoa học tự nhiên, nông nghiệp và sư phạm. Đây là diễn giải cấu trúc của mạng, chưa khẳng định quan hệ học thuật thực tế. Thứ hạng nhạy với ngưỡng: theo `docs/do_nhay_sna.md`, Sinh học ở hạng 24 tại 0,15 và hạng 78 tại 0,35. Vì vậy không suy rộng vị trí số 1 thành thuộc tính cố định của ngành.
+**(5) Ý nghĩa.** Đại học Võ Trường Toản dẫn G2 dù không nằm trong top bậc; Sinh học dẫn G3 (0,1624), nối các khối khoa học tự nhiên, nông nghiệp và sư phạm. Ở G1, Công nghệ thông tin và Đại học Mỏ – Địa chất là cầu nối giữa khối ngành phổ thông và khối ngành đặc thù. Thứ hạng betweenness **nhạy với ngưỡng**: Sinh học đứng hạng 23 ở Jaccard 0,15 và hạng 76 ở 0,35 (mục 4.5), nên chỉ đọc như đặc điểm của cấu hình 0,25.
 
 ### 3.2.3. Closeness centrality
 
-**(1) Định nghĩa.** Closeness đánh giá mức một đỉnh gần các đỉnh khác theo đường đi ngắn nhất. Trong báo cáo, ký hiệu $C_C$ hay CC chỉ closeness; hệ số phân cụm dùng $C_v$ hoặc $\bar C$.
+**(1) Định nghĩa.** Mức gần trung bình của một đỉnh tới các đỉnh nó đi tới được.
 
-**(2) Công thức.** Gọi $r_v$ là số đỉnh thuộc thành phần liên thông chứa $v$, bao gồm $v$, trong mạng có $n$ đỉnh. Hiệu chỉnh Wasserman–Faust là
+**(2) Công thức.** $C_C(v)=\dfrac{n_v-1}{n-1}\cdot\dfrac{n_v-1}{\sum_{u}d(v,u)}$ (hiệu chỉnh Wasserman–Faust khi đồ thị không liên thông, $n_v$ là số đỉnh tới được). G4 dùng khoảng cách **đi vào** đỉnh.
 
-$$C_C(v)=\frac{r_v-1}{n-1}\,\frac{r_v-1}{\sum_{u\ne v,\;u\leftrightarrow v}d(v,u)}.$$
-
-Hệ số đầu giảm lợi thế của đỉnh nằm trong một thành phần nhỏ khép kín. Đỉnh cô lập được gán 0 theo quy tắc của hàm.
-
-**(3) Cách tính và xử lý liên thông.** `nx.closeness_centrality(g)` được gọi cho G2/G3, giữ `wf_improved=True`, không truyền `distance` nên dùng số bước. Tính trên toàn mạng, mỗi đỉnh dùng phần tới được và hiệu chỉnh theo quy mô toàn mạng. Bản chạy không lưu closeness cho G1/G4; không diễn giải ô trống thành 0.
+**(3) Cách tính.** `nx.closeness_centrality` cho G2–G4; `bipartite.closeness_centrality` cho G1.
 
 **(4) Kết quả.**
 
-**Bảng 3.8. Top 10 closeness G2 năm 2026**
+**Bảng 3.9. Mười đỉnh closeness cao nhất năm 2026**
 
-| Hạng | closeness |
-| --- | --- |
-| 1 | Trường Đại Học Công Nghệ và Quản Lý Hữu Nghị (DCQ) — 0,43092 |
-| 2 | Trường Đại Học Ngoại Ngữ Tin Học TPHCM (DNT) — 0,43092 |
-| 3 | Trường Đại học Hùng Vương TPHCM (DHV) — 0,42407 |
-| 4 | Trường Đại Học Kinh Tế Kỹ Thuật Bình Dương (DKB) — 0,42407 |
-| 5 | Trường Đại Học Bà Rịa – Vũng Tàu (BVU) — 0,41499 |
-| 6 | Trường Đại Học Kinh Tế Công Nghiệp Long An (DLA) — 0,41259 |
-| 7 | Trường Đại Học Lạc Hồng (DLH) — 0,40863 |
-| 8 | Trường Đại học Sao Đỏ (SDU) — 0,40863 |
-| 9 | Trường Đại Học Trưng Vương (DVP) — 0,40785 |
-| 10 | Trường Đại Học Đại Nam (DDN) — 0,40476 |
+| Hạng | G2 | G3 | G4 (theo khoảng cách đi vào) |
+| --- | --- | --- | --- |
+| 1 | Trường Đại Học Ngoại Ngữ Tin Học TPHCM (DNT) — 0,4312 | Sinh học (7420101) — 0,2359 | Trường Đại Học Công Đoàn (LDA) — 0,6788 |
+| 2 | Trường Đại Học Công Nghệ và Quản Lý Hữu Nghị (DCQ) — 0,4303 | Hải dương học (7440228) — 0,2242 | Trường Đại Học Thăng Long (DTL) — 0,6724 |
+| 3 | Trường Đại học Hùng Vương TPHCM (DHV) — 0,4235 | Nông học (7620109) — 0,2196 | Trường Đại Học Quy Nhơn (DQN) — 0,6703 |
+| 4 | Trường Đại Học Kinh Tế Kỹ Thuật Bình Dương (DKB) — 0,4235 | Lịch sử (7229010) — 0,2193 | Trường Đại Học Vinh (TDV) — 0,6682 |
+| 5 | Trường Đại Học Bà Rịa – Vũng Tàu (BVU) — 0,4145 | Khoa học đất (7620103) — 0,2189 | Trường Đại Học Hải Phòng (THP) — 0,6682 |
+| 6 | Trường Đại Học Kinh Tế Công Nghiệp Long An (DLA) — 0,4129 | Toán tin (7460117) — 0,2177 | Học Viện Nông Nghiệp Việt Nam (HVN) — 0,6599 |
+| 7 | Trường Đại Học Lạc Hồng (DLH) — 0,4082 | Địa lý học (7310501) — 0,2149 | Trường Đại Học Đồng Tháp (SPD) — 0,6599 |
+| 8 | Trường Đại học Sao Đỏ (SDU) — 0,4082 | Kỹ thuật trắc địa - bản đồ (7520503) — 0,2108 | Trường Đại học Thủ Dầu Một (TDM) — 0,6579 |
+| 9 | Trường Đại Học Trưng Vương (DVP) — 0,4074 | Hóa dược (7720203) — 0,2107 | Trường Đại Học Công Nghiệp TPHCM (IUH) — 0,6559 |
+| 10 | Trường Đại Học Đại Nam (DDN) — 0,4036 | Khí tượng và khí hậu học (7440222) — 0,2092 | Đại Học Cần Thơ (TCT) — 0,6519 |
 
-*Nguồn: `data/network/metrics/g2_uni_uni_2026.csv`; tên trường/ngành đối chiếu bảng `universities` và `majors` của `data/eduradar.db`.*
+*Nguồn: `data/network/metrics/<mạng>_2026.csv`, cột `closeness`.*
 
-**Bảng 3.9. Top 10 closeness G3 năm 2026**
-
-| Hạng | closeness |
-| --- | --- |
-| 1 | Sinh học (7420101) — 0,23631 |
-| 2 | Hải dương học (7440228) — 0,22465 |
-| 3 | Lịch sử (7229010) — 0,22083 |
-| 4 | Nông học (7620109) — 0,21931 |
-| 5 | Toán tin (7460117) — 0,21903 |
-| 6 | Khoa học đất (7620103) — 0,21862 |
-| 7 | Hán Nôm (7220104) — 0,21553 |
-| 8 | Địa lý học (7310501) — 0,21500 |
-| 9 | Hóa dược (7720203) — 0,21061 |
-| 10 | Kỹ thuật trắc địa - bản đồ (7520503) — 0,21061 |
-
-*Nguồn: `data/network/metrics/g3_major_major_2026.csv`; tên trường/ngành đối chiếu bảng `universities` và `majors` của `data/eduradar.db`.*
-
-**(5) Ý nghĩa.** Đại học Công nghệ và Quản lý Hữu Nghị và Đại học Ngoại ngữ – Tin học TP.HCM gần phần lớn lõi G2; Sinh học, Hải dương học, Lịch sử đứng gần các cụm ngành trong G3 theo số bước. Closeness đo vị trí trong phép chiếu, không trực tiếp đo khoảng cách địa lý hoặc mức tương đồng nội dung học tập. Do đường đi bỏ trọng số Jaccard, cạnh 0,25 và cạnh 1 đều dài một bước.
+**(5) Ý nghĩa.** G2 và G4 có closeness cao ở các trường đa ngành phía Nam (G2) và trường điểm trung bình được nhiều trường khác “nhắm lên” (G4: Công Đoàn, Thăng Long). G3 có closeness thấp hơn hẳn (≈ 0,21–0,24) vì đường đi trung bình 5,67 bước. Với G1, hàm hai phía của NetworkX chuẩn hoá theo phía đối diện nên ở thành phần nhỏ giá trị có thể vượt 1: 24 đỉnh G1 2026 có closeness > 1 (lớn nhất 1,6035), thuộc thành phần nhỏ: Biên phòng, CCE, Chỉ huy - Tham mưu Thông tin, Chỉ huy - Tham mưu đặc công, Chỉ huy Kỹ thuật hóa học, Chỉ huy Tham mưu Lục quân. Vì vậy báo cáo không xếp hạng closeness G1 toàn cục.
 
 ### 3.2.4. Eigenvector centrality
 
-**(1) Định nghĩa.** Eigenvector gán điểm cao cho đỉnh nối với các đỉnh cũng được đánh giá cao. Khác bậc, nó xem xét vị trí của hàng xóm qua quan hệ lặp.
+**(1) Định nghĩa.** Một đỉnh quan trọng khi nối với những đỉnh quan trọng.
 
-**(2) Công thức.** Với ma trận kề có trọng số $W$, vectơ riêng chính $x$ thỏa
+**(2) Công thức.** $\lambda x_v=\sum_u w_{vu}x_u$, $x$ là vector riêng ứng với trị riêng lớn nhất của ma trận kề có trọng số; bản không trọng số dùng $w_{vu}\in\{0,1\}$.
 
-$$Wx=\lambda_{\max}x,\qquad x_v=\lambda_{\max}^{-1}\sum_u w_{vu}x_u,\qquad\|x\|_2=1.$$
-
-**(3) Cách tính và xử lý liên thông.** `nx.eigenvector_centrality_numpy(big,weight="weight")` chỉ chạy trên LCC của G2/G3. Những đỉnh ngoài LCC không có giá trị trong cột eigenvector; ô trống không phải 0. Trọng số là Jaccard, nên một nhóm ít đỉnh nhưng cạnh rất mạnh có thể chi phối nghiệm.
+**(3) Cách tính.** `nx.eigenvector_centrality_numpy` trên thành phần liên thông lớn nhất (G4: thành phần liên thông mạnh lớn nhất); đỉnh ngoài nhận 0. Tính cả bản có trọng số (`eigenvector`) và không trọng số (`eigenvector_unw`).
 
 **(4) Kết quả.**
 
-**Bảng 3.10. Top 10 eigenvector G2 năm 2026**
+**Bảng 3.10. Mười đỉnh eigenvector cao nhất G2, G3 năm 2026, có và không trọng số**
 
-| Hạng | eigenvector |
-| --- | --- |
-| 1 | Trường Đại Học Ngoại Ngữ Tin Học TPHCM (DNT) — 0,20229 |
-| 2 | Trường Đại Học Ngân Hàng TPHCM (NHS) — 0,18850 |
-| 3 | Trường Đại Học Gia Định (GDU) — 0,17685 |
-| 4 | Trường Đại Học Bà Rịa – Vũng Tàu (BVU) — 0,17643 |
-| 5 | Trường Đại Học Đại Nam (DDN) — 0,17566 |
-| 6 | Trường Đại học Hùng Vương TPHCM (DHV) — 0,17532 |
-| 7 | Trường Đại Học Kinh Tế Kỹ Thuật Bình Dương (DKB) — 0,17405 |
-| 8 | Trường Đại Học Công Nghệ và Quản Lý Hữu Nghị (DCQ) — 0,16677 |
-| 9 | Đại học Kinh Tế TPHCM - Phân hiệu Vĩnh Long (KSV) — 0,16612 |
-| 10 | Trường Đại Học Lạc Hồng (DLH) — 0,16360 |
+| Hạng | G2 có trọng số | G2 không trọng số | G3 có trọng số | G3 không trọng số |
+| --- | --- | --- | --- | --- |
+| 1 | Trường Đại Học Ngoại Ngữ Tin Học TPHCM (DNT) — 0,2029 | Trường Đại Học Ngoại Ngữ Tin Học TPHCM (DNT) — 0,1789 | Quản lý và phân tích dữ liệu khoa học (7440229) — 0,2965 | Sư phạm Địa lý (7140219) — 0,2481 |
+| 2 | Trường Đại Học Ngân Hàng TPHCM (NHS) — 0,1901 | Trường Đại Học Ngân Hàng TPHCM (NHS) — 0,1674 | Địa tin học (7480206) — 0,2965 | Sư phạm Lịch sử - Địa lý (7140249) — 0,2353 |
+| 3 | Trường Đại Học Gia Định (GDU) — 0,1766 | Trường Đại Học Bà Rịa – Vũng Tàu (BVU) — 0,1662 | Kỹ thuật địa vật lý (7520502) — 0,2965 | Giáo dục Chính trị (7140205) — 0,2350 |
+| 4 | Trường Đại Học Bà Rịa – Vũng Tàu (BVU) — 0,1761 | Trường Đại Học Kinh Tế Kỹ Thuật Bình Dương (DKB) — 0,1658 | Đá quý Đá mỹ nghệ (7520505) — 0,2965 | Sư phạm Tin học (7140210) — 0,2346 |
+| 5 | Trường Đại Học Đại Nam (DDN) — 0,1753 | Trường Đại học Hùng Vương TPHCM (DHV) — 0,1658 | Kỹ thuật khí thiên nhiên (7520605) — 0,2965 | Sư phạm Lịch sử (7140218) — 0,2333 |
+| 6 | Trường Đại học Hùng Vương TPHCM (DHV) — 0,1750 | Trường Đại Học Đại Nam (DDN) — 0,1655 | Công nghệ số trong thăm dò và khai thác tài nguyên thiên nhiên (7520606) — 0,2965 | Sư phạm Ngữ văn (7140217) — 0,2329 |
+| 7 | Trường Đại Học Kinh Tế Kỹ Thuật Bình Dương (DKB) — 0,1737 | Trường Đại Học Công Nghệ và Quản Lý Hữu Nghị (DCQ) — 0,1642 | Xây dựng công trình ngầm thành phố và Hệ thống tàu điện ngầm (7580204) — 0,2965 | Sư phạm Toán học (7140209) — 0,2310 |
+| 8 | Trường Đại Học Công Nghệ và Quản Lý Hữu Nghị (DCQ) — 0,1664 | Trường Đại Học Lạc Hồng (DLH) — 0,1619 | Du lịch địa chất (7810105) — 0,2965 | Sư phạm Vật lý (7140211) — 0,2310 |
+| 9 | Đại học Kinh Tế TPHCM - Phân hiệu Vĩnh Long (KSV) — 0,1660 | Trường Đại Học Gia Định (GDU) — 0,1601 | Quản lý tài nguyên khoáng sản (7850196) — 0,2965 | Sư phạm Hóa học (7140212) — 0,2310 |
+| 10 | Trường Đại Học Lạc Hồng (DLH) — 0,1632 | Đại học Kinh Tế TPHCM - Phân hiệu Vĩnh Long (KSV) — 0,1597 | An toàn, Vệ sinh lao động (7850202) — 0,2965 | Sư phạm Sinh học (7140213) — 0,2310 |
 
-*Nguồn: `data/network/metrics/g2_uni_uni_2026.csv`; tên trường/ngành đối chiếu bảng `universities` và `majors` của `data/eduradar.db`.*
+**Bảng 3.11. Mức tập trung của eigenvector năm 2026**
 
-**Bảng 3.11. Top 10 eigenvector G3 năm 2026**
+| Mạng 2026 | Bản | Đỉnh > 0,001 | Đỉnh > 0,05 | Lớn nhất |
+| --- | --- | --- | --- | --- |
+| G1 Trường–Ngành | có trọng số | 456/697 | 60/697 | 0,3701 |
+| G1 Trường–Ngành | không trọng số | 594/697 | 105/697 | 0,2111 |
+| G2 Trường–Trường | có trọng số | 174/250 | 68/250 | 0,2029 |
+| G2 Trường–Trường | không trọng số | 179/250 | 75/250 | 0,1789 |
+| G3 Ngành–Ngành | có trọng số | 34/370 | 18/370 | 0,2965 |
+| G3 Ngành–Ngành | không trọng số | 52/370 | 23/370 | 0,2481 |
+| G4 Cạnh tranh | có trọng số | 173/226 | 65/226 | 0,3327 |
 
-| Hạng | eigenvector |
-| --- | --- |
-| 1 | Quản lý và phân tích dữ liệu khoa học (7440229) — 0,29654 |
-| 2 | Địa tin học (7480206) — 0,29654 |
-| 3 | Kỹ thuật địa vật lý (7520502) — 0,29654 |
-| 4 | Đá quý Đá mỹ nghệ (7520505) — 0,29654 |
-| 5 | Kỹ thuật khí thiên nhiên (7520605) — 0,29654 |
-| 6 | Công nghệ số trong thăm dò và khai thác tài nguyên thiên nhiên (7520606) — 0,29654 |
-| 7 | Xây dựng công trình ngầm thành phố và Hệ thống tàu điện ngầm (7580204) — 0,29654 |
-| 8 | Du lịch địa chất (7810105) — 0,29654 |
-| 9 | Quản lý tài nguyên khoáng sản (7850196) — 0,29654 |
-| 10 | An toàn, Vệ sinh lao động (7850202) — 0,29654 |
+*Nguồn: `data/network/metrics/<mạng>_2026.csv`, cột `eigenvector`, `eigenvector_unw`.*
 
-*Nguồn: `data/network/metrics/g3_major_major_2026.csv`; tên trường/ngành đối chiếu bảng `universities` và `majors` của `data/eduradar.db`.*
-
-**(5) Ý nghĩa.** G2 tập trung vào lõi các trường có danh mục ngành chồng lấn. G3 cho một giới hạn rõ rệt của độ đo: mười ngành đầu cùng điểm 0,29654 đều chỉ được Trường Đại học Mỏ – Địa chất (MDA) mở trong dữ liệu 2026. Hai tập trường của bất kỳ hai ngành trong nhóm đều là $\{\mathrm{MDA}\}$, nên Jaccard bằng 1; chúng tạo clique đầy đủ mười đỉnh và còn liên kết với các ngành khác của MDA. Cụm cạnh mạnh này chi phối vectơ riêng của LCC. Điểm cao ở đây phản ánh cấu trúc danh mục hiếm và tập trung ở một trường, không phải mười ngành quan trọng nhất quốc gia.
+**(5) Ý nghĩa.** Eigenvector dồn vào khối dày đặc nhất (*localization*) do mạng gồm nhiều khối tách biệt. Ở G3 có trọng số, chỉ 34/370 ngành có giá trị > 0,001; mười ngành đầu cùng giá trị 0,2965 vì là khối ngành địa chất – mỏ chỉ do một trường mở, mọi cặp có Jaccard = 1. Bỏ trọng số, khối sư phạm (52/370 ngành > 0,001) thay chỗ. G2 ít bị ảnh hưởng hơn (174/250 đỉnh > 0,001) và cả hai bản cùng chỉ ra lõi trường tư đa ngành phía Nam. Do đó **xếp hạng toàn cục nên xem PageRank/degree**; eigenvector chỉ dùng để chỉ ra “lõi dày đặc nhất”. Web ghi chú điều này ngay dưới bảng eigenvector.
 
 ### 3.2.5. PageRank
 
-**(1) Định nghĩa.** PageRank là phân bố ổn định của quá trình đi ngẫu nhiên có xác suất khởi động lại. Điểm của một đỉnh tăng khi nhận dòng chuyển từ các đỉnh có điểm cao, có xét mức chia dòng ra của nguồn.
+**(1) Định nghĩa.** Xác suất dừng của bước ngẫu nhiên đi theo cạnh có trọng số, có xác suất nhảy ngẫu nhiên.
 
-**(2) Công thức.** Với $\alpha=0{,}85$ và $s_u^{out}=\sum_z w_{uz}$,
+**(2) Công thức.** $PR(v)=\dfrac{1-\alpha}{n}+\alpha\sum_{u\to v}PR(u)\dfrac{w_{uv}}{s_u^{out}}$, $\alpha=0{,}85$, $s_u^{out}$ là tổng trọng số cạnh ra.
 
-$$PR(v)=\frac{1-\alpha}{n}+\alpha\sum_{u\to v}\frac{w_{uv}}{s_u^{out}}PR(u),\qquad\sum_v PR(v)=1.$$
-
-Đỉnh không có cạnh ra được xử lý bằng phân phối dangling mặc định đồng đều; công thức trên hiểu có bổ sung phần phân phối đó.
-
-**(3) Cách tính và xử lý liên thông.** `nx.pagerank(g,weight="weight")` chạy trên toàn G2/G3/G4; G2/G3 vô hướng được hiểu như cạnh hai chiều. G4 dùng trọng số số ngành cạnh tranh. Teleportation cho phép tính điểm kể cả mạng không liên thông mạnh; G1 chưa tính PageRank trong bản chạy.
+**(3) Cách tính.** `nx.pagerank(weight="weight")` cho cả bốn mạng (vô hướng coi mỗi cạnh là hai chiều).
 
 **(4) Kết quả.**
 
-**Bảng 3.12. Top 10 PageRank G3 năm 2026**
+**Bảng 3.12. Mười đỉnh PageRank cao nhất năm 2026**
 
-| Hạng | pagerank |
-| --- | --- |
-| 1 | Tài chính - Ngân hàng (7340201) — 0,00540 |
-| 2 | Logistics và quản lý chuỗi cung ứng (7510605) — 0,00523 |
-| 3 | Sư phạm Địa lý (7140219) — 0,00504 |
-| 4 | Toán kinh tế (7310108) — 0,00502 |
-| 5 | Kế toán (7340301) — 0,00500 |
-| 6 | Ngôn ngữ Anh (7220201) — 0,00474 |
-| 7 | Quản trị kinh doanh (7340101) — 0,00474 |
-| 8 | Quản trị khách sạn (7810201) — 0,00465 |
-| 9 | Công nghệ thông tin (7480201) — 0,00462 |
-| 10 | Sư phạm Ngữ văn (7140217) — 0,00459 |
-
-*Nguồn: `data/network/metrics/g3_major_major_2026.csv`; tên trường/ngành đối chiếu bảng `universities` và `majors` của `data/eduradar.db`.*
-
-**Bảng 3.13. Top 10 PageRank G4 năm 2026**
-
-| Hạng | pagerank |
-| --- | --- |
-| 1 | Đại Học Cần Thơ (TCT) — 0,02432 |
-| 2 | Đại Học Kinh Tế Quốc Dân (KHA) — 0,02117 |
-| 3 | Trường Đại Học Nha Trang (TSN) — 0,01650 |
-| 4 | Trường Đại Học Mở TPHCM (MBS) — 0,01598 |
-| 5 | Trường Đại Học Sài Gòn (SGD) — 0,01581 |
-| 6 | Trường Đại Học Sư Phạm Hà Nội (SPH) — 0,01550 |
-| 7 | Đại Học Phenikaa (PKA) — 0,01389 |
-| 8 | Đại Học Bách Khoa Hà Nội (BKA) — 0,01369 |
-| 9 | Trường Đại Học Giao Thông Vận Tải (GHA) — 0,01366 |
-| 10 | Trường Đại học Thủ Đô Hà Nội (HNM) — 0,01329 |
-
-*Nguồn: `data/network/metrics/g4_competition_2026.csv`; tên trường/ngành đối chiếu bảng `universities` và `majors` của `data/eduradar.db`.*
-
-**Bảng 3.14. Liên hệ PageRank và điểm chuẩn qua ba năm**
-
-| Mạng | Độ đo | 2024 | 2025 | 2026 |
+| Hạng | G1 (cả hai phía) | G2 | G3 | G4 |
 | --- | --- | --- | --- | --- |
-| g4_competition | Spearman(PageRank, điểm THPT TB) | 0,5669 | 0,5352 | 0,6069 |
+| 1 | Quản trị kinh doanh (7340101) — 0,0183 | Trường Đại Học Ngoại Ngữ Tin Học TPHCM (DNT) — 0,0103 | Tài chính - Ngân hàng (7340201) — 0,0055 | Đại Học Cần Thơ (TCT) — 0,0243 |
+| 2 | Trường Đại Học Tôn Đức Thắng (DTT) — 0,0152 | Đại học Kinh Tế TPHCM - Phân hiệu Vĩnh Long (KSV) — 0,0096 | Logistics và quản lý chuỗi cung ứng (7510605) — 0,0053 | Đại Học Kinh Tế Quốc Dân (KHA) — 0,0212 |
+| 3 | Công nghệ thông tin (7480201) — 0,0140 | Trường Đại Học Ngân Hàng TPHCM (NHS) — 0,0095 | Toán kinh tế (7310108) — 0,0052 | Trường Đại Học Nha Trang (TSN) — 0,0165 |
+| 4 | Kế toán (7340301) — 0,0123 | Trường Đại Học Công Nghệ và Quản Lý Hữu Nghị (DCQ) — 0,0090 | Sư phạm Địa lý (7140219) — 0,0051 | Trường Đại Học Mở TPHCM (MBS) — 0,0160 |
+| 5 | Trường Đại Học Đông Á (DAD) — 0,0116 | Trường Đại Học Kinh Tế Kỹ Thuật Bình Dương (DKB) — 0,0090 | Kế toán (7340301) — 0,0051 | Trường Đại Học Sài Gòn (SGD) — 0,0158 |
+| 6 | Tài chính - Ngân hàng (7340201) — 0,0116 | Trường Đại học Hùng Vương TPHCM (DHV) — 0,0089 | Tôn giáo học (7229009) — 0,0049 | Trường Đại Học Sư Phạm Hà Nội (SPH) — 0,0155 |
+| 7 | Đại Học Kinh Tế Quốc Dân (KHA) — 0,0109 | Trường Đại Học Lạc Hồng (DLH) — 0,0088 | Nhân học (7310302) — 0,0049 | Đại Học Phenikaa (PKA) — 0,0139 |
+| 8 | Ngôn ngữ Anh (7220201) — 0,0107 | Trường Đại Học Bà Rịa – Vũng Tàu (BVU) — 0,0087 | Ngôn ngữ Anh (7220201) — 0,0048 | Đại Học Bách Khoa Hà Nội (BKA) — 0,0137 |
+| 9 | Marketing (7340115) — 0,0084 | Trường Đại Học Đại Nam (DDN) — 0,0086 | Quản trị kinh doanh (7340101) — 0,0048 | Trường Đại Học Giao Thông Vận Tải (GHA) — 0,0137 |
+| 10 | Luật (7380101) — 0,0078 | Học Viện Ngân Hàng (NHH) — 0,0085 | Hán Nôm (7220104) — 0,0048 | Trường Đại học Thủ Đô Hà Nội (HNM) — 0,0133 |
 
-*Nguồn: `data/network/summary.csv`.*
+*Nguồn: `data/network/metrics/<mạng>_2026.csv`, cột `pagerank`.*
 
-**(5) Ý nghĩa.** Trong G3, PageRank cao thuộc nhiều ngành kinh tế – dịch vụ và sư phạm. Trong G4, các chuỗi cạnh hướng từ điểm thấp lên điểm cao của từng ngành có xu hướng dồn về một số trường đích, nhưng một trường vẫn có thể ở vị trí khác nhau giữa các ngành. Tương quan dương với điểm THPT trung bình là bằng chứng liên hệ trong tập dữ liệu, không đủ để coi PageRank là thứ hạng uy tín. Phân tích tương quan và cách lấy điểm trung bình được nêu tại mục 4.3.
+**(5) Ý nghĩa.** Ở G1, PageRank xen kẽ ngành đại trà và trường nhiều dòng điểm (Tôn Đức Thắng, Đông Á) vì trọng số là số dòng. Ở G4, PageRank xếp đầu Cần Thơ, Kinh tế Quốc dân, Nha Trang, Bách khoa Hà Nội…, tương quan hạng dương với điểm THPT trung bình ở cả ba năm (ρ = 0,5670; 0,5421; 0,6075). PageRank G4 đo vị trí “được hướng tới qua nhiều bước” trong mô hình, không phải xếp hạng học thuật.
 
 ### 3.2.6. HITS: hub và authority
 
-**(1) Định nghĩa.** HITS xác định đồng thời hub (đỉnh trỏ tới nhiều authority mạnh) và authority (đỉnh được nhiều hub mạnh trỏ tới). G4 phân biệt trường có nhiều lựa chọn nhắm lên và trường được các đối thủ trực tiếp nhắm tới.
+**(1) Định nghĩa.** Authority cao khi được nhiều hub tốt trỏ tới; hub cao khi trỏ tới nhiều authority tốt.
 
-**(2) Công thức.** Với ma trận cạnh có trọng số $W$,
+**(2) Công thức.** $a_v=\sum_{u\to v}w_{uv}h_u$, $h_v=\sum_{v\to u}w_{vu}a_u$, lặp và chuẩn hoá đến hội tụ (vector riêng chính của $A^TA$ và $AA^T$).
 
-$$a^{(t+1)}=W^\top h^{(t)},\qquad h^{(t+1)}=Wa^{(t+1)}.$$
-
-Sau mỗi vòng chuẩn hóa, nghiệm tương ứng với các vectơ riêng chính của $W^\top W$ và $WW^\top$; bản xuất chuẩn hóa để tổng authority và tổng hub lần lượt bằng 1.
-
-**(3) Cách tính và xử lý liên thông.** `nx.hits(g,max_iter=1000,normalized=True)` chạy toàn G4; ma trận kề sử dụng thuộc tính `weight` mặc định của đồ thị nên có xét số ngành. Không lấy LCC trước khi tính. HITS không có teleportation như PageRank, có thể tập trung mạnh vào một lõi dày; các thành phần khác có điểm rất nhỏ. G1–G3 không được tính HITS trong bản chạy.
+**(3) Cách tính.** `nx.hits(max_iter=1000, normalized=True)` trên G4; trên G1 (vô hướng) chạy trên thành phần lớn nhất, khi đó hub = authority.
 
 **(4) Kết quả.**
 
-**Bảng 3.15. Top 10 hub và authority G4 năm 2026**
+**Bảng 3.13. Mười trường authority/hub cao nhất G4 và authority G1 năm 2026**
 
-| Hạng | hub | authority |
-| --- | --- | --- |
-| 1 | Trường Đại Học Vinh (TDV) — 0,01409 | Trường Đại Học Kiến Trúc Đà Nẵng (KTD) — 0,03357 |
-| 2 | Trường Đại học Công Nghệ TPHCM (DKC) — 0,01404 | Trường Đại Học Công Đoàn (LDA) — 0,02517 |
-| 3 | Trường Đại Học Đồng Tháp (SPD) — 0,01401 | Trường Đại Học Sư Phạm Kỹ Thuật Hưng Yên (SKH) — 0,02358 |
-| 4 | Trường Đại Học Nguyễn Tất Thành (NTT) — 0,01378 | Trường Đại Học Công Nghiệp Việt - Hung (VHD) — 0,02272 |
-| 5 | Trường Đại Học Đông Á (DAD) — 0,01365 | Trường Đại học Nghệ An (CEA) — 0,02093 |
-| 6 | Trường Đại học Nam Cần Thơ (DNC) — 0,01322 | Trường Đại Học Hồng Đức (HDT) — 0,01988 |
-| 7 | Đại Học Duy Tân (DDT) — 0,01315 | Trường Đại Học Vinh (TDV) — 0,01921 |
-| 8 | Trường Đại Học Quy Nhơn (DQN) — 0,01313 | Trường Đại Học Nông Lâm Thái Nguyên (DTN) — 0,01883 |
-| 9 | Trường Đại Học Văn Lang (DVL) — 0,01276 | Đại Học Cần Thơ (TCT) — 0,01803 |
-| 10 | Trường Đại Học Văn Hiến (DVH) — 0,01240 | Trường Đại Học Quy Nhơn (DQN) — 0,01790 |
+| Hạng | G4 authority | G4 hub | G1 authority (= hub, vô hướng) |
+| --- | --- | --- | --- |
+| 1 | Trường Đại Học Kiến Trúc Đà Nẵng (KTD) — 0,0336 | Trường Đại Học Vinh (TDV) — 0,0141 | Quản trị kinh doanh (7340101) — 0,0355 |
+| 2 | Trường Đại Học Công Đoàn (LDA) — 0,0252 | Trường Đại học Công Nghệ TPHCM (DKC) — 0,0140 | Trường Đại Học Tôn Đức Thắng (DTT) — 0,0285 |
+| 3 | Trường Đại Học Sư Phạm Kỹ Thuật Hưng Yên (SKH) — 0,0236 | Trường Đại Học Đồng Tháp (SPD) — 0,0140 | Đại Học Kinh Tế Quốc Dân (KHA) — 0,0238 |
+| 4 | Trường Đại Học Công Nghiệp Việt - Hung (VHD) — 0,0227 | Trường Đại Học Nguyễn Tất Thành (NTT) — 0,0138 | Tài chính - Ngân hàng (7340201) — 0,0226 |
+| 5 | Trường Đại học Nghệ An (CEA) — 0,0209 | Trường Đại Học Đông Á (DAD) — 0,0136 | Kế toán (7340301) — 0,0195 |
+| 6 | Trường Đại Học Hồng Đức (HDT) — 0,0199 | Trường Đại học Nam Cần Thơ (DNC) — 0,0132 | Marketing (7340115) — 0,0191 |
+| 7 | Trường Đại Học Vinh (TDV) — 0,0192 | Đại Học Duy Tân (DDT) — 0,0132 | Trường Đại Học Thương Mại (TMU) — 0,0149 |
+| 8 | Trường Đại Học Nông Lâm Thái Nguyên (DTN) — 0,0188 | Trường Đại Học Quy Nhơn (DQN) — 0,0131 | Công nghệ thông tin (7480201) — 0,0140 |
+| 9 | Đại Học Cần Thơ (TCT) — 0,0180 | Trường Đại Học Văn Lang (DVL) — 0,0128 | Trường Đại Học Đông Á (DAD) — 0,0128 |
+| 10 | Trường Đại Học Quy Nhơn (DQN) — 0,0179 | Trường Đại Học Văn Hiến (DVH) — 0,0124 | Ngôn ngữ Anh (7220201) — 0,0126 |
 
-*Nguồn: `data/network/metrics/g4_competition_2026.csv`; tên trường/ngành đối chiếu bảng `universities` và `majors` của `data/eduradar.db`.*
+*Nguồn: `data/network/metrics/g4_competition_2026.csv`, `g1_uni_major_2026.csv`.*
 
-**Bảng 3.16. Liên hệ authority và điểm chuẩn qua ba năm**
-
-| Mạng | Độ đo | 2024 | 2025 | 2026 |
-| --- | --- | --- | --- | --- |
-| g4_competition | Spearman(authority, điểm THPT TB) | -0,4012 | -0,4139 | 0,2343 |
-
-*Nguồn: `data/network/summary.csv`.*
-
-**(5) Ý nghĩa.** Top hub có nhiều trường đa ngành; top authority tập trung ở các trường có nhiều quan hệ cạnh tranh trực tiếp. Authority tương quan âm với điểm năm 2024 và 2025, nhưng dương năm 2026. Vì vậy không thể đồng nhất authority với trường điểm cao hoặc uy tín. Cơ chế lõi dày và thay đổi phân bố điểm là những cách giải thích phù hợp với số liệu, được kiểm tra thêm tại mục 4.3, không phải kết luận nhân quả.
+**(5) Ý nghĩa.** Authority G4 cao = trường được nhiều trường khác “nhắm lên” trong vùng điểm gần nhau. HITS tập trung vào lõi cạnh tranh dày nhất nên authority tương quan hạng với điểm trung bình đổi dấu qua năm (−0,4013 năm 2024, 0,2349 năm 2026; mục 4.3). Tên gọi “authority” vì vậy không thể hiểu là uy tín học thuật.
 
 ### 3.2.7. Density
 
-**(1) Định nghĩa.** Mật độ là tỷ lệ số cạnh quan sát được trên số cạnh tối đa có thể có của đúng loại đồ thị.
+**(1) Định nghĩa.** Tỉ lệ cạnh có trên số cạnh tối đa.
 
-**(2) Công thức.**
+**(2) Công thức.** Vô hướng $D=\dfrac{2m}{n(n-1)}$; có hướng $D=\dfrac{m}{n(n-1)}$; hai phía $D_B=\dfrac{m}{|U|\,|M|}$. Bậc trung bình $\langle k\rangle=2m/n$ (có hướng $m/n$).
 
-$$D_{G1}=\frac{m}{|U||M|},\qquad D_{G2,G3}=\frac{2m}{n(n-1)},\qquad D_{G4}=\frac{m}{n(n-1)}.$$
-
-**(3) Cách tính và xử lý liên thông.** G1 gọi `bipartite.density(g1,U)`; G2/G3/G4 gọi `nx.density(g)`, trên toàn mạng sau xử lý đỉnh cô lập. Mật độ không dùng trọng số và không yêu cầu liên thông. Mẫu số G1 không tính những cạnh trường–trường hay ngành–ngành vốn bị cấm trong đồ thị hai phía.
+**(3) Cách tính.** `nx.density`, `bipartite.density`.
 
 **(4) Kết quả.**
 
-**Bảng 3.17. Mật độ theo đúng loại mạng**
+**Bảng 3.14. Mật độ và bậc trung bình qua ba năm**
 
-| Mạng | 2024 | 2025 | 2026 |
+| Mạng / chỉ tiêu | 2024 | 2025 | 2026 |
 | --- | --- | --- | --- |
-| g1_uni_major | 0,0372 | 0,0388 | 0,0427 |
-| g2_uni_uni | 0,0818 | 0,0789 | 0,0820 |
-| g3_major_major | 0,0182 | 0,0192 | 0,0199 |
-| g4_competition | 0,1577 | 0,1602 | 0,1812 |
+| G1: Mật độ | 0,0187 | 0,0192 | 0,0208 |
+| G1: Bậc trung bình | 12,8563 | 13,3773 | 14,4792 |
+| G2: Mật độ | 0,0836 | 0,0790 | 0,0816 |
+| G2: Bậc trung bình | 20,7309 | 19,7450 | 20,3200 |
+| G3: Mật độ | 0,0189 | 0,0201 | 0,0204 |
+| G3: Bậc trung bình | 7,0374 | 7,4447 | 7,5189 |
+| G4: Mật độ | 0,1578 | 0,1602 | 0,1812 |
+| G4: Bậc trung bình | 40,7027 | 41,4923 | 40,7743 |
+| G1: Mật độ hai phía | 0,0389 | 0,0400 | 0,0434 |
 
 *Nguồn: `data/network/summary.csv`.*
 
-**(5) Ý nghĩa.** G1 có mật độ tăng, phù hợp với số cặp trường–ngành tăng. G2 dày hơn G3 vì các trường dễ có chung một phần ngành phổ biến, còn nhiều ngành có tập trường khác biệt. Không so trực tiếp mật độ hai phía với mật độ mạng có hướng như cùng một ý nghĩa: mẫu số và quy tắc tạo cạnh khác nhau. Việc G4 năm 2026 có mật độ cao hơn đồng thời ít đỉnh hơn cũng cần được xét cùng độ phủ THPT.
+**(5) Ý nghĩa.** Cả bốn mạng đều thưa (G1 hai phía 0,04; G3 0,02). G4 dày nhất (0,18) vì một cặp trường chỉ cần một ngành có điểm cách nhau ≤ 2 là có cạnh. Mật độ G1 hai phía tăng 0,0389 → 0,0434: các trường hiện diện mở nhiều ngành hơn (18,28 ngành/trường năm 2026).
 
 ### 3.2.8. Average shortest path length
 
-**(1) Định nghĩa.** Độ dài đường đi ngắn nhất trung bình là số bước trung bình để nối hai đỉnh trong cùng một miền liên thông được chọn.
+**(1) Định nghĩa.** Số bước trung bình giữa hai đỉnh tới được nhau.
 
-**(2) Công thức.** Với $V_L$ là tập đỉnh LCC và $n_L=|V_L|$,
+**(2) Công thức.** $L=\dfrac{1}{n_c(n_c-1)}\sum_{u\ne v}d(u,v)$ trên thành phần lớn nhất (LCC) có $n_c$ đỉnh.
 
-$$L_{LCC}=\frac{1}{n_L(n_L-1)}\sum_{u\ne v\in V_L}d(u,v).$$
+**(3) Cách tính.** `nx.average_shortest_path_length` trên LCC; G4 tính hai cách: theo hướng trên SCC lớn nhất và bỏ hướng trên thành phần yếu lớn nhất.
 
-**(3) Cách tính và xử lý liên thông.** G2/G3 trong script mạng và G1 trong script báo cáo được gọi `nx.average_shortest_path_length(big)`, không trọng số, trên LCC. `lcc` chọn thành phần có nhiều đỉnh nhất. Đồ thị một đỉnh được quy ước kết quả 0 trong code. G4 được tính bổ sung trên SCC lớn nhất, giữ hướng; G1 dùng LCC. Công thức trên áp dụng với miền SCC thay cho LCC khi xét G4. Bảng 3.29 ghi các số bổ sung; không đưa khoảng cách vô hạn giữa các thành phần vào trung bình và không thay đường đi có hướng bằng đường đi bỏ hướng.
+**(4) Kết quả.** Năm 2026 (ba năm ở Bảng 3.15):
 
-**(4) Kết quả.**
-
-**Bảng 3.18. Đường đi trung bình và phạm vi LCC**
-
-| Mạng | Độ đo | 2024 | 2025 | 2026 |
-| --- | --- | --- | --- | --- |
-| g2_uni_uni | Số đỉnh LCC | 219 | 229 | 231 |
-| g2_uni_uni | L trên LCC | 2,7652 | 3,3973 | 3,2475 |
-| g3_major_major | Số đỉnh LCC | 358 | 361 | 364 |
-| g3_major_major | L trên LCC | 5,7182 | 5,6231 | 5,6565 |
+| Mạng 2026 | Miền tính | Số đỉnh | Đường đi trung bình |
+| --- | --- | ---: | ---: |
+| G1 | LCC | 669 | 3,2793 |
+| G2 | LCC | 232 | 3,2444 |
+| G3 | LCC | 357 | 5,6705 |
+| G4 | SCC lớn nhất, theo hướng | 192 | 1,9803 |
+| G4 | Thành phần yếu lớn nhất, bỏ hướng | 224 | 1,7399 |
 
 *Nguồn: `data/network/summary.csv`.*
 
-**(5) Ý nghĩa.** G2 cần trung bình khoảng ba bước giống nhau trong LCC; G3 có đường đi dài hơn, phù hợp cấu trúc cụm lĩnh vực tách rõ. Giá trị chỉ đại diện LCC, nên phải đọc cùng số đỉnh LCC. L giảm sau tăng ngưỡng không tự chứng minh mạng kết nối tốt hơn: LCC có thể đã vỡ thành một cụm nhỏ, như kiểm tra ngưỡng G3 tại mục 4.5.
+**(5) Ý nghĩa.** G1 có $L$ = 3,28 bước (trường → ngành → trường → ngành); G2 3,24; G4 chỉ 1,98 theo hướng. G3 dài nhất (5,67) vì các khối ngành nối với nhau qua ít cầu nối.
 
 ### 3.2.9. Diameter
 
-**(1) Định nghĩa.** Đường kính là đường đi ngắn nhất dài nhất giữa một cặp đỉnh trong miền liên thông xét đến; nó phản ánh phần kéo dài nhất của cấu trúc mạng.
+**(1) Định nghĩa.** Khoảng cách ngắn nhất lớn nhất giữa hai đỉnh của thành phần.
 
-**(2) Công thức.**
+**(2) Công thức.** $\operatorname{diam}=\max_{u,v\in LCC}d(u,v)$.
 
-$$\operatorname{diam}(G_L)=\max_{u,v\in V_L}d(u,v).$$
-
-**(3) Cách tính và xử lý liên thông.** `nx.diameter(big)` tính trên cùng LCC của G2/G3 như chỉ tiêu đường đi trung bình, không trọng số. Với LCC một đỉnh code trả 0. Không có đường kính toàn mạng không liên thông trong bảng kết quả; G1 được tính bổ sung trên LCC, G4 trên SCC lớn nhất và giữ hướng; kết quả ở Bảng 3.29. Không gán 0 cho khoảng cách giữa các thành phần.
+**(3) Cách tính.** `nx.diameter` trên LCC; G4 thêm đường kính có hướng trên SCC lớn nhất.
 
 **(4) Kết quả.**
 
-**Bảng 3.19. Đường kính của hai mạng chiếu**
+**Bảng 3.15. Thành phần lớn nhất, đường đi trung bình và đường kính qua ba năm**
 
-| Mạng | Độ đo | 2024 | 2025 | 2026 |
-| --- | --- | --- | --- | --- |
-| g2_uni_uni | Đường kính LCC | 8 | 13 | 12 |
-| g3_major_major | Đường kính LCC | 17 | 14 | 14 |
+| Mạng / chỉ tiêu | 2024 | 2025 | 2026 |
+| --- | --- | --- | --- |
+| G1: Số đỉnh thành phần lớn nhất (LCC) | 663 | 672 | 669 |
+| G1: Đường đi ngắn nhất TB (LCC) | 3,3014 | 3,3171 | 3,2793 |
+| G1: Đường kính (LCC) | 8 | 8 | 7 |
+| G2: Số đỉnh thành phần lớn nhất (LCC) | 219 | 235 | 232 |
+| G2: Đường đi ngắn nhất TB (LCC) | 2,7499 | 3,4301 | 3,2444 |
+| G2: Đường kính (LCC) | 8 | 13 | 12 |
+| G3: Số đỉnh thành phần lớn nhất (LCC) | 345 | 350 | 357 |
+| G3: Đường đi ngắn nhất TB (LCC) | 5,6952 | 5,6750 | 5,6705 |
+| G3: Đường kính (LCC) | 17 | 14 | 14 |
+| G4: Số đỉnh thành phần lớn nhất (LCC) | 257 | 256 | 224 |
+| G4: Đường đi ngắn nhất TB (LCC) | 1,8558 | 1,7984 | 1,7399 |
+| G4: Đường kính (LCC) | 4 | 4 | 4 |
+| G4: Số đỉnh SCC lớn nhất | 243 | 248 | 192 |
+| G4: Đường đi TB có hướng (SCC) | 2,1242 | 2,0691 | 1,9803 |
+| G4: Đường kính có hướng (SCC) | 6 | 5 | 4 |
 
 *Nguồn: `data/network/summary.csv`.*
 
-**(5) Ý nghĩa.** Đường kính G2 tăng từ 8 lên 12 giữa hai mốc 2024 và 2026, trong khi LCC lớn hơn: có thể các trường ở rìa được nối thêm bằng các chuỗi dài. G3 giảm từ 17 xuống 14. Đây là quan sát theo ngưỡng 0,25; đường kính nhạy với vài cạnh cầu nối và không nên dùng riêng để đánh giá toàn mạng tiến bộ hay suy giảm.
+**(5) Ý nghĩa.** G2 và G3 có đường kính 12–14 bước dù đường đi trung bình chỉ 3,2–5,7: một chuỗi dài các trường/ngành ở rìa nối vào lõi. G4 có SCC lớn nhất 192/226 trường, đường kính có hướng 4: hầu hết trường trong lõi cạnh tranh tới được nhau trong ≤ 4 bước “nhắm lên”.
 
 ### 3.2.10. Clustering coefficient và Transitivity
 
-**(1) Định nghĩa.** Clustering của đỉnh đo mức các hàng xóm của nó cũng liên kết với nhau; trung bình clustering cho mỗi đỉnh trọng số như nhau. Transitivity đo tỷ lệ bộ ba liên thông đóng thành tam giác trên toàn mạng, nên nhấn mạnh các đỉnh tạo nhiều bộ ba hơn.
+**(1) Định nghĩa.** Mức các láng giềng của một đỉnh cũng nối với nhau (cục bộ), và tỉ lệ bộ ba khép kín (toàn cục).
 
-**(2) Công thức.** Với $T_v$ là số tam giác qua $v$,
+**(2) Công thức.** $C_v=\dfrac{2T_v}{k_v(k_v-1)}$, $\bar C=\frac1n\sum_vC_v$; transitivity $T=\dfrac{3\times\text{số tam giác}}{\text{số bộ ba nối}}$. G1 hai phía không có tam giác nên dùng clustering Latapy: $C_{uv}=\dfrac{|N(u)\cap N(v)|}{|N(u)\cup N(v)|}$, $C_u$ là trung bình trên các $v$ cách $u$ hai bước. G4 dùng clustering có hướng (Fagiolo).
 
-$$C_v=\frac{2T_v}{k_v(k_v-1)},\quad \bar C=\frac1n\sum_v C_v,\quad\mathrm{Transitivity}=\frac{3\,T}{\sum_v\binom{k_v}{2}}.$$
-
-Quy ước $C_v=0$ nếu $k_v<2$; $T$ là số tam giác khác nhau. Hai đại lượng trung bình và transitivity không thể thay thế nhau.
-
-**(3) Cách tính và xử lý liên thông.** G2/G3 lưu `nx.clustering(g,weight=None)`, `nx.average_clustering(g)` và `nx.transitivity(g)` trên toàn mạng. Đỉnh bậc dưới 2 vẫn góp 0 vào trung bình. Không dùng trọng số Jaccard; không loại thành phần nhỏ. G1 và G4 được tính bổ sung từ DB bằng `scripts/report_network_supplement.py` tại Bảng 3.29. G1 hai phía nên clustering tam giác bằng 0; G4 dùng clustering có hướng, còn transitivity chỉ tính sau bỏ hướng và được ghi nhãn riêng.
+**(3) Cách tính.** `nx.clustering`, `nx.average_clustering`, `nx.transitivity`; `bipartite.clustering(mode="dot")` cho G1.
 
 **(4) Kết quả.**
 
-**Bảng 3.20. Phân cụm cục bộ và tỷ lệ đóng tam giác**
+**Bảng 3.16. Hệ số phân cụm và transitivity qua ba năm**
 
-| Mạng | Độ đo | 2024 | 2025 | 2026 |
-| --- | --- | --- | --- | --- |
-| g2_uni_uni | Clustering trung bình | 0,5527 | 0,5544 | 0,5486 |
-| g2_uni_uni | Transitivity | 0,5289 | 0,5504 | 0,5436 |
-| g3_major_major | Clustering trung bình | 0,5285 | 0,5701 | 0,5180 |
-| g3_major_major | Transitivity | 0,6417 | 0,6634 | 0,6651 |
+| Mạng / chỉ tiêu | 2024 | 2025 | 2026 |
+| --- | --- | --- | --- |
+| G1: Hệ số phân cụm TB | 0,1291 | 0,1279 | 0,1227 |
+| G1: Transitivity | 0 | 0 | 0 |
+| G2: Hệ số phân cụm TB | 0,5582 | 0,5493 | 0,5485 |
+| G2: Transitivity | 0,5304 | 0,5493 | 0,5436 |
+| G3: Hệ số phân cụm TB | 0,5149 | 0,5611 | 0,5122 |
+| G3: Transitivity | 0,6454 | 0,6690 | 0,6679 |
+| G4: Hệ số phân cụm TB | 0,4700 | 0,4521 | 0,4637 |
+| G4: Transitivity | 0,5845 | 0,5684 | 0,5444 |
 
-*Nguồn: `data/network/summary.csv`.*
+*Nguồn: `data/network/summary.csv`. Transitivity G1 = 0 theo định nghĩa đồ thị hai phía.*
 
-**Bảng 3.21. Top 10 local clustering của G2 và G3 năm 2026, chỉ xét đỉnh bậc ít nhất 5**
-
-| Hạng | G2 — tên trường (mã), bậc, clustering | G3 — tên ngành (mã), bậc, clustering |
-| ---: | --- | --- |
-| 1 | Khoa Giáo Dục Thể Chất Huế (DHC), $k=5$, $C=1,00000$ | Kỹ thuật điện tử - viễn thông (7520207), $k=5$, $C=1,00000$ |
-| 2 | Trường Đại Học Sư Phạm Thể Dục Thể Thao TPHCM (STS), $k=5$, $C=1,00000$ | Biến đổi khí hậu và phát triển bền vững (7440298), $k=5$, $C=1,00000$ |
-| 3 | Trường Đại Học Thể Dục Thể Thao Bắc Ninh (TDB), $k=5$, $C=1,00000$ | Quản lý biển (7850199), $k=5$, $C=1,00000$ |
-| 4 | Trường Đại Học Sư Phạm Thể Dục Thể Thao Hà Nội (TDH), $k=5$, $C=1,00000$ | Kỹ thuật không gian (7520121), $k=12$, $C=1,00000$ |
-| 5 | Trường Đại Học Thể Dục Thể Thao TPHCM (TDS), $k=5$, $C=1,00000$ | Ngôn ngữ Bồ Đào Nha (7220207), $k=5$, $C=1,00000$ |
-| 6 | Trường Đại Học Thể Dục Thể Thao Đà Nẵng (TTD), $k=5$, $C=1,00000$ | Nghiên cứu phát triển (7310111), $k=5$, $C=1,00000$ |
-| 7 | Trường Đại Học Kỹ Thuật Y Tế Hải Dương (DKY), $k=16$, $C=0,95833$ | Chỉ huy âm nhạc (7210204), $k=5$, $C=1,00000$ |
-| 8 | Trường Đại Học Y Dược Thái Nguyên (DTY), $k=16$, $C=0,95833$ | Thanh nhạc (7210206), $k=5$, $C=1,00000$ |
-| 9 | Trường Đại Học Y Tế Công Cộng (YTC), $k=6$, $C=0,93333$ | Năng lượng tái tạo (đào tạo bằng tiếng Việt) (7510208), $k=7$, $C=1,00000$ |
-| 10 | Trường Đại học Y khoa Tokyo Việt Nam (THU), $k=12$, $C=0,89394$ | Giáo dục Mầm non (7140201), $k=17$, $C=0,97059$ |
-
-*Nguồn: `data/network/metrics/g2_uni_uni_2026.csv`, `data/network/metrics/g3_major_major_2026.csv`; tên trường từ bảng `universities` của `data/eduradar.db`. Xếp giảm dần theo cột `clustering`, lọc `degree >= 5`; khi bằng nhau giữ thứ tự xuất hiện trong CSV. Script tái lập cả danh sách ở khóa `clustering_top10_2026` trong JSON stdout.*
-
-Sáu trường thể dục thể thao đầu bảng G2 đều có bậc 5 và clustering 1, phù hợp một nhóm sáu trường đóng kín quan hệ trong phép chiếu. Các trường y dược tiếp theo cũng có mức đóng tam giác cao. Trong G3, nhiều ngành có clustering 1 nhưng bậc chỉ 5: mọi cặp hàng xóm của chúng nối nhau, chưa chứng minh đỉnh ấy là cầu nối hay có độ phổ biến toàn hệ thống. Lọc bậc ít nhất 5 giảm các ví dụ quá tầm thường ở bậc 2–4, nhưng không loại bỏ ảnh hưởng của các nhóm nhỏ khép kín.
-
-**(5) Ý nghĩa.** Clustering G2 khoảng 0,55 cho thấy nhiều nhóm trường có danh mục tương tự khá khép kín. G3 có transitivity khoảng 0,64–0,67 nhưng clustering trung bình thấp hơn: các đỉnh có nhiều bộ ba tập trung vào các nhóm đóng tam giác mạnh. Một đỉnh có clustering bằng 1 nhưng bậc 2 chỉ nói rằng hai hàng xóm nối nhau; không chứng minh vai trò trung tâm. Các chỉ tiêu cao ở phép chiếu còn chịu ảnh hưởng của chính cách sinh cạnh qua hàng xóm chung.
+**(5) Ý nghĩa.** G2 có $\bar C$ ≈ 0,55 so với mật độ 0,08 (gấp gần 7 lần), cùng đường đi ngắn: **dấu hiệu thế giới nhỏ** (chưa kiểm định với mô hình null). G3 có transitivity 0,67: ngành mở cùng nhau thành khối khép kín. Clustering Latapy G1 0,12 nghĩa là hai trường chung một ngành thường chỉ trùng ~12% tập ngành.
 
 ### 3.2.11. Modularity
 
-**(1) Định nghĩa.** Modularity đánh giá mức cạnh tập trung trong các cộng đồng so với mô hình kỳ vọng giữ tổng trọng số bậc. Cần một phân hoạch cộng đồng trước khi đánh giá $Q$.
+**(1) Định nghĩa.** Mức một phân hoạch có nhiều cạnh trong nhóm hơn kỳ vọng ngẫu nhiên cùng bậc.
 
-**(2) Công thức.** Với $s_i=\sum_j w_{ij}$, $2W=\sum_i s_i$ và $c_i$ là nhãn cộng đồng,
+**(2) Công thức.** $Q=\dfrac{1}{2m}\sum_{ij}\Big[A_{ij}-\dfrac{k_ik_j}{2m}\Big]\delta(c_i,c_j)$; bản có trọng số thay $A_{ij}$, $k_i$, $m$ bằng trọng số tương ứng.
 
-$$Q=\frac{1}{2W}\sum_{ij}\left(w_{ij}-\frac{s_i s_j}{2W}\right)\delta(c_i,c_j).$$
-
-Đây là dạng có trọng số, độ phân giải mặc định $\gamma=1$; không nhầm $W$ với số cạnh khi Jaccard không đồng đều.
-
-**(3) Cách tính và xử lý liên thông.** G2/G3 chạy `community.louvain_communities(g,weight="weight",seed=42)` trên toàn mạng, sau đó `community.modularity(g,comms,weight="weight")`. Thành phần tách rời vẫn tham gia phân hoạch; ID cộng đồng được sắp theo kích thước giảm dần để xuất, không phải thứ bậc chất lượng. Q của GN và Louvain trên mẫu 60 đỉnh tại mục 4.2 là phép tính khác, không thay Q toàn mạng.
+**(3) Cách tính.** `community.louvain_communities(weight="weight", seed=42)` và `community.modularity` cho cả bốn mạng (G4 dùng bản có hướng của NetworkX).
 
 **(4) Kết quả.**
 
-**Bảng 3.22. Cộng đồng và modularity toàn mạng**
+**Bảng 3.17. Số cộng đồng Louvain và modularity qua ba năm**
 
-| Mạng | Độ đo | 2024 | 2025 | 2026 |
-| --- | --- | --- | --- | --- |
-| g2_uni_uni | Số cộng đồng Louvain | 19 | 19 | 20 |
-| g2_uni_uni | Q Louvain có trọng số | 0,4511 | 0,4939 | 0,4822 |
-| g3_major_major | Số cộng đồng Louvain | 28 | 27 | 19 |
-| g3_major_major | Q Louvain có trọng số | 0,8394 | 0,8460 | 0,8363 |
+| Mạng / chỉ tiêu | 2024 | 2025 | 2026 |
+| --- | --- | --- | --- |
+| G1: Số cộng đồng Louvain | 21 | 20 | 21 |
+| G1: Modularity Q (Louvain) | 0,4079 | 0,3929 | 0,3619 |
+| G2: Số cộng đồng Louvain | 18 | 16 | 19 |
+| G2: Modularity Q (Louvain) | 0,4489 | 0,4939 | 0,4845 |
+| G3: Số cộng đồng Louvain | 27 | 23 | 20 |
+| G3: Modularity Q (Louvain) | 0,8358 | 0,8443 | 0,8363 |
+| G4: Số cộng đồng Louvain | 6 | 6 | 5 |
+| G4: Modularity Q (Louvain) | 0,3685 | 0,3642 | 0,3184 |
 
 *Nguồn: `data/network/summary.csv`.*
 
-**(5) Ý nghĩa.** G3 có Q khoảng 0,84, phù hợp các khối ngành tách rõ theo nhóm trường đào tạo. G2 có Q khoảng 0,45–0,49, các khối còn chồng lấn nhiều hơn. Q cao là chứng cứ cấu trúc của phân hoạch tại tham số đã chọn, chưa đủ xác nhận cộng đồng là nhóm xã hội có thật; mạng quá vỡ cũng có thể cho Q cao. Cần đọc Q cùng LCC, số thành phần và phân tích độ nhạy.
+**(5) Ý nghĩa.** G3 có Q ≈ 0,84: cấu trúc cộng đồng rất rõ (ngưỡng thường dùng Q > 0,3). G2 ≈ 0,48 và G1 ≈ 0,36: cộng đồng rõ vừa phải; G4 0,32 với 5 cụm là các dải điểm. Danh sách cộng đồng và so sánh với Girvan–Newman ở mục 4.1–4.2.
 
 ### 3.2.12. Các độ đo bổ sung: components, LCC, assortativity, reciprocity
 
-**(1) Định nghĩa.** Components đếm các miền liên thông; LCC là miền có nhiều đỉnh nhất. G4 có thành phần yếu (bỏ hướng khi xét khả năng nối) và mạnh (mọi cặp tới được nhau theo hướng). Assortativity đo tương quan bậc ở hai đầu cạnh. Reciprocity là tỷ lệ cạnh có cạnh ngược chiều.
+**(1) Định nghĩa.** Số thành phần liên thông (G4: yếu/mạnh), kích thước thành phần lớn nhất, assortativity theo bậc (đỉnh bậc cao có nối đỉnh bậc cao không), reciprocity (tỉ lệ cạnh có chiều ngược).
 
-**(2) Công thức.** Tỷ lệ LCC là $n_L/n$. Assortativity là hệ số Pearson $r=\operatorname{Corr}(k_u,k_v)$ trên các đầu cạnh theo quy tắc đồ thị vô hướng. Với G4,
+**(2) Công thức.** $r=\dfrac{\sum_{(u,v)\in E}(k_u-\bar k)(k_v-\bar k)}{\sum_{(u,v)\in E}(k_u-\bar k)^2}$ (hệ số Pearson giữa bậc hai đầu cạnh; G4 dùng bậc vào – bậc vào); $\rho=\dfrac{|\{(u,v)\in E:(v,u)\in E\}|}{m}$.
 
-$$R=\frac{|\{(u,v)\in E:(v,u)\in E\}|}{m}.$$
-
-Một cặp tương hỗ đóng góp hai cạnh vào tử và mẫu. Đây là reciprocity không trọng số.
-
-**(3) Cách tính và xử lý liên thông.** G1/G2/G3 dùng `nx.number_connected_components`; G4 dùng `number_weakly_connected_components` và `number_strongly_connected_components`. `lcc(g)` dùng thành phần yếu nếu có hướng. `degree_assortativity_coefficient(g)` chỉ lưu cho G2/G3, không truyền `weight`; `nx.reciprocity(g)` chỉ lưu cho G4. Vì G4 chỉ có LCC yếu, không được gọi 224 đỉnh năm 2026 là một thành phần mạnh.
+**(3) Cách tính.** `nx.number_connected_components`, `number_weakly/strongly_connected_components`, `degree_assortativity_coefficient`, `nx.reciprocity`.
 
 **(4) Kết quả.**
 
-**Bảng 3.23. Liên thông và đồng phối bậc của các phép chiếu**
+**Bảng 3.18. Liên thông, assortativity và reciprocity qua ba năm**
 
-| Mạng | Độ đo | 2024 | 2025 | 2026 |
-| --- | --- | --- | --- | --- |
-| g2_uni_uni | Thành phần liên thông | 12 | 9 | 8 |
-| g2_uni_uni | Số đỉnh LCC | 219 | 229 | 231 |
-| g2_uni_uni | Assortativity | 0,3761 | 0,4246 | 0,3928 |
-| g3_major_major | Thành phần liên thông | 13 | 12 | 7 |
-| g3_major_major | Số đỉnh LCC | 358 | 361 | 364 |
-| g3_major_major | Assortativity | 0,6123 | 0,5943 | 0,6526 |
-
-*Nguồn: `data/network/summary.csv`.*
-
-**Bảng 3.24. Liên thông yếu/mạnh và tương hỗ G4**
-
-| Mạng | Độ đo | 2024 | 2025 | 2026 |
-| --- | --- | --- | --- | --- |
-| g4_competition | Thành phần yếu | 2 | 3 | 2 |
-| g4_competition | Thành phần mạnh | 17 | 13 | 35 |
-| g4_competition | Số đỉnh LCC yếu | 257 | 256 | 224 |
-| g4_competition | Reciprocity | 0,3415 | 0,3454 | 0,3377 |
+| Mạng / chỉ tiêu | 2024 | 2025 | 2026 |
+| --- | --- | --- | --- |
+| G1: Số thành phần liên thông | 13 | 12 | 14 |
+| G1: Assortativity theo bậc | −0,1478 | −0,1312 | −0,1241 |
+| G2: Số thành phần liên thông | 11 | 7 | 8 |
+| G2: Assortativity theo bậc | 0,3720 | 0,4271 | 0,3934 |
+| G3: Số thành phần liên thông | 13 | 10 | 7 |
+| G3: Assortativity theo bậc | 0,6165 | 0,6005 | 0,6562 |
+| G4: Thành phần liên thông yếu | 2 | 3 | 2 |
+| G4: Thành phần liên thông mạnh | 17 | 13 | 35 |
+| G4: Reciprocity | 0,3415 | 0,3454 | 0,3377 |
+| G4: Assortativity theo bậc | −0,0717 | −0,0187 | −0,1348 |
 
 *Nguồn: `data/network/summary.csv`.*
 
-**(5) Ý nghĩa.** Assortativity dương ở G2/G3 cho thấy các đỉnh có nhiều quan hệ thường nối với các đỉnh cũng nhiều quan hệ; đó là bậc trong mạng chiếu, không đồng nhất với quy mô tuyển sinh. G4 có reciprocity khoảng một phần ba vì cùng hai trường có thể đổi thứ tự điểm giữa các ngành. Số thành phần mạnh tăng lên 35 vào 2026 dù mật độ cao hơn cho thấy mật độ và khả năng đi hai chiều phản ánh hai mặt khác nhau.
+**(5) Ý nghĩa.** G2, G3 assortative mạnh (0,39; 0,66): trường đa ngành giống trường đa ngành, ngành phổ biến đi với ngành phổ biến. G1 disassortative (−0,12): trường mở nhiều ngành chủ yếu nối các ngành hiếm hơn và ngược lại. G4 có reciprocity 0,34: một phần ba quan hệ “nhắm lên” là hai chiều (điểm đảo thứ tự giữa các ngành); số SCC tăng 17 → 35 năm 2026 do bớt trường có điểm THPT thang 30.
 
 ## 3.3. Bảng tổng hợp toàn bộ chỉ tiêu đã xuất
 
-Các bảng dưới đây chép đủ các cột chỉ tiêu trong `summary.csv` cho từng mạng và ba năm. Những global chưa có trong tệp gốc được tính đọc từ DB ở Bảng 3.29, giữ rõ miền LCC/SCC và định nghĩa có hướng. Không coi số tính bổ sung là số đã ghi trong summary. “— chưa tính” nghĩa là bản chạy không xuất giá trị, không có nghĩa giá trị bằng 0. “Không áp dụng” dùng cho trường không phù hợp loại mạng hoặc thuật toán đang được báo cáo. `compute_seconds` là thời gian khối `undirected_metrics`, có cả so sánh mẫu; không phải thời gian toàn pipeline. Các thời gian là quan sát của lượt chạy đã lưu, phụ thuộc máy và không được xem như hằng số thuật toán.
+Các bảng sau chép đủ mọi cột của `summary.csv` cho từng mạng và ba năm (tên tiếng Việt kèm tên cột gốc). Ô “—” là chỉ tiêu không áp dụng cho mạng đó. `compute_seconds`, `gn_seconds` là thời gian của lượt chạy đã lưu, phụ thuộc máy.
 
-**Bảng 3.25. Toàn bộ trường summary của g1_uni_major**
+**Bảng 3.19. Toàn bộ chỉ tiêu G1**
 
-| Chỉ tiêu / tên cột | 2024 | 2025 | 2026 |
+| Chỉ tiêu (cột) | 2024 | 2025 | 2026 |
 | --- | --- | --- | --- |
-| Số đỉnh (`nodes`) | 707 | 712 | 705 |
-| Số trường (G1) (`universities`) | 279 | 278 | 276 |
-| Số ngành (G1) (`majors`) | 428 | 434 | 429 |
-| Số cạnh (`edges`) | 4.447 | 4.680 | 5.058 |
-| Mật độ hai phía (`bipartite_density`) | 0,0372 | 0,0388 | 0,0427 |
-| Số ngành TB/trường (`avg_majors_per_uni`) | 15,9391 | 16,8345 | 18,3261 |
-| Số trường TB/ngành (`avg_unis_per_major`) | 10,3902 | 10,7834 | 11,7902 |
-| Thành phần liên thông (vô hướng) (`components`) | 15 | 12 | 14 |
-| Mật độ một phía (`density`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Số đỉnh LCC (yếu nếu có hướng) (`lcc_nodes`) | Xem Bảng 3.29 | Xem Bảng 3.29 | Xem Bảng 3.29 |
-| Bậc trung bình (`avg_degree`) | Xem Bảng 3.29 | Xem Bảng 3.29 | Xem Bảng 3.29 |
-| Clustering TB (`avg_clustering`) | Xem Bảng 3.29 | Xem Bảng 3.29 | Xem Bảng 3.29 |
-| Transitivity (`transitivity`) | Xem Bảng 3.29 | Xem Bảng 3.29 | Xem Bảng 3.29 |
-| Đường đi TB trên LCC (`avg_path_length_lcc`) | Xem Bảng 3.29 | Xem Bảng 3.29 | Xem Bảng 3.29 |
-| Đường kính LCC (`diameter_lcc`) | Xem Bảng 3.29 | Xem Bảng 3.29 | Xem Bảng 3.29 |
-| Assortativity (`assortativity`) | Xem Bảng 3.29 | Xem Bảng 3.29 | Xem Bảng 3.29 |
-| Số cộng đồng Louvain (`louvain_communities`) | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn |
-| Q Louvain toàn mạng (`modularity_louvain`) | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn |
-| Số đỉnh mẫu GN/Louvain (`gn_sample_nodes`) | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn |
-| Q tốt nhất GN trên mẫu (`gn_best_modularity`) | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn |
-| Số cộng đồng GN ở Q tốt nhất (`gn_best_k`) | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn |
-| Thời gian GN mẫu (giây) (`gn_seconds`) | — chưa tính | — chưa tính | — chưa tính |
-| Q Louvain mẫu (`louvain_sample_modularity`) | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn |
-| Thời gian Louvain mẫu (giây) (`louvain_sample_seconds`) | — chưa tính | — chưa tính | — chưa tính |
-| Thời gian undirected_metrics (giây) (`compute_seconds`) | — chưa tính | — chưa tính | — chưa tính |
-| Ngưỡng Jaccard (`jaccard_threshold`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Thành phần yếu (`weak_components`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Thành phần mạnh (`strong_components`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Reciprocity (`reciprocity`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Spearman(authority, điểm TB) (`spearman_authority_vs_avg_score`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Spearman(PageRank, điểm TB) (`spearman_pagerank_vs_avg_score`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Khoảng điểm G4 (`score_gap`) | Không áp dụng | Không áp dụng | Không áp dụng |
+| Số đỉnh (`nodes`) | 689 | 697 | 697 |
+| Số trường (`universities`) | 276 | 278 | 276 |
+| Số ngành (`majors`) | 413 | 419 | 421 |
+| Số cạnh (`edges`) | 4.429 | 4.662 | 5.046 |
+| Mật độ hai phía (`bipartite_density`) | 0,0389 | 0,0400 | 0,0434 |
+| Mật độ (`density`) | 0,0187 | 0,0192 | 0,0208 |
+| Bậc trung bình (`avg_degree`) | 12,8563 | 13,3773 | 14,4792 |
+| Số ngành TB / trường (`avg_majors_per_uni`) | 16,0471 | 16,7698 | 18,2826 |
+| Số trường TB / ngành (`avg_unis_per_major`) | 10,7240 | 11,1265 | 11,9857 |
+| Số thành phần liên thông (`components`) | 13 | 12 | 14 |
+| Số đỉnh thành phần lớn nhất (LCC) (`lcc_nodes`) | 663 | 672 | 669 |
+| Hệ số phân cụm TB (`avg_clustering`) | 0,1291 | 0,1279 | 0,1227 |
+| Transitivity (`transitivity`) | 0 | 0 | 0 |
+| Đường đi ngắn nhất TB (LCC) (`avg_path_length_lcc`) | 3,3014 | 3,3171 | 3,2793 |
+| Đường kính (LCC) (`diameter_lcc`) | 8 | 8 | 7 |
+| Assortativity theo bậc (`assortativity`) | −0,1478 | −0,1312 | −0,1241 |
+| Số cộng đồng Louvain (`louvain_communities`) | 21 | 20 | 21 |
+| Modularity Q (Louvain) (`modularity_louvain`) | 0,4079 | 0,3929 | 0,3619 |
+| Power-law γ (bậc trường) (`uni_powerlaw_gamma`) | 2,9250 | 2,6632 | 2,8732 |
+| Power-law k_min (bậc trường) (`uni_powerlaw_kmin`) | 17 | 14 | 17 |
+| Power-law số đỉnh ở đuôi (bậc trường) (`uni_powerlaw_tail_nodes`) | 103 | 140 | 130 |
+| Power-law KS (bậc trường) (`uni_powerlaw_ks`) | 0,1006 | 0,1008 | 0,0883 |
+| Power-law γ (bậc ngành) (`major_powerlaw_gamma`) | 2,4595 | 2,3878 | 2,4384 |
+| Power-law k_min (bậc ngành) (`major_powerlaw_kmin`) | 16 | 14 | 17 |
+| Power-law số đỉnh ở đuôi (bậc ngành) (`major_powerlaw_tail_nodes`) | 85 | 105 | 92 |
+| Power-law KS (bậc ngành) (`major_powerlaw_ks`) | 0,0856 | 0,0948 | 0,0976 |
+| Thời gian tính độ đo (giây) (`compute_seconds`) | 5,3110 | 6,1401 | 5,7719 |
 
-*Nguồn: `data/network/summary.csv`; ô rỗng được ghi rõ theo phạm vi phép tính trong `sna/build.py`.*
+**Bảng 3.20. Toàn bộ chỉ tiêu G2**
 
-**Bảng 3.26. Toàn bộ trường summary của g2_uni_uni**
-
-| Chỉ tiêu / tên cột | 2024 | 2025 | 2026 |
+| Chỉ tiêu (cột) | 2024 | 2025 | 2026 |
 | --- | --- | --- | --- |
-| Số đỉnh (`nodes`) | 251 | 250 | 249 |
-| Số trường (G1) (`universities`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Số ngành (G1) (`majors`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Số cạnh (`edges`) | 2.566 | 2.455 | 2.531 |
-| Mật độ hai phía (`bipartite_density`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Số ngành TB/trường (`avg_majors_per_uni`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Số trường TB/ngành (`avg_unis_per_major`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Thành phần liên thông (vô hướng) (`components`) | 12 | 9 | 8 |
-| Mật độ một phía (`density`) | 0,0818 | 0,0789 | 0,0820 |
-| Số đỉnh LCC (yếu nếu có hướng) (`lcc_nodes`) | 219 | 229 | 231 |
-| Bậc trung bình (`avg_degree`) | 20,4462 | 19,6400 | 20,3293 |
-| Clustering TB (`avg_clustering`) | 0,5527 | 0,5544 | 0,5486 |
-| Transitivity (`transitivity`) | 0,5289 | 0,5504 | 0,5436 |
-| Đường đi TB trên LCC (`avg_path_length_lcc`) | 2,7652 | 3,3973 | 3,2475 |
-| Đường kính LCC (`diameter_lcc`) | 8 | 13 | 12 |
-| Assortativity (`assortativity`) | 0,3761 | 0,4246 | 0,3928 |
-| Số cộng đồng Louvain (`louvain_communities`) | 19 | 19 | 20 |
-| Q Louvain toàn mạng (`modularity_louvain`) | 0,4511 | 0,4939 | 0,4822 |
-| Số đỉnh mẫu GN/Louvain (`gn_sample_nodes`) | 60 | 60 | 60 |
-| Q tốt nhất GN trên mẫu (`gn_best_modularity`) | 0,0109 | 0,0042 | 0,0019 |
-| Số cộng đồng GN ở Q tốt nhất (`gn_best_k`) | 9 | 11 | 11 |
-| Thời gian GN mẫu (giây) (`gn_seconds`) | 8,2801 | 7,7934 | 7,1910 |
-| Q Louvain mẫu (`louvain_sample_modularity`) | 0,1394 | 0,1595 | 0,1438 |
-| Thời gian Louvain mẫu (giây) (`louvain_sample_seconds`) | 0,0137 | 0,0106 | 0,0056 |
-| Thời gian undirected_metrics (giây) (`compute_seconds`) | 9,4367 | 8,6075 | 8,0941 |
+| Số đỉnh (`nodes`) | 249 | 251 | 250 |
+| Số cạnh (`edges`) | 2.581 | 2.478 | 2.540 |
+| Mật độ (`density`) | 0,0836 | 0,0790 | 0,0816 |
+| Bậc trung bình (`avg_degree`) | 20,7309 | 19,7450 | 20,3200 |
+| Số thành phần liên thông (`components`) | 11 | 7 | 8 |
+| Số đỉnh thành phần lớn nhất (LCC) (`lcc_nodes`) | 219 | 235 | 232 |
+| Hệ số phân cụm TB (`avg_clustering`) | 0,5582 | 0,5493 | 0,5485 |
+| Transitivity (`transitivity`) | 0,5304 | 0,5493 | 0,5436 |
+| Đường đi ngắn nhất TB (LCC) (`avg_path_length_lcc`) | 2,7499 | 3,4301 | 3,2444 |
+| Đường kính (LCC) (`diameter_lcc`) | 8 | 13 | 12 |
+| Assortativity theo bậc (`assortativity`) | 0,3720 | 0,4271 | 0,3934 |
+| Số cộng đồng Louvain (`louvain_communities`) | 18 | 16 | 19 |
+| Modularity Q (Louvain) (`modularity_louvain`) | 0,4489 | 0,4939 | 0,4845 |
+| Thời gian tính độ đo (giây) (`compute_seconds`) | 60,1818 | 40,6768 | 51,8732 |
+| GN: số đỉnh xét (`gn_nodes`) | 249 | 251 | 250 |
+| GN: Q tốt nhất (`gn_best_modularity`) | 0,2659 | 0,3480 | 0,3239 |
+| GN: số cộng đồng tại Q tốt nhất (`gn_best_k`) | 36 | 25 | 32 |
+| GN: k tối đa đã xét (`gn_max_k_checked`) | 40 | 40 | 40 |
+| GN: thời gian (giây) (`gn_seconds`) | 59,4702 | 39,9793 | 51,2114 |
+| Louvain không trọng số: Q (`louvain_unweighted_modularity`) | 0,4019 | 0,4421 | 0,4347 |
+| Louvain không trọng số: số cộng đồng (`louvain_unweighted_communities`) | 18 | 16 | 16 |
+| Power-law γ (`powerlaw_gamma`) | 4,5467 | 2,5747 | 2,6435 |
+| Power-law k_min (`powerlaw_kmin`) | 38 | 16 | 16 |
+| Power-law số đỉnh ở đuôi (`powerlaw_tail_nodes`) | 50 | 134 | 143 |
+| Power-law KS (`powerlaw_ks`) | 0,1137 | 0,1108 | 0,0938 |
 | Ngưỡng Jaccard (`jaccard_threshold`) | 0,2500 | 0,2500 | 0,2500 |
-| Thành phần yếu (`weak_components`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Thành phần mạnh (`strong_components`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Reciprocity (`reciprocity`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Spearman(authority, điểm TB) (`spearman_authority_vs_avg_score`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Spearman(PageRank, điểm TB) (`spearman_pagerank_vs_avg_score`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Khoảng điểm G4 (`score_gap`) | Không áp dụng | Không áp dụng | Không áp dụng |
 
-*Nguồn: `data/network/summary.csv`; ô rỗng được ghi rõ theo phạm vi phép tính trong `sna/build.py`.*
+**Bảng 3.21. Toàn bộ chỉ tiêu G3**
 
-**Bảng 3.27. Toàn bộ trường summary của g3_major_major**
-
-| Chỉ tiêu / tên cột | 2024 | 2025 | 2026 |
+| Chỉ tiêu (cột) | 2024 | 2025 | 2026 |
 | --- | --- | --- | --- |
-| Số đỉnh (`nodes`) | 387 | 387 | 377 |
-| Số trường (G1) (`universities`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Số ngành (G1) (`majors`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Số cạnh (`edges`) | 1.360 | 1.431 | 1.412 |
-| Mật độ hai phía (`bipartite_density`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Số ngành TB/trường (`avg_majors_per_uni`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Số trường TB/ngành (`avg_unis_per_major`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Thành phần liên thông (vô hướng) (`components`) | 13 | 12 | 7 |
-| Mật độ một phía (`density`) | 0,0182 | 0,0192 | 0,0199 |
-| Số đỉnh LCC (yếu nếu có hướng) (`lcc_nodes`) | 358 | 361 | 364 |
-| Bậc trung bình (`avg_degree`) | 7,0284 | 7,3953 | 7,4907 |
-| Clustering TB (`avg_clustering`) | 0,5285 | 0,5701 | 0,5180 |
-| Transitivity (`transitivity`) | 0,6417 | 0,6634 | 0,6651 |
-| Đường đi TB trên LCC (`avg_path_length_lcc`) | 5,7182 | 5,6231 | 5,6565 |
-| Đường kính LCC (`diameter_lcc`) | 17 | 14 | 14 |
-| Assortativity (`assortativity`) | 0,6123 | 0,5943 | 0,6526 |
-| Số cộng đồng Louvain (`louvain_communities`) | 28 | 27 | 19 |
-| Q Louvain toàn mạng (`modularity_louvain`) | 0,8394 | 0,8460 | 0,8363 |
-| Số đỉnh mẫu GN/Louvain (`gn_sample_nodes`) | 60 | 60 | 60 |
-| Q tốt nhất GN trên mẫu (`gn_best_modularity`) | 0,6384 | 0,6323 | 0,6598 |
-| Số cộng đồng GN ở Q tốt nhất (`gn_best_k`) | 7 | 6 | 6 |
-| Thời gian GN mẫu (giây) (`gn_seconds`) | 0,4907 | 0,4968 | 0,6619 |
-| Q Louvain mẫu (`louvain_sample_modularity`) | 0,6384 | 0,6337 | 0,6662 |
-| Thời gian Louvain mẫu (giây) (`louvain_sample_seconds`) | 0,0157 | 0,0053 | 0,0025 |
-| Thời gian undirected_metrics (giây) (`compute_seconds`) | 1,6113 | 1,4918 | 1,7016 |
+| Số đỉnh (`nodes`) | 374 | 371 | 370 |
+| Số cạnh (`edges`) | 1.316 | 1.381 | 1.391 |
+| Mật độ (`density`) | 0,0189 | 0,0201 | 0,0204 |
+| Bậc trung bình (`avg_degree`) | 7,0374 | 7,4447 | 7,5189 |
+| Số thành phần liên thông (`components`) | 13 | 10 | 7 |
+| Số đỉnh thành phần lớn nhất (LCC) (`lcc_nodes`) | 345 | 350 | 357 |
+| Hệ số phân cụm TB (`avg_clustering`) | 0,5149 | 0,5611 | 0,5122 |
+| Transitivity (`transitivity`) | 0,6454 | 0,6690 | 0,6679 |
+| Đường đi ngắn nhất TB (LCC) (`avg_path_length_lcc`) | 5,6952 | 5,6750 | 5,6705 |
+| Đường kính (LCC) (`diameter_lcc`) | 17 | 14 | 14 |
+| Assortativity theo bậc (`assortativity`) | 0,6165 | 0,6005 | 0,6562 |
+| Số cộng đồng Louvain (`louvain_communities`) | 27 | 23 | 20 |
+| Modularity Q (Louvain) (`modularity_louvain`) | 0,8358 | 0,8443 | 0,8363 |
+| Thời gian tính độ đo (giây) (`compute_seconds`) | 34,3414 | 24,5849 | 37,1930 |
+| GN: số đỉnh xét (`gn_nodes`) | 374 | 371 | 370 |
+| GN: Q tốt nhất (`gn_best_modularity`) | 0,8045 | 0,8260 | 0,8066 |
+| GN: số cộng đồng tại Q tốt nhất (`gn_best_k`) | 26 | 22 | 23 |
+| GN: k tối đa đã xét (`gn_max_k_checked`) | 40 | 40 | 40 |
+| GN: thời gian (giây) (`gn_seconds`) | 33,5918 | 23,8528 | 36,1405 |
+| Louvain không trọng số: Q (`louvain_unweighted_modularity`) | 0,8090 | 0,8287 | 0,8167 |
+| Louvain không trọng số: số cộng đồng (`louvain_unweighted_communities`) | 25 | 21 | 17 |
+| Power-law γ (`powerlaw_gamma`) | 2,9230 | 2,5054 | 2,8913 |
+| Power-law k_min (`powerlaw_kmin`) | 7 | 6 | 8 |
+| Power-law số đỉnh ở đuôi (`powerlaw_tail_nodes`) | 170 | 193 | 145 |
+| Power-law KS (`powerlaw_ks`) | 0,1030 | 0,1255 | 0,1197 |
 | Ngưỡng Jaccard (`jaccard_threshold`) | 0,2500 | 0,2500 | 0,2500 |
-| Thành phần yếu (`weak_components`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Thành phần mạnh (`strong_components`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Reciprocity (`reciprocity`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Spearman(authority, điểm TB) (`spearman_authority_vs_avg_score`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Spearman(PageRank, điểm TB) (`spearman_pagerank_vs_avg_score`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Khoảng điểm G4 (`score_gap`) | Không áp dụng | Không áp dụng | Không áp dụng |
 
-*Nguồn: `data/network/summary.csv`; ô rỗng được ghi rõ theo phạm vi phép tính trong `sna/build.py`.*
+**Bảng 3.22. Toàn bộ chỉ tiêu G4**
 
-**Bảng 3.28. Toàn bộ trường summary của g4_competition**
-
-| Chỉ tiêu / tên cột | 2024 | 2025 | 2026 |
+| Chỉ tiêu (cột) | 2024 | 2025 | 2026 |
 | --- | --- | --- | --- |
 | Số đỉnh (`nodes`) | 259 | 260 | 226 |
-| Số trường (G1) (`universities`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Số ngành (G1) (`majors`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Số cạnh (`edges`) | 10.541 | 10.789 | 9.215 |
-| Mật độ hai phía (`bipartite_density`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Số ngành TB/trường (`avg_majors_per_uni`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Số trường TB/ngành (`avg_unis_per_major`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Thành phần liên thông (vô hướng) (`components`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Mật độ một phía (`density`) | 0,1577 | 0,1602 | 0,1812 |
-| Số đỉnh LCC (yếu nếu có hướng) (`lcc_nodes`) | 257 | 256 | 224 |
-| Bậc trung bình (`avg_degree`) | Xem Bảng 3.29 | Xem Bảng 3.29 | Xem Bảng 3.29 |
-| Clustering TB (`avg_clustering`) | Xem Bảng 3.29 | Xem Bảng 3.29 | Xem Bảng 3.29 |
-| Transitivity (`transitivity`) | Xem Bảng 3.29 | Xem Bảng 3.29 | Xem Bảng 3.29 |
-| Đường đi TB trên LCC (`avg_path_length_lcc`) | Xem Bảng 3.29 | Xem Bảng 3.29 | Xem Bảng 3.29 |
-| Đường kính LCC (`diameter_lcc`) | Xem Bảng 3.29 | Xem Bảng 3.29 | Xem Bảng 3.29 |
-| Assortativity (`assortativity`) | Xem Bảng 3.29 | Xem Bảng 3.29 | Xem Bảng 3.29 |
-| Số cộng đồng Louvain (`louvain_communities`) | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn |
-| Q Louvain toàn mạng (`modularity_louvain`) | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn |
-| Số đỉnh mẫu GN/Louvain (`gn_sample_nodes`) | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn |
-| Q tốt nhất GN trên mẫu (`gn_best_modularity`) | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn |
-| Số cộng đồng GN ở Q tốt nhất (`gn_best_k`) | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn |
-| Thời gian GN mẫu (giây) (`gn_seconds`) | — chưa tính | — chưa tính | — chưa tính |
-| Q Louvain mẫu (`louvain_sample_modularity`) | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn | Không áp dụng trong phân hoạch đã chọn |
-| Thời gian Louvain mẫu (giây) (`louvain_sample_seconds`) | — chưa tính | — chưa tính | — chưa tính |
-| Thời gian undirected_metrics (giây) (`compute_seconds`) | — chưa tính | — chưa tính | — chưa tính |
-| Ngưỡng Jaccard (`jaccard_threshold`) | Không áp dụng | Không áp dụng | Không áp dụng |
-| Thành phần yếu (`weak_components`) | 2 | 3 | 2 |
-| Thành phần mạnh (`strong_components`) | 17 | 13 | 35 |
+| Số cạnh (`edges`) | 10.542 | 10.788 | 9.215 |
+| Mật độ (`density`) | 0,1578 | 0,1602 | 0,1812 |
+| Bậc trung bình (`avg_degree`) | 40,7027 | 41,4923 | 40,7743 |
+| Số đỉnh thành phần lớn nhất (LCC) (`lcc_nodes`) | 257 | 256 | 224 |
+| Hệ số phân cụm TB (`avg_clustering`) | 0,4700 | 0,4521 | 0,4637 |
+| Transitivity (`transitivity`) | 0,5845 | 0,5684 | 0,5444 |
+| Đường đi ngắn nhất TB (LCC) (`avg_path_length_lcc`) | 1,8558 | 1,7984 | 1,7399 |
+| Đường kính (LCC) (`diameter_lcc`) | 4 | 4 | 4 |
+| Assortativity theo bậc (`assortativity`) | −0,0717 | −0,0187 | −0,1348 |
+| Số cộng đồng Louvain (`louvain_communities`) | 6 | 6 | 5 |
+| Modularity Q (Louvain) (`modularity_louvain`) | 0,3685 | 0,3642 | 0,3184 |
+| Thành phần liên thông yếu (`weak_components`) | 2 | 3 | 2 |
+| Thành phần liên thông mạnh (`strong_components`) | 17 | 13 | 35 |
 | Reciprocity (`reciprocity`) | 0,3415 | 0,3454 | 0,3377 |
-| Spearman(authority, điểm TB) (`spearman_authority_vs_avg_score`) | -0,4012 | -0,4139 | 0,2343 |
-| Spearman(PageRank, điểm TB) (`spearman_pagerank_vs_avg_score`) | 0,5669 | 0,5352 | 0,6069 |
-| Khoảng điểm G4 (`score_gap`) | 2 | 2 | 2 |
+| Số đỉnh SCC lớn nhất (`scc_nodes`) | 243 | 248 | 192 |
+| Đường đi TB có hướng (SCC) (`scc_avg_path_length`) | 2,1242 | 2,0691 | 1,9803 |
+| Đường kính có hướng (SCC) (`scc_diameter`) | 6 | 5 | 4 |
+| Power-law γ (bậc vào) (`in_powerlaw_gamma`) | 6,2016 | 5,2177 | 3,8357 |
+| Power-law k_min (bậc vào) (`in_powerlaw_kmin`) | 77 | 69 | 59 |
+| Power-law số đỉnh ở đuôi (bậc vào) (`in_powerlaw_tail_nodes`) | 50 | 64 | 77 |
+| Power-law KS (bậc vào) (`in_powerlaw_ks`) | 0,1458 | 0,0866 | 0,1252 |
+| Spearman(authority, điểm TB) (`spearman_authority_vs_avg_score`) | −0,4013 | −0,4098 | 0,2349 |
+| Spearman(PageRank, điểm TB) (`spearman_pagerank_vs_avg_score`) | 0,5670 | 0,5421 | 0,6075 |
+| Khoảng điểm tối đa (`score_gap`) | 2 | 2 | 2 |
 
-*Nguồn: `data/network/summary.csv`; ô rỗng được ghi rõ theo phạm vi phép tính trong `sna/build.py`.*
-
-
-Các đại lượng dưới đây được tính bổ sung trực tiếp từ `data/eduradar.db` bằng `scripts/report_network_supplement.py`, không ghi đè `data/network/summary.csv`. Script dựng lại bốn mạng với đúng hàm và tham số của `sna/build.py`, rồi assert số đỉnh/cạnh của cả 12 mạng khớp summary đã lưu trước khi xuất kết quả JSON ra stdout. Tất cả độ dài đường đi, bậc, clustering và assortativity trong bảng bổ sung đều không dùng trọng số. Số thực làm tròn bốn chữ số như summary hiện hành.
-
-**Bảng 3.29. Các độ đo toàn mạng bổ sung của G1 và G4**
-
-| Mạng | Chỉ tiêu và phạm vi tính | 2024 | 2025 | 2026 |
-| --- | --- | ---: | ---: | ---: |
-| G1 | Số đỉnh LCC | 673 | 687 | 677 |
-| G1 | Bậc trung bình toàn mạng, $2m/n$ | 12,5799 | 13,1461 | 14,3489 |
-| G1 | Average shortest path length trên LCC | 3,3195 | 3,3482 | 3,2963 |
-| G1 | Diameter trên LCC | 8 | 8 | 7 |
-| G1 | Degree assortativity, toàn mạng hai phía | −0,1448 | −0,1280 | −0,1221 |
-| G1 | Average clustering, toàn mạng | 0,0000 | 0,0000 | 0,0000 |
-| G1 | Transitivity, toàn mạng | 0,0000 | 0,0000 | 0,0000 |
-| G4 | Số đỉnh thành phần liên thông yếu lớn nhất | 257 | 256 | 224 |
-| G4 | Số đỉnh thành phần liên thông mạnh lớn nhất | 243 | 248 | 192 |
-| G4 | Average shortest path length **có hướng trên SCC lớn nhất** | 2,1242 | 2,0676 | 1,9803 |
-| G4 | Diameter **có hướng trên SCC lớn nhất** | 6 | 5 | 4 |
-| G4 | Bậc tổng trung bình toàn mạng, $2m/n$ | 81,3977 | 82,9923 | 81,5487 |
-| G4 | Bậc vào trung bình toàn mạng, $m/n$ | 40,6988 | 41,4962 | 40,7743 |
-| G4 | Bậc ra trung bình toàn mạng, $m/n$ | 40,6988 | 41,4962 | 40,7743 |
-| G4 | Average clustering **có hướng**, toàn mạng | 0,4701 | 0,4520 | 0,4637 |
-| G4 | Degree assortativity **out-degree nguồn / in-degree đích** | 0,0137 | −0,0744 | 0,0145 |
-| G4 | Transitivity của **đồ thị bỏ hướng**, toàn mạng | 0,5845 | 0,5683 | 0,5444 |
-
-*Nguồn: `data/eduradar.db`; tính bằng `scripts/report_network_supplement.py`, tái dùng hàm dựng mạng trong `sna/build.py`; quy mô được đối chiếu `data/network/summary.csv`. Dòng LCC yếu G4 cũng khớp giá trị đã có trong summary; các dòng bổ sung khác không được tuyên bố là cột đã lưu trong summary.*
-
-**Cách tính và giới hạn diễn giải.** G1 là hai phía nên không có tam giác, do đó clustering và transitivity bằng 0 theo định nghĩa tam giác thông thường; kết quả này không có nghĩa không tồn tại nhóm trường/ngành liên quan. Assortativity G1 so bậc của hai loại đỉnh khác nhau trong cùng một đồ thị, không phải assortativity của một phép chiếu trường hoặc ngành; các giá trị âm không thể trực tiếp so như cùng ý nghĩa với G2/G3.
-
-G4 chỉ dùng LCC yếu để mô tả phạm vi liên thông khi bỏ hướng. Để tính đường đi và đường kính **giữ hướng**, script lấy thành phần liên thông mạnh lớn nhất bằng `max(nx.strongly_connected_components(g4), key=len)`, sau đó gọi `nx.average_shortest_path_length` và `nx.diameter` trên đồ thị con cảm sinh ấy. Không lấy tất cả đỉnh của LCC yếu làm miền đường đi có hướng vì nhiều cặp có thể không tới được nhau. Ví dụ năm 2026, đường đi trung bình 1,9803 chỉ đại diện SCC 192 trường, không phải toàn bộ 226 trường G4.
-
-Clustering G4 gọi `nx.average_clustering(g4, weight=None)` trực tiếp trên đồ thị có hướng. Định nghĩa đỉnh trong trường hợp có hướng dùng
-
-$$C_v^{dir}=\frac{T_v^{dir}}{2\,[k_v^{tot}(k_v^{tot}-1)-2k_v^{\leftrightarrow}]},$$
-
-trong đó $T_v^{dir}$ đếm tam giác có hướng theo quy tắc của hàm, $k_v^{tot}=k_v^{in}+k_v^{out}$ và $k_v^{\leftrightarrow}$ là số hàng xóm có cạnh qua lại. Vì định nghĩa khác, không thay chỉ tiêu này bằng average clustering của G4 sau bỏ hướng. Assortativity G4 gọi `nx.degree_assortativity_coefficient(g4)` với mặc định `x='out'`, `y='in'`, `weight=None`. Transitivity G4 được tính riêng bằng `nx.transitivity(g4.to_undirected())`, không được gọi là transitivity có hướng; hai cạnh ngược chiều được gộp thành một cạnh khi bỏ hướng, và trọng số không được dùng trong phép tính này.
-
-Louvain/modularity và so sánh GN ở báo cáo chỉ áp dụng G2/G3; với G1/G4, các ô tương ứng có thể ghi **“không áp dụng trong mô hình phân hoạch đã chọn”**. Đây là phạm vi lựa chọn của đồ án, không có nghĩa những thuật toán ấy tuyệt đối không thể áp dụng cho G1/G4. Các cột thời gian chưa chạy cho G1/G4 vẫn ghi **“— chưa tính”**.
-
-Lệnh tái lập (chỉ đọc và xuất JSON ra stdout):
-
-```powershell
-.venv/Scripts/python.exe -X utf8 scripts/report_network_supplement.py
-```
-
-Script còn tái tính ba phép temporal validation AA từ DB và các CSV dự đoán đã lưu, với cùng quy tắc tên–mã và mẫu số 300 ở Chương 4. Kết quả top300 lần lượt là 56/300 cho 2024→2025, 36/300 cho 2025→2026 và 69/300 cho 2024→2026; nhờ vậy phần kiểm chứng có thể tái lập cùng bảng global bổ sung mà không chạy lại centrality.
-
-
+*Nguồn Bảng 3.19–3.22: `data/network/summary.csv`; bảng sinh bằng `scripts/report_sna_tables.py`.*
 
 ## 3.4. Nhận xét cấu trúc và thay đổi 2024–2026
 
-**Dấu hiệu thế giới nhỏ.** G2 có đường đi trung bình trong LCC 2,7652–3,3973 bước và clustering trung bình 0,5486–0,5544, cao hơn mật độ 0,0789–0,0820. Đây là những dấu hiệu phù hợp với cấu trúc thế giới nhỏ: nhiều nhóm khép kín nhưng vẫn nối qua một số cầu nối. Đồ án chưa tạo tập mô hình null cùng quy mô/phân bố bậc, chưa đo tỷ số small-world hay kiểm định độ khác biệt, nên không xác nhận chính thức G2 là mạng small-world. G3 có đường đi khoảng 5,6–5,7 bước, transitivity cao và Q khoảng 0,84, thể hiện phân khối ngành rõ; cần cùng hạn chế kiểm định như G2.
+**Dấu hiệu thế giới nhỏ.** G2 có đường đi trung bình trong LCC 2,75–3,43 bước và clustering trung bình 0,55–0,56, gấp 6–7 lần mật độ 0,08. Đây là dấu hiệu phù hợp cấu trúc thế giới nhỏ; đồ án chưa so với mô hình null cùng phân bố bậc nên không khẳng định chính thức.
 
-**Mở rộng danh mục ngành ở G1.** Cạnh tăng từ 4.447 lên 5.058 (khoảng 13,7%), trong khi trường giảm 279 xuống 276 và ngành 428 lên 429. Số ngành trung bình mỗi trường tăng 15,9391 lên 18,3261. Như vậy tập dữ liệu cho thấy quan hệ trường–ngành dày hơn; không được đồng nhất cạnh với số chỉ tiêu hoặc số sinh viên.
+**Mở rộng danh mục ngành ở G1.** Cạnh tăng 4.429 → 5.046 (+13,9%) trong khi số trường gần như giữ nguyên (276 → 276) và số ngành tăng 413 → 421; số ngành trung bình mỗi trường tăng 16,05 → 18,28. Cạnh không đồng nghĩa chỉ tiêu hay số sinh viên.
 
-**G2 và G3 thay đổi ở ngưỡng 0,25.** G2 giảm từ 12 xuống 8 thành phần, LCC tăng từ 219 lên 231 đỉnh; đường đi trung bình và đường kính cũng tăng, phù hợp khả năng nối thêm các phần rìa. G3 giảm từ 13 xuống 7 thành phần và 28 xuống 19 cộng đồng; transitivity tăng 0,6417 lên 0,6651 trong khi Q vẫn cao. Có thể mô tả là liên kết/hội tụ hơn trong cấu hình này, nhưng kiểm tra độ nhạy cho thấy nhận xét về liên thông có thể đảo chiều ở Jaccard 0,35. Chiều tăng Q của G2 và transitivity của G3 vững hơn qua các ngưỡng đã khảo sát.
+**G2, G3 ở ngưỡng 0,25.** G2 giảm 11 → 8 thành phần, LCC tăng 219 → 232 đỉnh; G3 giảm 13 → 7 thành phần, 27 → 20 cộng đồng, transitivity tăng 0,6454 → 0,6679 trong khi Q giữ ≈ 0,84. Phân tích độ nhạy (mục 4.5) cho thấy chiều “liên thông hơn” của G2/G3 chỉ đúng ở 0,25, còn chiều tăng Q của G2 và transitivity của G3 vững hơn.
 
-**G4 cần tách biến động cấu trúc khỏi độ phủ.** Đỉnh giảm 259 xuống 226, cạnh giảm 10.541 xuống 9.215; mật độ tăng 0,1577 lên 0,1812 vì mẫu số cũng giảm. Điểm THPT thang 30 có mã ngành trong dữ liệu đầu vào của `load` phủ 276, 270 và 238 trường qua ba năm trước lọc cờ và loại cô lập. Sự khác nhau này không đủ chứng minh cạnh tranh ngoài đời đã giảm. Authority đổi dấu tương quan, còn PageRank giữ tương quan dương, là hai quan sát cần giải thích theo phương pháp và phân bố điểm ở Chương 4.
+**G4 cần tách biến động cấu trúc khỏi độ phủ.** Đỉnh giảm 259 → 226, cạnh 10.542 → 9.215, mật độ tăng 0,158 → 0,181 vì mẫu số giảm; số trường có điểm THPT thang 30 (có mã ngành) giảm 272 → 238 (Bảng 4.6). Không đủ căn cứ kết luận cạnh tranh ngoài thực tế giảm.
 
-*Nguồn cho mục 3.4: `data/network/summary.csv`, `data/eduradar.db` (đếm `COUNT(DISTINCT uni_code)` với `major_code IS NOT NULL`, THPT, thang 30), `docs/do_nhay_sna.md`.*
+*Nguồn mục 3.4: `data/network/summary.csv`, `data/eduradar.db`, `docs/do_nhay_sna.md`.*
 
 # Chương 4. Thuật toán áp dụng
 
 ## 4.1. Louvain: phát hiện cộng đồng trường và ngành
 
-**Mục tiêu và lý do chọn.** Louvain tìm nhóm đỉnh có quan hệ nội bộ mạnh để nhận diện nhóm trường có danh mục giống nhau trong G2 và khối ngành đồng xuất hiện trong G3. Chọn thuật toán vì xử lý được trọng số Jaccard, chi phí phù hợp quy mô vài trăm đỉnh và cho phân hoạch có thể đưa lên web.
+**Mục tiêu và lý do chọn.** Nhận diện nhóm trường có danh mục ngành giống nhau (G2) và khối ngành thường mở cùng nhau (G3). Louvain xử lý được trọng số Jaccard, nhanh ở quy mô vài trăm đỉnh và cho phân hoạch đưa lên web (màu nút, bộ lọc cộng đồng).
 
-**Nguyên lý và mã giả.** Thuật toán luân phiên hai pha: chuyển từng đỉnh sang cộng đồng lân cận nếu làm tăng modularity, rồi thu gọn mỗi cộng đồng thành một siêu đỉnh và lặp lại. Kết quả là tối ưu cục bộ, không bảo đảm Q cực đại toàn cục.
+**Nguyên lý và mã giả.** Hai pha luân phiên: chuyển từng đỉnh sang cộng đồng láng giềng nếu làm tăng $Q$, rồi gộp mỗi cộng đồng thành siêu đỉnh và lặp lại. Kết quả là tối ưu cục bộ.
 
 ```text
 khởi tạo mỗi đỉnh là một cộng đồng
 lặp:
-    duyệt đỉnh, thử chuyển sang cộng đồng hàng xóm
-    nhận chuyển có ΔQ dương lớn nhất; lặp đến khi không cải thiện
-    thu gọn cộng đồng thành siêu đỉnh, cộng trọng số các cạnh
-    dừng nếu mức tăng Q không đạt ngưỡng
-trả phân hoạch cuối, tính Q trên mạng đầu vào
+    với từng đỉnh, chuyển sang cộng đồng láng giềng có ΔQ dương lớn nhất
+    lặp đến khi không còn cải thiện
+    gộp cộng đồng thành siêu đỉnh (cộng trọng số cạnh)
+dừng khi Q không tăng; trả phân hoạch, tính Q trên mạng gốc
 ```
 
-**Tham số và độ phức tạp.** Code gọi `louvain_communities(g,weight="weight",seed=42)`, resolution mặc định 1, không chỉnh threshold hoặc số mức. Jaccard đầu vào là 0,25. Mỗi lượt cục bộ thường duyệt quan hệ lân cận gần $O(m)$; tổng chi phí phụ thuộc số lượt và số mức thu gọn, không có bảo đảm tuyến tính cho mọi đầu vào. Seed cố định hỗ trợ tái lập trong cùng môi trường; không loại bỏ tính phụ thuộc nghiệm cục bộ.
+**Tham số và độ phức tạp.** `louvain_communities(g, weight="weight", seed=42)`, resolution 1. Mỗi lượt cục bộ khoảng $O(m)$; thực nghiệm dưới 1 giây cho G2/G3. Seed cố định để tái lập; độ dao động theo seed đo ở mục 4.5.
 
-**Kết quả.**
+**Kết quả.** Số cộng đồng và Q ba năm ở Bảng 3.17. Năm 2026:
 
-**Bảng 4.1. Louvain toàn mạng qua ba năm**
+**Bảng 4.1. Cộng đồng G2 năm 2026 và trường tiêu biểu**
 
-| Mạng | Độ đo | 2024 | 2025 | 2026 |
-| --- | --- | --- | --- | --- |
-| g2_uni_uni | Đỉnh | 251 | 250 | 249 |
-| g2_uni_uni | Cạnh | 2.566 | 2.455 | 2.531 |
-| g2_uni_uni | Cộng đồng | 19 | 19 | 20 |
-| g2_uni_uni | Q | 0,4511 | 0,4939 | 0,4822 |
-| g3_major_major | Đỉnh | 387 | 387 | 377 |
-| g3_major_major | Cạnh | 1.360 | 1.431 | 1.412 |
-| g3_major_major | Cộng đồng | 28 | 27 | 19 |
-| g3_major_major | Q | 0,8394 | 0,8460 | 0,8363 |
-
-*Nguồn: `data/network/summary.csv`.*
-
-**Bảng 4.2. Cộng đồng g2_uni_uni năm 2026 và tên tiêu biểu**
-
-| ID | Số đỉnh | Bốn đỉnh có bậc cao nhất (hoặc toàn bộ nếu nhỏ hơn bốn) |
+| Cộng đồng | Số đỉnh | Bốn đỉnh bậc cao nhất |
 | --- | --- | --- |
-| 0 | 59 | Trường Đại Học Ngoại Ngữ Tin Học TPHCM; Trường Đại Học Công Nghệ và Quản Lý Hữu Nghị; Trường Đại học Hùng Vương TPHCM; Trường Đại Học Kinh Tế Kỹ Thuật Bình Dương |
-| 1 | 33 | Trường Đại Học Hải Phòng; Trường Đại Học Hà Tĩnh; Trường Đại Học Hùng Vương; Trường Đại Học Hải Dương |
-| 2 | 31 | Đại học Kinh Tế TPHCM - Phân hiệu Vĩnh Long; Trường Đại Học Ngân Hàng TPHCM; Học Viện Ngân Hàng; Trường Đại Học Kinh Tế Công Nghiệp Long An |
-| 3 | 25 | Trường Đại Học Công Nghiệp Việt Trì; Trường Đại Học Kinh tế công nghệ Thái Nguyên; Trường Đại Học Kinh Tế Kỹ Thuật Công Nghiệp; Trường Đại Học Võ Trường Toản |
-| 4 | 24 | Trường Đại học Y Dược - ĐHQG Hà Nội; Trường Đại học Kỹ thuật Y Dược Đà Nẵng; Trường Y Dược Đà Nẵng; Trường Đại Học Y Dược Huế |
-| 5 | 22 | Trường Đại Học Thủy Lợi; Trường Đại học Công nghệ Giao thông vận tải; Phân hiệu Đại học Xây dựng miền Trung tại Đà Nẵng; Trường Đại Học Xây Dựng Miền Trung |
-| 6 | 6 | Học Viện Công Nghệ Bưu Chính Viễn Thông; Trường Đại học Quản lý và công nghệ TPHCM; Trường Đại học Công nghệ Thông tin và Truyền thông Việt Hàn - Đại học Đà Nẵng; Học Viện Công Nghệ Bưu Chính Viễn Thông (Cơ sở TP.HCM) |
+| 1 | 61 | Trường Đại Học Ngoại Ngữ Tin Học TPHCM; Trường Đại Học Công Nghệ và Quản Lý Hữu Nghị; Trường Đại học Hùng Vương TPHCM; Trường Đại Học Kinh Tế Kỹ Thuật Bình Dương |
+| 2 | 41 | Đại học Kinh Tế TPHCM - Phân hiệu Vĩnh Long; Trường Đại Học Ngân Hàng TPHCM; Học Viện Ngân Hàng; Trường Đại Học Kinh Tế Công Nghiệp Long An |
+| 3 | 34 | Trường Đại Học Hải Phòng; Trường Đại Học Hà Tĩnh; Trường Đại Học Hùng Vương; Trường Đại Học Hải Dương |
+| 4 | 26 | Trường Đại học Y Dược - ĐHQG Hà Nội; Trường Đại học Kỹ thuật Y Dược Đà Nẵng; Trường Y Dược Đà Nẵng; Trường Đại Học Y Dược Huế |
+| 5 | 22 | Trường Đại Học Thủy Lợi; Phân hiệu Đại học Xây dựng miền Trung tại Đà Nẵng; Trường Đại Học Xây Dựng Miền Trung; Trường Đại Học Giao Thông Vận Tải (Cơ sở 2) |
+| 6 | 19 | Học Viện Công Nghệ Bưu Chính Viễn Thông; Trường Đại học Công Nghệ Thông Tin và Truyền Thông Thái Nguyên; Trường Đại Học Sư Phạm Kỹ Thuật Vinh; Trường Đại Học Tiền Giang |
 | 7 | 6 | Trường Ngoại Ngữ Thái Nguyên; Trường Đại Học Ngoại Ngữ Đà Nẵng; Trường Đại Học Ngoại Ngữ Huế; Học Viện Khoa Học Quân Sự - Hệ Dân sự |
-| 8 | 6 | Học Viện An Ninh Nhân Dân; Trường Sĩ Quan Thông Tin - Hệ Dân Sự - Đại Học Thông Tin Liên Lạc; Trường Đại Học An Ninh Nhân Dân; Học Viện Cảnh Sát Nhân Dân |
-| 9 | 6 | Khoa Giáo Dục Thể Chất Huế; Trường Đại Học Sư Phạm Thể Dục Thể Thao TPHCM; Trường Đại Học Thể Dục Thể Thao Bắc Ninh; Trường Đại Học Sư Phạm Thể Dục Thể Thao Hà Nội |
-| 10 | 5 | Trường Đại Học Luật Hà Nội; Trường Đại học Luật Huế; Trường Đại học Kiểm Sát ; Học viện Tòa án |
+| 8 | 6 | Khoa Giáo Dục Thể Chất Huế; Trường Đại Học Sư Phạm Thể Dục Thể Thao TPHCM; Trường Đại Học Thể Dục Thể Thao Bắc Ninh; Trường Đại Học Sư Phạm Thể Dục Thể Thao Hà Nội |
+| 9 | 5 | Trường Đại Học Luật Hà Nội; Trường Đại học Luật Huế; Trường Đại học Kiểm Sát ; Học viện Tòa án |
+| 10 | 5 | Trường Đại Học Nghệ Thuật Huế; Trường Đại Học Mỹ Thuật Công Nghiệp; Trường Đại Học Mỹ Thuật Việt Nam; Trường Đại Học Mỹ Thuật TPHCM |
 | 11 | 5 | Học Viện Hành Chính và Quản trị công; Học Viện Thanh Thiếu Niên Việt Nam; Học viện cán bộ TPHCM; Trường Đại Học Văn Hóa Hà Nội |
-| 12 | 5 | Trường Đại Học Nghệ Thuật Huế; Trường Đại Học Mỹ Thuật Công Nghiệp; Trường Đại Học Mỹ Thuật Việt Nam; Trường Đại Học Mỹ Thuật TPHCM |
-| 13 | 4 | Trường Đại Học Khoa Học Thái Nguyên; Trường Đại Học Khoa Học Tự Nhiên Hà Nội; Trường Đại Học Khoa Học Huế; Trường Đại Học Khoa Học Tự Nhiên TPHCM |
+| 12 | 4 | Trường Đại Học Khoa Học Thái Nguyên; Trường Đại Học Khoa Học Tự Nhiên Hà Nội; Trường Đại Học Khoa Học Huế; Trường Đại Học Khoa Học Tự Nhiên TPHCM |
+| 13 | 4 | Học Viện An Ninh Nhân Dân; Trường Đại Học An Ninh Nhân Dân; Học Viện Cảnh Sát Nhân Dân; Trường Đại Học Cảnh Sát Nhân Dân |
 | 14 | 2 | Trường Sĩ Quan Lục Quân 1 - Đại học Trần Quốc Tuấn; Trường Sĩ Quan Lục Quân 2 - Đại học Nguyễn Huệ |
 | 15 | 2 | Học Viện Chính Trị Công An Nhân Dân; Trường Sĩ Quan Chính Trị - Đại Học Chính Trị |
 | 16 | 2 | Học Viện Âm Nhạc Huế; Nhạc Viện TPHCM |
@@ -1354,487 +1227,483 @@ trả phân hoạch cuối, tính Q trên mạng đầu vào
 | 18 | 2 | Trường Đại Học Khoa Học Xã Hội và Nhân Văn Hà Nội; Trường Đại Học Khoa Học Xã Hội và Nhân Văn TPHCM |
 | 19 | 2 | Trường Đại Học Sân Khấu Điện Ảnh TPHCM; Trường Đại Học Sân Khấu Điện Ảnh Hà Nội |
 
-*Nguồn: `data/network/metrics/g2_uni_uni_2026.csv`; tên trường/ngành từ bảng `universities` và `majors` của DB.*
+**Bảng 4.2. Cộng đồng G3 năm 2026 và ngành tiêu biểu**
 
-**Bảng 4.3. Cộng đồng g3_major_major năm 2026 và tên tiêu biểu**
-
-| ID | Số đỉnh | Bốn đỉnh có bậc cao nhất (hoặc toàn bộ nếu nhỏ hơn bốn) |
+| Cộng đồng | Số đỉnh | Bốn đỉnh bậc cao nhất |
 | --- | --- | --- |
-| 0 | 50 | Công nghệ chế biến thủy sản; Phát triển nông thôn; Quản lý thủy sản; Công nghệ chế biến lâm sản |
 | 1 | 48 | Logistics và quản lý chuỗi cung ứng; Tài chính - Ngân hàng; Quản trị khách sạn; Truyền thông đa phương tiện |
-| 2 | 38 | Quản lý thông tin; Hán Nôm; Ngôn ngữ Đức; Lưu trữ học |
-| 3 | 34 | Sinh học; Vật lý y khoa; Hải dương học; Quản lý năng lượng |
-| 4 | 33 | Sư phạm Địa lý; Giáo dục Chính trị; Giáo dục Công dân; Sư phạm Lịch sử - Địa lý |
-| 5 | 33 | Khí tượng và khí hậu học; Toán kinh tế; Thủy văn học; Quản lý tài nguyên nước |
-| 6 | 32 | Kỹ thuật xây dựng; Kỹ thuật cơ điện tử; Kỹ thuật môi trường; Kỹ thuật cơ khí |
-| 7 | 28 | Công nghệ điện ảnh, truyền hình; Diễn viên kịch, điện ảnh - truyền hình; Đạo diễn điện ảnh, truyền hình; Nhạc công kịch hát dân tộc |
-| 8 | 21 | Kỹ thuật trắc địa - bản đồ; Địa chất học; Địa kỹ thuật xây dựng; Quản lý và phân tích dữ liệu khoa học |
-| 9 | 17 | Kỹ nghệ gỗ và nội thất (đào tạo bằng tiếng Việt); Công nghệ may; Kỹ thuật công nghiệp (đào tạo bằng tiếng Việt); Robot và trí tuệ nhân tạo |
-| 10 | 16 | Y học dự phòng; Y học cổ truyền; Răng - Hàm - Mặt; Kỹ thuật hình ảnh y học |
-| 11 | 10 | Piano; Âm nhạc học; Biểu diễn nhạc cụ truyền thống; Biểu diễn nhạc cụ phương Tây |
-| 12 | 4 | Hội họa; Đồ họa; Điêu khắc; Lý luận, lịch sử và phê bình mỹ thuật |
-| 13 | 3 | Khoa học và Kỹ thuật máy tính; Công nghệ Thực phẩm và sức khỏe – EFTH; Nông nghiệp thông minh và bền vững |
-| 14 | 2 | Ngành Nghiệp vụ an ninh; Ngành An ninh mạng và phòng chống tội phạm công nghệ cao |
-| 15 | 2 | Công nghệ kỹ thuật máy tính; Công nghệ kỹ thuật nhiệt |
-| 16 | 2 | Du lịch điện tử; Quản trị du lịch và khách sạn |
-| 17 | 2 | Quản lý bệnh viện; Khoa học y sinh |
-| 18 | 2 | Kinh tế thể thao; Quản trị công nghệ truyền thông |
+| 2 | 45 | Hán Nôm; Quản lý thông tin; Ngôn ngữ Đức; Lưu trữ học |
+| 3 | 38 | Kỹ thuật xây dựng; Kỹ thuật cơ điện tử; Kỹ thuật môi trường; Kỹ thuật cơ khí |
+| 4 | 36 | Công nghệ chế biến thuỷ sản; Phát triển nông thôn; Công nghệ chế biến lâm sản; Quản lý thủy sản |
+| 5 | 33 | Sư phạm Địa lý; Giáo dục Chính trị; Giáo dục Công dân; Sư phạm Lịch sử - Địa lý |
+| 6 | 27 | Sinh học; Hải dương học; Vật lý Y khoa; Quản lý năng lượng |
+| 7 | 25 | Khí tượng và khí hậu học; Toán kinh tế; Thủy văn học; Quản lý tài nguyên nước |
+| 8 | 23 | Nhạc công kịch hát dân tộc; Biên kịch điện ảnh; Diễn viên kịch, điện ảnh - truyền hình; Đạo diễn điện ảnh, truyền hình |
+| 9 | 21 | Kỹ thuật trắc địa - bản đồ; Địa chất học; Quản lý và phân tích dữ liệu khoa học; Địa tin học |
+| 10 | 20 | Robot và trí tuệ nhân tạo; Kỹ thuật công nghiệp; Công nghệ may; Hệ thống nhúng và IoT |
+| 11 | 16 | Y học dự phòng; Y học cổ truyền; Răng - Hàm - Mặt; Kỹ thuật hình ảnh y học |
+| 12 | 10 | Chăn nuôi; Quản lý tài nguyên rừng; Thú y; Quản lý đất đai |
+| 13 | 10 | Piano; Âm nhạc học; Biểu diễn nhạc cụ truyền thống; Sáng tác âm nhạc |
+| 14 | 5 | Kinh doanh xuất bản phẩm; Sáng tác văn học; Di sản học; Bảo tàng học |
+| 15 | 3 | Khoa học và Kỹ thuật máy tính; Công nghệ Thực phẩm và sức khỏe; Nông nghiệp thông minh và bền vững |
+| 16 | 2 | Nghiệp vụ An ninh; An ninh mạng và phòng chống tội phạm công nghệ cao |
+| 17 | 2 | Công nghệ kỹ thuật máy tính; Công nghệ kỹ thuật nhiệt |
+| 18 | 2 | Du lịch điện tử; Quản trị du lịch và khách sạn |
+| 19 | 2 | Khoa học y sinh; Quản lý bệnh viện |
+| 20 | 2 | Kinh tế thể thao; Quản trị công nghệ truyền thông |
 
-*Nguồn: `data/network/metrics/g3_major_major_2026.csv`; tên trường/ngành từ bảng `universities` và `majors` của DB.*
+*Nguồn: `data/network/metrics/g2_uni_uni_2026.csv`, `g3_major_major_2026.csv`, cột `community` (1 = cộng đồng đông nhất); tên từ DB.*
 
-**Đánh giá.** G2 có các nhóm dễ giải thích như y dược, sư phạm/đại học địa phương, kinh tế – tài chính, công nghiệp – kỹ thuật; G3 có nhóm nông – lâm – thủy sản, kinh tế – dịch vụ – CNTT, khoa học xã hội, sư phạm, nghệ thuật và y dược. Nhãn lĩnh vực là diễn giải thủ công từ tên tiêu biểu, không phải nhãn được thuật toán học. Cộng đồng nhỏ có thể đơn thuần là thành phần tách rời. Q cao của G3 cho thấy phân khối rõ trong mô hình, nhưng không xác nhận ranh giới ngành học tuyệt đối. Độ ổn định theo ngưỡng và theo seed được đánh giá tại mục 4.5.
+**Đánh giá.** G2 tách được các nhóm dễ giải thích: trường tư đa ngành phía Nam, kinh tế – ngân hàng, đại học địa phương đa ngành, y dược, xây dựng – giao thông, công nghệ thông tin – viễn thông, ngoại ngữ, thể thao, luật, mỹ thuật, công an – quân đội. G3 có khối nông – lâm – thủy sản, kinh tế – dịch vụ, khoa học xã hội – ngôn ngữ, sư phạm, khoa học tự nhiên, kỹ thuật, nghệ thuật, y dược. Nhãn lĩnh vực là diễn giải thủ công từ tên tiêu biểu. Cộng đồng nhỏ (2–4 đỉnh) thường là thành phần tách rời.
 
-## 4.2. Girvan–Newman: đối chiếu trên mẫu 60 đỉnh
+## 4.2. Girvan–Newman trên toàn đồ thị, so với Louvain
 
-**Mục tiêu và lý do chọn.** Girvan–Newman (GN) cho góc nhìn từ cầu nối: lần lượt bỏ cạnh có betweenness cao để tách mạng. Thuật toán giúp đối chiếu Louvain trên cùng một mẫu, đồng thời minh họa khác biệt giữa tách cầu nối và tối ưu modularity trực tiếp.
+**Mục tiêu và lý do chọn.** Girvan–Newman (GN) phát hiện cộng đồng bằng cách cắt cầu nối, bổ sung góc nhìn cho Louvain (tối ưu $Q$ trực tiếp). GN chạy trên **toàn bộ** G2 (250 đỉnh) và G3 (370 đỉnh) năm 2026, không lấy mẫu.
 
 **Nguyên lý và mã giả.**
 
 ```text
-lấy đồ thị con cảm sinh của 60 đỉnh có bậc cao nhất
-lặp tối đa 10 phân hoạch do girvan_newman sinh:
-    tính lại edge betweenness, bỏ cạnh lớn nhất đến khi tách thêm thành phần
-    tính Q của phân hoạch trên đồ thị mẫu ban đầu
-    lưu phân hoạch có Q cao nhất
-chạy Louvain trên đúng đồ thị mẫu để so Q và thời gian
+lặp (community.girvan_newman):
+    tính edge betweenness, xoá cạnh lớn nhất đến khi tách thêm một thành phần
+    tính Q không trọng số của phân hoạch trên đồ thị gốc; giữ Q lớn nhất
+dừng khi đủ 40 cộng đồng hoặc quá 300 giây
+chạy Louvain không trọng số (seed 42) trên cùng đồ thị để so
 ```
 
-**Tham số và độ phức tạp.** `sub = g.subgraph(sorted(g,key=lambda n:-g.degree(n))[:60]).copy()`. Code dùng `zip(range(2,12),community.girvan_newman(sub))`: tối đa mười phân hoạch sinh ra, không bảo đảm số cộng đồng đúng bằng biến vòng lặp nếu mẫu vốn đã không liên thông. GN mặc định tính edge betweenness không trọng số; Q và Louvain trên mẫu cũng không truyền `weight`, nên sử dụng mặc định `weight="weight"` đối với modularity/Louvain của NetworkX (thuộc tính Jaccard hiện có). Cần phân biệt điều này với betweenness dùng để chọn cạnh: không có chuyển Jaccard thành khoảng cách. Chi phí GN trường hợp xấu khoảng $O(nm^2)$; đó là lý do chỉ chạy mẫu. Louvain trên mẫu dùng seed 42.
-
-**Kết quả.** Bảng giữ nguyên thời gian đã lưu; không lấy thời gian lần chạy mới thay thế.
-
-**Bảng 4.4. So sánh GN và Louvain trên mẫu cảm sinh 60 đỉnh bậc cao**
-
-| Mạng | Độ đo | 2024 | 2025 | 2026 |
-| --- | --- | --- | --- | --- |
-| g2_uni_uni | Số đỉnh mẫu | 60 | 60 | 60 |
-| g2_uni_uni | Số cộng đồng GN tốt nhất | 9 | 11 | 11 |
-| g2_uni_uni | Q GN tốt nhất | 0,0109 | 0,0042 | 0,0019 |
-| g2_uni_uni | Q Louvain cùng mẫu | 0,1394 | 0,1595 | 0,1438 |
-| g2_uni_uni | Giây GN | 8,2801 | 7,7934 | 7,1910 |
-| g2_uni_uni | Giây Louvain | 0,0137 | 0,0106 | 0,0056 |
-| g3_major_major | Số đỉnh mẫu | 60 | 60 | 60 |
-| g3_major_major | Số cộng đồng GN tốt nhất | 7 | 6 | 6 |
-| g3_major_major | Q GN tốt nhất | 0,6384 | 0,6323 | 0,6598 |
-| g3_major_major | Q Louvain cùng mẫu | 0,6384 | 0,6337 | 0,6662 |
-| g3_major_major | Giây GN | 0,4907 | 0,4968 | 0,6619 |
-| g3_major_major | Giây Louvain | 0,0157 | 0,0053 | 0,0025 |
-
-*Nguồn: `data/network/summary.csv`.*
-
-**Đánh giá.** Trên mẫu G2, Louvain cho Q cao hơn GN rõ rệt và thời gian ngắn hơn; mẫu G3 có Q gần nhau hơn. Chọn mẫu bậc cao tạo ra lõi cảm sinh, có thể loại bỏ chính các đỉnh rìa/cầu nối quan trọng; đây không phải benchmark đại diện mọi cấu trúc. GN chỉ xem mười phân hoạch, không duyệt toàn bộ cây phân cấp để tìm tối ưu. Không so Q mẫu với Q toàn mạng như cùng một bài toán, và không suy từ vài số giây trên một máy thành tỷ lệ tăng tốc tổng quát.
-
-## 4.3. HITS, PageRank và tương quan Spearman với điểm chuẩn
-
-**Mục tiêu và lý do chọn.** Hai thuật toán kiểm tra hai khía cạnh của mạng cạnh tranh: HITS tìm cặp hub–authority trong lõi cạnh tranh trực tiếp, PageRank mô tả dòng lan truyền qua nhiều bước. Spearman được dùng vì quan tâm thứ hạng, không yêu cầu liên hệ tuyến tính giữa điểm centrality và điểm chuẩn.
-
-**Nguyên lý và mã giả.** Công thức HITS/PageRank đã nêu ở mục 3.2.5–3.2.6. Với mỗi năm:
-
-```text
-dựng G4 từ THPT30, flag rỗng, MAX theo trường–ngành
-chạy HITS toàn G4 (1000 vòng tối đa), PageRank có trọng số (alpha 0,85)
-từ dữ liệu load(year), lấy THPT30, tính MEAN(score) theo trường
-ghép các trường có cả centrality và điểm trung bình
-rank hai chuỗi theo hạng trung bình khi bằng nhau
-tính Pearson giữa hai dãy hạng → Spearman
-```
-
-Điểm trung bình ở bước kiểm tra **không lọc `flag`**, và chỉ lấy các dòng đã có `major_code` vì `load(year)` lọc sẵn. Nó cũng không lấy MAX trước khi tính trung bình. Vì vậy đây là trung bình các dòng điểm THPT30 có map ngành của trường, chịu ảnh hưởng cơ cấu ngành/chương trình/tổ hợp; không phải một điểm tuyển sinh đại diện đã chuẩn hóa.
-
-**Tham số và độ phức tạp.** HITS `max_iter=1000,normalized=True`; PageRank dùng mặc định $\alpha=0{,}85$, `weight="weight"`; khoảng G4 bằng 2. Một phép nhân ma trận thưa mỗi vòng tốn khoảng $O(m)$, tổng gần $O(t(n+m))$ tùy thuật toán số và số vòng hội tụ. Lấy hạng hai dãy tốn $O(n\log n)$. Spearman dùng công thức chung $\rho=\operatorname{Corr}(\operatorname{rank}(x),\operatorname{rank}(y))$; không dùng công thức $1-6\sum d_i^2/[n(n^2-1)]$ mà bỏ qua các giá trị đồng hạng.
+**Tham số và độ phức tạp.** Edge betweenness không trọng số; $Q$ và Louvain so sánh đều **không trọng số** (`weight=None`) để cùng điều kiện. Chi phí GN xấu nhất $O(m^2n)$ cho mỗi lần tách hoàn toàn; vì vậy dừng ở $k\le40$.
 
 **Kết quả.**
 
-**Bảng 4.5. Tương quan đã lưu trong summary**
+**Bảng 4.3. Girvan–Newman toàn đồ thị so với Louvain**
 
-| Mạng | Độ đo | 2024 | 2025 | 2026 |
-| --- | --- | --- | --- | --- |
-| g4_competition | Trường trong G4 | 259 | 260 | 226 |
-| g4_competition | ρ authority với điểm TB | -0,4012 | -0,4139 | 0,2343 |
-| g4_competition | ρ PageRank với điểm TB | 0,5669 | 0,5352 | 0,6069 |
-
-*Nguồn: `data/network/summary.csv`.*
-
-**Bảng 4.6. Số trường / authority trung bình theo nhóm điểm THPT trung bình**
-
-| Nhóm điểm TB | 2024 | 2025 | 2026 |
+| Mạng / chỉ tiêu | 2024 | 2025 | 2026 |
 | --- | --- | --- | --- |
-| ≤17 | 71 / 0,00650 | 76 / 0,00684 | 69 / 0,00309 |
-| (17;19] | 35 / 0,00845 | 24 / 0,00545 | 28 / 0,00774 |
-| (19;21] | 39 / 0,00318 | 51 / 0,00358 | 50 / 0,00655 |
-| (21;23] | 34 / 0,00170 | 53 / 0,00202 | 38 / 0,00362 |
-| (23;25] | 41 / 0,00069 | 29 / 0,00078 | 26 / 0,00295 |
-| >25 | 39 / 0,00085 | 27 / 0,00139 | 15 / 0,00189 |
+| G2: GN: số đỉnh xét | 249 | 251 | 250 |
+| G2: GN: số cộng đồng tại Q tốt nhất | 36 | 25 | 32 |
+| G2: GN: Q tốt nhất | 0,2659 | 0,3480 | 0,3239 |
+| G2: Louvain không trọng số: số cộng đồng | 18 | 16 | 16 |
+| G2: Louvain không trọng số: Q | 0,4019 | 0,4421 | 0,4347 |
+| G2: Số cộng đồng Louvain | 18 | 16 | 19 |
+| G2: Modularity Q (Louvain) | 0,4489 | 0,4939 | 0,4845 |
+| G2: GN: thời gian (giây) | 59,4702 | 39,9793 | 51,2114 |
+| G3: GN: số đỉnh xét | 374 | 371 | 370 |
+| G3: GN: số cộng đồng tại Q tốt nhất | 26 | 22 | 23 |
+| G3: GN: Q tốt nhất | 0,8045 | 0,8260 | 0,8066 |
+| G3: Louvain không trọng số: số cộng đồng | 25 | 21 | 17 |
+| G3: Louvain không trọng số: Q | 0,8090 | 0,8287 | 0,8167 |
+| G3: Số cộng đồng Louvain | 27 | 23 | 20 |
+| G3: Modularity Q (Louvain) | 0,8358 | 0,8443 | 0,8363 |
+| G3: GN: thời gian (giây) | 33,5918 | 23,8528 | 36,1405 |
 
-*Nguồn: `data/eduradar.db` (lọc như biến `thpt` trong `main`, không lọc flag), ghép `metrics/g4_competition_<năm>.csv`; authority CSV làm tròn 5 chữ số.*
+*Nguồn: `data/network/summary.csv`, các cột `gn_*`, `louvain_unweighted_*`, `louvain_communities`, `modularity_louvain`.*
 
-**Bảng 4.7. Phân bố các cặp trường–ngành dùng dựng cạnh G4**
+**Đánh giá.** Trên G3, GN đạt Q = 0,8066 gần Louvain không trọng số (0,8167): cấu trúc khối rõ đến mức cắt cầu nối cũng tìm ra gần đúng phân hoạch tối ưu. Trên G2, GN chỉ đạt 0,3239 so với 0,4347 của Louvain: G2 dày, nhiều đường song song, việc cắt cạnh betweenness cao tách ra các mảnh nhỏ trước khi chạm ranh giới cộng đồng. GN chậm hơn Louvain hàng trăm lần (≈ 51 giây so với dưới 1 giây). Louvain được chọn cho web; GN dùng để kiểm chứng.
 
-| Chỉ tiêu | 2024 | 2025 | 2026 |
-| --- | --- | --- | --- |
-| Cặp trường–ngành (THPT30, flag rỗng, MAX) | 4.287 | 4.535 | 4.455 |
-| Cặp đúng 15 điểm | 885 | 1.138 | 1.431 |
-| Cặp có điểm ≤16 | 1.389 | 1.551 | 1.636 |
-| Trường có THPT30 trong load(), trước lọc flag/cô lập | 276 | 270 | 238 |
+## 4.3. HITS, PageRank và tương quan Spearman với điểm chuẩn
 
-*Nguồn: truy vấn `data/eduradar.db` theo `major_code IS NOT NULL`; ba dòng đầu áp đúng bộ lọc `g4_competition`, dòng cuối áp bộ lọc điểm trung bình.*
-
-**Đánh giá và diễn giải dấu tương quan.** Năm 2024–2025, nhóm điểm thấp – trung bình có authority trung bình cao hơn nhóm điểm cao; điều này phù hợp với HITS tập trung vào lõi cạnh tranh dày. Trọng số số ngành có thể làm các trường đa ngành trong vùng đông đối thủ được nhấn mạnh. Trong năm 2026, số cặp đúng 15 điểm tăng lên 1.431, trong khi authority trung bình nhóm ≤17 giảm và nhóm 17–21 cao hơn; nhóm điểm trung bình trên 25 cũng chỉ còn 15 trường trong G4. Các quan sát này gợi ý sự thay đổi phân bố điểm và phạm vi quan sát góp phần vào việc authority đổi dấu. Chúng không chứng minh riêng một biến là nguyên nhân, vì nhiều ngành, trường và dòng dữ liệu cùng thay đổi.
-
-PageRank tương quan dương ở cả ba năm, mạnh hơn authority theo trị số dương trong năm 2026. Điều này phù hợp với dòng chuyển qua cạnh hướng lên trong từng ngành và cơ chế chia dòng ra/teleportation. Tuy nhiên cạnh giữa các ngành có thể tạo chu trình, PageRank còn phụ thuộc số ngành và độ phủ trường; không thể diễn giải là xếp hạng học thuật. Báo cáo chưa thực hiện kiểm định p-value, khoảng tin cậy hay kiểm soát quy mô danh mục ngành, nên các hệ số chỉ là mô tả liên hệ trong mẫu.
-
-## 4.4. Adamic–Adar: dự đoán liên kết ngành
-
-**Mục tiêu và lý do chọn.** Adamic–Adar (AA) xếp hạng những cặp ngành chưa có cạnh G3 nhưng có hàng xóm chung. Nó ưu tiên bằng chứng từ hàng xóm ít phổ biến, phù hợp kiểm tra khả năng hai ngành sẽ cùng xuất hiện trong các tập trường tương tự mà không cần nhãn huấn luyện.
+**Mục tiêu và lý do chọn.** Kiểm xem vị trí trong mạng cạnh tranh G4 có phản ánh mức điểm của trường không. Spearman dùng hạng nên không cần quan hệ tuyến tính.
 
 **Nguyên lý và mã giả.**
 
-$$AA(x,y)=\sum_{z\in N(x)\cap N(y)}\frac{1}{\log |N(z)|}.$$
-
 ```text
-với mọi cặp chưa có cạnh trong G3:
-    tìm hàng xóm chung
-    cộng 1/log(bậc hàng xóm chung)
-sắp giảm dần AA, giữ 300 cặp đầu
-đối chiếu dự đoán năm trước với cạnh vượt Jaccard 0,25 ở năm sau
+dựng G4 (THPT thang 30, không cờ, điểm cao nhất theo trường–ngành, khoảng 2)
+chạy HITS (1000 vòng) và PageRank có trọng số (α = 0,85)
+điểm TB của trường = MEAN(score) các dòng THPT thang 30 có mã ngành
+ρ = Pearson(rank(độ đo), rank(điểm TB)) trên các trường có cả hai
 ```
 
-**Tham số và độ phức tạp.** Code gọi `nx.adamic_adar_index(g)` không truyền danh sách cặp, tức xét mọi non-edge của G3 sau bỏ cô lập; không dùng trọng số Jaccard trong AA. Giữ `top=300`, xuất tên ngành và AA làm tròn bốn chữ số. Có $O(n^2)$ cặp ứng viên trong trường hợp xấu; mỗi cặp cần giao hai tập hàng xóm, chi phí phụ thuộc bậc (cận đơn giản $O(n^2\Delta)$), sau đó sắp danh sách điểm. Một hàng xóm chung của hai đỉnh khác nhau luôn có bậc ít nhất 2 nên không phát sinh $\log 1$ trong đóng góp hợp lệ.
+**Tham số và độ phức tạp.** Mỗi vòng lặp HITS/PageRank là một phép nhân ma trận thưa $O(m)$; xếp hạng $O(n\log n)$. Điểm TB không lọc cờ và không lấy MAX, nên chịu ảnh hưởng cơ cấu chương trình của trường.
 
-**Kết quả: mười cặp minh họa năm 2026.**
+**Kết quả.**
 
-**Bảng 4.8. Mười cặp AA cao nhất G3 năm 2026**
+**Bảng 4.4. Tương quan hạng với điểm THPT trung bình**
+
+| Mạng / chỉ tiêu | 2024 | 2025 | 2026 |
+| --- | --- | --- | --- |
+| G4: Số đỉnh | 259 | 260 | 226 |
+| G4: Số cạnh | 10.542 | 10.788 | 9.215 |
+| G4: Spearman(authority, điểm TB) | −0,4013 | −0,4098 | 0,2349 |
+| G4: Spearman(PageRank, điểm TB) | 0,5670 | 0,5421 | 0,6075 |
+
+**Bảng 4.5. Số trường / authority trung bình theo nhóm điểm THPT trung bình**
+
+| Nhóm điểm TB | 2024 | 2025 | 2026 |
+| --- | --- | --- | --- |
+| ≤ 17 | 71 / 0,00650 | 76 / 0,00684 | 69 / 0,00309 |
+| (17; 19] | 35 / 0,00845 | 25 / 0,00524 | 29 / 0,00749 |
+| (19; 21] | 39 / 0,00318 | 52 / 0,00351 | 49 / 0,00667 |
+| (21; 23] | 34 / 0,00170 | 51 / 0,00210 | 38 / 0,00362 |
+| (23; 25] | 41 / 0,00069 | 28 / 0,00079 | 26 / 0,00295 |
+| > 25 | 39 / 0,00084 | 28 / 0,00135 | 15 / 0,00189 |
+
+**Bảng 4.6. Các cặp trường–ngành dùng dựng G4**
+
+| Chỉ tiêu | 2024 | 2025 | 2026 |
+| --- | --- | --- | --- |
+| Cặp trường–ngành (THPT 30, không cờ, điểm cao nhất) | 4.270 | 4.518 | 4.445 |
+| Cặp đúng 15 điểm | 884 | 1.134 | 1.430 |
+| Cặp ≤ 16 điểm | 1.385 | 1.544 | 1.630 |
+| Trường có điểm THPT 30 (trước lọc cờ, bỏ cô lập) | 272 | 270 | 238 |
+
+*Nguồn: `data/network/summary.csv`, `metrics/g4_competition_<năm>.csv`, `data/eduradar.db`.*
+
+**Đánh giá.** PageRank tương quan dương ổn định (0,54–0,61): dòng “nhắm lên” nhiều bước dồn về trường điểm cao. Authority âm năm 2024–2025 vì HITS dồn vào lõi dày nhất là các trường điểm thấp – trung bình nhiều ngành (Bảng 4.5); năm 2026 số cặp đúng 15 điểm tăng mạnh và nhóm > 25 điểm còn ít trường, authority chuyển sang nhóm 17–21 điểm nên tương quan thành dương. Đây là mô tả trong mẫu, chưa có kiểm định ý nghĩa thống kê.
+
+![Hạng PageRank và điểm trung bình](fig/g4_pagerank_score.png)
+
+*Hình 4.1. Hạng PageRank G4 (1 = cao nhất) và điểm THPT trung bình theo trường, ba năm. Nguồn: `metrics/g4_competition_<năm>.csv`, `data/eduradar.db`; script `scripts/build_report_figures.py`.*
+
+## 4.4. Adamic–Adar: dự đoán liên kết ngành
+
+**Mục tiêu và lý do chọn.** Xếp hạng các cặp ngành **chưa có cạnh** G3 nhưng có nhiều láng giềng chung ít phổ biến, để dự đoán cặp ngành sẽ được mở cùng nhau.
+
+**Nguyên lý và mã giả.** $AA(x,y)=\sum_{z\in N(x)\cap N(y)}\dfrac{1}{\ln|N(z)|}$.
+
+```text
+với mọi cặp chưa có cạnh trong G3 năm gốc: cộng 1/ln(bậc láng giềng chung)
+giữ 300 cặp AA cao nhất
+kiểm: bao nhiêu cặp thành cạnh ở G3 năm đích; so tỉ lệ nền ngẫu nhiên
+```
+
+**Tham số và độ phức tạp.** `nx.adamic_adar_index` trên mọi non-edge, không trọng số; xấu nhất $O(n^2\Delta)$.
+
+**Kết quả.**
+
+**Bảng 4.7. Mười cặp AA cao nhất G3 năm 2026**
 
 | Hạng | Ngành A | Ngành B | AA |
 | --- | --- | --- | --- |
 | 1 | Văn học | Giáo dục Chính trị | 5,0762 |
-| 2 | Sư phạm Tiếng Anh | Giáo dục Công dân | 5,0363 |
+| 2 | Giáo dục Công dân | Sư phạm Tiếng Anh | 5,0363 |
 | 3 | Kinh doanh quốc tế | Quản trị dịch vụ du lịch và lữ hành | 5,0023 |
 | 4 | Tâm lý học giáo dục | Việt Nam học | 4,8374 |
-| 5 | Văn học | Tâm lý học giáo dục | 4,7365 |
+| 5 | Tâm lý học giáo dục | Văn học | 4,7365 |
 | 6 | Giáo dục Mầm non | Việt Nam học | 4,6962 |
 | 7 | Giáo dục Thể chất | Việt Nam học | 4,6962 |
 | 8 | Truyền thông đa phương tiện | Kế toán | 4,6943 |
 | 9 | Công nghệ thông tin | Công nghệ tài chính | 4,6943 |
-| 10 | Kỹ thuật Dầu khí (Khoan-Khai thác Mỏ Dầu khí) | Kỹ thuật trắc địa - bản đồ | 4,4406 |
+| 10 | Kỹ thuật trắc địa - bản đồ | Kỹ thuật Dầu khí | 4,4406 |
 
-*Nguồn: `data/network/metrics/link_prediction_2026.csv`; thứ tự hai ngành không có hướng.*
+*Nguồn: `data/network/metrics/link_prediction_2026.csv`.*
 
-Các cặp như Văn học – Giáo dục Chính trị có thể phản ánh cụm trường sư phạm cùng mở chúng, không có nghĩa hai chương trình tương đương. Cặp Công nghệ thông tin – Công nghệ tài chính gợi liên hệ trong khối kinh tế – công nghệ, nhưng vẫn cần đọc như đồng xuất hiện trong danh mục trường.
+**Bảng 4.8. Kiểm chứng theo thời gian (top 300)**
 
-**Kiểm chứng theo thời gian.** Dựng lại G3 trực tiếp từ DB bằng `load` → `g1_bipartite` → `jaccard_projection(...,"major",0.25)` → bỏ cô lập, không ghi đè kết quả. Dùng top 300 đã lưu trong `metrics/link_prediction_<năm gốc>.csv`; ghép tên về mã trong bảng `majors`. Khi tên trùng nhiều mã, một dòng được tính trúng nếu có ít nhất một cặp mã hợp lệ tạo cạnh ở năm đích. Chỉ mã có ở cả hai mạng được đối chiếu; dòng dự đoán không còn cặp mã hợp lệ vẫn tính trượt trong mẫu số 300, đồng thời báo riêng số dòng đối chiếu được.
+| Gốc → đích | Trúng top 10 | Trúng top 100 | Trúng top 300 (precision) | Tỉ lệ nền | Gấp nền |
+| --- | --- | --- | --- | --- | --- |
+| 2024 → 2025 | 5 | 25 | 55 (18,3%) | 0,32% | 57,2 lần |
+| 2025 → 2026 | 1 | 19 | 36 (12,0%) | 0,31% | 38,3 lần |
+| 2024 → 2026 | 8 | 29 | 68 (22,7%) | 0,53% | 42,6 lần |
 
-Nền ngẫu nhiên là tỷ lệ các non-edge năm gốc trên tập mã chung hai năm trở thành cạnh năm đích. Đây là nền theo cặp mã, còn danh sách lưu theo tên; sự khác nhau này và quy tắc any-code có thể làm độ nâng hơi lạc quan. Các năm đích chỉ dùng để kiểm tra, không dùng để chọn top 300. Chưa có kiểm định hoặc khoảng tin cậy cho mức nâng.
+*Nguồn: `scripts/report_network_supplement.py` (dựng lại G3 từ DB bằng hàm của `sna/build.py`, Jaccard 0,25).*
 
-**Bảng 4.9. Temporal validation AA với năm gốc và năm đích tách rõ**
-
-| Gốc → đích | Trúng top10 | Trúng top100 | Trúng top300 / precision@300 | Dòng top300 đối chiếu được | Cạnh mới / non-edge nền | Tỷ lệ nền | Nâng so nền |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 2024 → 2025 | 5 | 26 | 56 / 18,67% | 292 | 189 / 61.927 | 0,3052% | 61,2 lần |
-| 2025 → 2026 | 1 | 19 | 36 / 12,00% | 296 | 189 / 61.845 | 0,3056% | 39,3 lần |
-| 2024 → 2026 (hai năm) | 8 | 30 | 69 / 23,00% | 283 | 294 / 56.090 | 0,5242% | 43,9 lần |
-
-*Nguồn: `data/eduradar.db`, `metrics/link_prediction_2024.csv`, `metrics/link_prediction_2025.csv`; G3 dựng bằng các hàm hiện hành trong `sna/build.py`, Jaccard 0,25 và bỏ cô lập.*
-
-**Đánh giá.** Các phép kiểm một năm vẫn tốt hơn nền nhiều lần, nhưng precision@300 khác nhau và thấp hơn phép kiểm hai năm. Con số 23% so 0,52% chỉ thuộc **2024 → 2026**, không phải “năm sau”. Mô hình dự đoán một cạnh cùng xuất hiện vượt ngưỡng, không dự báo điểm chuẩn, nhu cầu lao động hay quyết định mở ngành. Tệp chỉ lưu tên làm mất định danh mã ở bước kiểm chứng; nên giữ mã ngành trong lần cải tiến sau và so thêm các baseline như common neighbors hoặc resource allocation trước khi khẳng định AA là lựa chọn tốt nhất.
+**Đánh giá.** Dự đoán tốt hơn nền ngẫu nhiên hàng chục lần ở mọi cặp năm; precision@300 hai năm (2024 → 2026) cao hơn một năm vì có thêm thời gian để cạnh xuất hiện. Kết quả vững theo ngưỡng (Bảng 4.11). Mô hình dự đoán đồng xuất hiện trong danh mục trường, không dự báo điểm chuẩn hay nhu cầu lao động.
 
 ## 4.5. Độ nhạy tham số và độ ổn định cộng đồng
 
-**Mục tiêu và lý do khảo sát.** Jaccard 0,25 và khoảng điểm 2 là tham số mô hình do nhóm chọn; cần kiểm tra xem kết luận có đổi khi điều chỉnh hợp lý. Phân tích thay một tham số mỗi lần, giữ tham số còn lại cố định; năm 2026 là chính, kèm 2024 cho so sánh hai mốc.
+**Mục tiêu.** Jaccard 0,25 và khoảng 2 điểm là tham số chọn tay; cần biết kết luận nào đổi khi tham số đổi.
 
-**Nguyên lý, mã giả và tham số.**
-
-```text
-giữ gap=2, thử Jaccard {0,15;0,20;0,25;0,30;0,35} năm 2026
-giữ Jaccard=0,25, thử gap {1;2;3}
-so n,m,LCC,Q,L và tương quan điểm
-trên đỉnh chung, so phân hoạch Louvain bằng ARI và NMI
-chạy 20 seed ở ngưỡng chuẩn làm mức dao động nền
-```
-
-Ngưỡng 0,20 và 0,30 chỉ được bổ sung cho 2026; không giả định mọi cấu hình đều chạy cả ba năm. Chi phí là tổng chi phí dựng mạng và tính độ đo của từng cấu hình, bao gồm GN mẫu nếu dùng lệnh build hiện tại. ARI/NMI cần so nhãn trên cùng tập đỉnh chung, không so trực tiếp ID cộng đồng vì ID chỉ là nhãn.
-
-Với bảng chéo hai phân hoạch $n_{ij}$, tổng hàng $a_i$, tổng cột $b_j$,
+**Cách làm.** Mỗi lần đổi một tham số; dựng lại mạng bằng chính hàm của `sna/build.py` (cấu hình chuẩn trùng `summary.csv`); so phân hoạch Louvain bằng ARI và NMI trên đỉnh chung:
 
 $$\operatorname{ARI}=\frac{\sum_{ij}\binom{n_{ij}}2-\left[\sum_i\binom{a_i}2\sum_j\binom{b_j}2\right]/\binom n2}{\frac12\left[\sum_i\binom{a_i}2+\sum_j\binom{b_j}2\right]-\left[\sum_i\binom{a_i}2\sum_j\binom{b_j}2\right]/\binom n2},\qquad\operatorname{NMI}=\frac{2I(X;Y)}{H(X)+H(Y)}.$$
 
-ARI hiệu chỉnh sự trùng khớp ngẫu nhiên; NMI đo thông tin chung chuẩn hóa. Cả hai bằng 1 khi hai phân hoạch trùng nhau (không cần cùng ID).
+Mức nền là ARI giữa 20 seed Louvain và seed 42 ở cùng ngưỡng 0,25. Toàn bộ số liệu: `docs/do_nhay_sna.md` (sinh bằng `scripts/report_sensitivity.py`).
 
 **Kết quả.**
 
-**Bảng 4.10. Độ nhạy mạng chiếu năm 2026 theo Jaccard**
+**Bảng 4.10. Độ nhạy G2 theo ngưỡng Jaccard (2026)**
 
-| Mạng / chỉ tiêu | 0,15 | 0,20 | 0,25 | 0,30 | 0,35 |
-| --- | --- | --- | --- | --- | --- |
-| G2 đỉnh | 261 | 258 | 249 | 237 | 218 |
-| G2 cạnh | 7.453 | 4.437 | 2.531 | 1.326 | 717 |
-| G2 LCC (%) | 95,4 | 94,6 | 92,8 | 83,5 | 64,7 |
-| G2 Q | 0,260 | 0,360 | 0,482 | 0,614 | 0,702 |
-| G2 cộng đồng | 11 | 11 | 20 | 23 | 30 |
-| G3 đỉnh | 406 | 399 | 377 | 337 | 275 |
-| G3 cạnh | 3.461 | 2.164 | 1.412 | 917 | 589 |
-| G3 LCC (%) | 99,0 | 98,2 | 96,6 | 63,8 | 8,4 |
-| G3 Q | 0,685 | 0,773 | 0,836 | 0,880 | 0,899 |
-| G3 cộng đồng | 14 | 15 | 19 | 33 | 52 |
-| G3 L (LCC) | 3,29 | 4,03 | 5,66 | 12,87 | 1,72 |
+| Độ đo | 0,15 | 0,20 | 0,25 | 0,30 | 0,35 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Số đỉnh | 262 | 259 | 250 | 237 | 218 |
+| Số cạnh | 7.472 | 4.446 | 2.540 | 1.332 | 720 |
+| Mật độ | 0,218 | 0,133 | 0,082 | 0,048 | 0,030 |
+| Số thành phần | 5 | 6 | 8 | 14 | 23 |
+| LCC (đỉnh) | 250 | 245 | 232 | 201 | 141 |
+| LCC (%) | 95,4 | 94,6 | 92,8 | 84,8 | 64,7 |
+| Đường đi TB (LCC) | 2,21 | 2,63 | 3,24 | 3,75 | 3,93 |
+| Clustering TB | 0,657 | 0,610 | 0,548 | 0,523 | 0,439 |
+| Modularity Louvain | 0,257 | 0,363 | 0,484 | 0,615 | 0,703 |
+| Số cộng đồng | 10 | 11 | 19 | 22 | 30 |
 
-*Nguồn: `docs/do_nhay_sna.md`, mục 2; giá trị trình bày giữ đúng độ làm tròn của tài liệu nguồn.*
+Năm 2024 (0,15 / 0,25 / 0,35): Q = 0,242 / 0,449 / 0,668; LCC = 251 / 219 / 163 đỉnh; thành phần = 4 / 11 / 20; cộng đồng = 10 / 18 / 26.
 
-**Bảng 4.11. Độ nhạy G4 theo khoảng điểm**
+**Bảng 4.11. Độ nhạy G3 theo ngưỡng Jaccard (2026)**
 
-| Chỉ tiêu / năm | 1 điểm | 2 điểm | 3 điểm |
-| --- | --- | --- | --- |
-| Cạnh 2026 | 6.098 | 9.215 | 11.492 |
-| Mật độ 2026 | 0,122 | 0,181 | 0,226 |
-| Thành phần mạnh 2026 | 50 | 35 | 23 |
-| ρ PageRank 2026 | 0,527 | 0,607 | 0,664 |
-| ρ authority 2026 | 0,233 | 0,234 | 0,248 |
-| Cạnh 2024 | 7.107 | 10.541 | 12.731 |
-| ρ PageRank 2024 | 0,450 | 0,567 | 0,634 |
-| ρ authority 2024 | −0,384 | −0,401 | −0,309 |
+| Độ đo | 0,15 | 0,20 | 0,25 | 0,30 | 0,35 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Số đỉnh | 399 | 392 | 370 | 330 | 267 |
+| Số cạnh | 3.429 | 2.135 | 1.391 | 906 | 579 |
+| Mật độ | 0,043 | 0,028 | 0,020 | 0,017 | 0,016 |
+| Số thành phần | 3 | 4 | 7 | 21 | 50 |
+| LCC (đỉnh) | 395 | 385 | 357 | 211 | 23 |
+| LCC (%) | 99,0 | 98,2 | 96,5 | 63,9 | 8,6 |
+| Đường đi TB (LCC) | 3,28 | 4,03 | 5,67 | 12,82 | 1,72 |
+| Clustering TB | 0,538 | 0,535 | 0,512 | 0,483 | 0,505 |
+| Modularity Louvain | 0,682 | 0,775 | 0,836 | 0,879 | 0,895 |
+| Số cộng đồng | 13 | 14 | 20 | 32 | 50 |
 
-*Nguồn: `docs/do_nhay_sna.md`, mục 3.*
+Năm 2024 (0,15 / 0,25 / 0,35): Q = 0,716 / 0,836 / 0,905; LCC = 381 / 345 / 28 đỉnh; thành phần = 5 / 13 / 41; cộng đồng = 16 / 27 / 42.
 
-**Bảng 4.12. Ổn định cộng đồng Louvain trên đỉnh chung năm 2026**
+**Bảng 4.12. Độ nhạy G4 theo khoảng điểm**
 
-| So sánh | G2 ARI / NMI | G3 ARI / NMI |
+| Độ đo | Năm | 1 điểm | 2 điểm | 3 điểm |
+| --- | --- | ---: | ---: | ---: |
+| Số đỉnh | 2026 | 224 | 226 | 226 |
+| Số cạnh | 2026 | 6.098 | 9.215 | 11.492 |
+| Mật độ | 2026 | 0,122 | 0,181 | 0,226 |
+| Thành phần liên thông mạnh | 2026 | 50 | 35 | 23 |
+| Spearman(PageRank, điểm TB) | 2026 | 0,528 | 0,608 | 0,664 |
+| Spearman(authority, điểm TB) | 2026 | 0,233 | 0,235 | 0,249 |
+| Top 10 PageRank trùng mốc 2 điểm | 2026 | 6 | 10 | 9 |
+| Top 10 authority trùng mốc 2 điểm | 2026 | 5 | 10 | 8 |
+| Số đỉnh | 2024 | 257 | 259 | 259 |
+| Số cạnh | 2024 | 7.107 | 10.542 | 12.731 |
+| Mật độ | 2024 | 0,108 | 0,158 | 0,191 |
+| Thành phần liên thông mạnh | 2024 | 19 | 17 | 16 |
+| Spearman(PageRank, điểm TB) | 2024 | 0,450 | 0,567 | 0,634 |
+| Spearman(authority, điểm TB) | 2024 | −0,384 | −0,401 | −0,309 |
+| Top 10 PageRank trùng mốc 2 điểm | 2024 | 7 | 10 | 9 |
+| Top 10 authority trùng mốc 2 điểm | 2024 | 7 | 10 | 10 |
+
+**Bảng 4.13. Độ ổn định cộng đồng Louvain (2026)**
+
+| So sánh | G2: ARI / NMI (đỉnh chung) | G3: ARI / NMI (đỉnh chung) |
 | --- | --- | --- |
-| 0,15 với 0,25 | 0,610 / 0,745 | 0,593 / 0,748 |
-| 0,35 với 0,25 | 0,676 / 0,835 | 0,485 / 0,792 |
-| 0,15 với 0,35 | 0,504 / 0,715 | 0,408 / 0,748 |
-| 20 seed với seed42 tại 0,25 (trung bình) | 0,813 / 0,904 | 0,923 / 0,964 |
-| ARI thấp nhất trong 20 seed | 0,612 | 0,849 |
+| 0,15 so với 0,25 | 0,525 / 0,725 (250) | 0,639 / 0,774 (370) |
+| 0,35 so với 0,25 | 0,598 / 0,804 (218) | 0,521 / 0,808 (267) |
+| 0,15 so với 0,35 | 0,406 / 0,663 (218) | 0,426 / 0,753 (267) |
+| Mức nền: 20 seed so với seed 42 (0,25) | TB 0,796 (thấp nhất 0,543) / 0,888 | TB 0,907 (thấp nhất 0,863) / 0,956 |
 
-*Nguồn: `docs/do_nhay_sna.md`, mục 4; số đỉnh chung 0,15–0,25: G2 249/G3 377, 0,35–0,25: G2 218/G3 275.*
+Cụm y dược (10 trường QHY, YDN, DDY, DHY, QSY, TYS, YDS, YHB, YPB, DTY) trong G2 2026:
 
-Biểu đồ đầy đủ được trình bày ở Hình 5.5 (`fig/sensitivity_jaccard.png`) và Hình 5.6 (`fig/sensitivity_gap.png`), dựa trên cùng các bảng trong tài liệu độ nhạy.
+- Ngưỡng 0,15: 10/10 trường cùng một cộng đồng; tỉ lệ cạnh của cộng đồng đó đi ra ngoài 24,6%.
+- Ngưỡng 0,20: 10/10 trường cùng một cộng đồng; tỉ lệ cạnh của cộng đồng đó đi ra ngoài 10,9%.
+- Ngưỡng 0,25: 10/10 trường cùng một cộng đồng; tỉ lệ cạnh của cộng đồng đó đi ra ngoài 6,6%.
+- Ngưỡng 0,30: 10/10 trường cùng một cộng đồng; tỉ lệ cạnh của cộng đồng đó đi ra ngoài 1,4%.
+- Ngưỡng 0,35: 10/10 trường cùng một cộng đồng; tỉ lệ cạnh của cộng đồng đó đi ra ngoài 0,9%.
 
-**Đánh giá lựa chọn và giới hạn.** Trong các ngưỡng đã thử, 0,25 là mức lớn nhất giữ hơn 90% đỉnh trong LCC của cả G2 và G3. Ở 0,30, G3 chỉ còn 63,8%; ở 0,35 còn 8,4%. Giá trị đường đi 1,72 ở 0,35 chỉ mô tả một LCC 23 ngành, không chứng minh toàn mạng “gần nhau hơn”. Ngưỡng thấp 0,15 làm G2 dày hơn nhưng Q chỉ 0,260. Do đó 0,25 là lựa chọn cân bằng có căn cứ thực nghiệm trong tập cấu hình khảo sát, chưa phải tối ưu toàn cục.
+**Bảng 4.14. Trùng lặp top 10 so với ngưỡng 0,25 (2026)**
 
-Tài liệu độ nhạy cho biết biến động tuyệt đối điểm MAX cùng trường–ngành giữa hai năm liền kề có trung vị 1,00 và 0,95; khoảng 76–80% không vượt 2 điểm. Điều này hỗ trợ chọn 2 như một khoảng gần nhau theo quy mô dao động quan sát, chưa chứng minh hai trường thực sự tranh cùng thí sinh. Gap 1 cho G4 rời rạc hơn, gap 3 nối thêm nhiều cặp xa điểm hơn. Dấu authority âm 2024/dương 2026 và PageRank dương giữ qua các gap đã thử.
+| Mạng | Ngưỡng | Bậc | Betweenness | Eigenvector | PageRank |
+| --- | --- | ---: | ---: | ---: | ---: |
+| G2 | 0,15 | 5/10 | 4/10 | 8/10 | 7/10 |
+| G2 | 0,35 | 6/10 | 2/10 | 8/10 | 7/10 |
+| G3 | 0,15 | 2/10 | 1/10 | 10/10 | 3/10 |
+| G3 | 0,35 | 4/10 | 0/10 | 0/10 | 1/10 |
 
-Đổi ngưỡng làm ARI thấp hơn dao động trung bình do đổi seed, trong khi NMI vẫn khá cao: các khối lớn có thể còn được giữ nhưng tách/gộp khác nhau. Nhóm mười trường y dược được theo dõi trong tài liệu nguồn luôn ở cùng cộng đồng. Các kết luận nhạy gồm top betweenness, số cộng đồng chính xác, top G3 và chiều thay đổi liên thông qua năm. Kết luận vững hơn gồm cấu trúc phân khối G3, dấu tương quan G4 trong các phép thử và chiều tăng transitivity G3/Q G2 giữa hai mốc. Nhận định thế giới nhỏ vẫn chỉ là dấu hiệu do chưa có mô hình null.
+G2: đỉnh betweenness cao nhất ở 0,25 là `U:VTT`; hạng ở 0,15 / 0,25 / 0,35 = 1 / 1 / 74.
+
+
+G3: đỉnh betweenness cao nhất ở 0,25 là `M:7420101`; hạng ở 0,15 / 0,25 / 0,35 = 23 / 1 / 76.
+
+**Bảng 4.15. Adamic–Adar G3 2024 → 2026 theo ngưỡng**
+
+| Ngưỡng | Trúng trong top 300 | Tỉ lệ nền | Gấp nền |
+| --- | ---: | ---: | ---: |
+| 0,15 | 121/300 | 0,01426 | 28,3 |
+| 0,25 | 68/300 | 0,00532 | 42,6 |
+| 0,35 | 57/300 | 0,00361 | 52,6 |
+
+**Bảng 4.16. Mức dao động điểm chuẩn giữa hai năm liền kề**
+
+Điểm THPT thang 30 cao nhất của cùng (trường, ngành), dòng không cờ.
+
+| Cặp năm | Số cặp | Trung vị mức thay đổi | ≤ 1 điểm | ≤ 2 điểm | ≤ 3 điểm |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 2024 → 2025 | 3.985 | 1,00 | 54,7% | 76,3% | 87,6% |
+| 2025 → 2026 | 3.957 | 0,95 | 61,1% | 79,5% | 88,8% |
+
+*Nguồn Bảng 4.10–4.16: `docs/do_nhay_sna.md`, `docs/do_nhay_sna.json` (sinh bằng `scripts/report_sensitivity.py`).*
+
+**Đánh giá.** Jaccard 0,25 là ngưỡng lớn nhất mà cả G2 và G3 giữ > 90% đỉnh trong LCC (92,8% và 96,5%); ở 0,30 LCC của G3 còn 63,9%, ở 0,35 còn 8,6% (bước chuyển thẩm thấu), làm các độ đo đường đi mất ý nghĩa; ngưỡng 0,15 làm G2 gần như một khối (Q = 0,257). Khoảng 2 điểm khớp với dao động thực tế: điểm chuẩn cùng trường–ngành giữa hai năm liền kề có trung vị thay đổi 1,00–0,95 điểm và 76,3–79,5% không vượt 2 điểm.
+
+**Kết luận vững:** đuôi nặng ở G1; cụm lĩnh vực rõ ở G3 (Q ≥ 0,68 mọi ngưỡng); cụm y dược luôn cùng một cộng đồng (10/10 ở mọi ngưỡng); PageRank G4 tương quan dương với điểm ở mọi khoảng điểm; dấu authority (âm 2024, dương 2026) giữ ở mọi khoảng điểm; Adamic–Adar tốt hơn nền 28–53 lần. **Kết luận nhạy:** top betweenness (Sinh học hạng 1 chỉ ở 0,25), số cộng đồng chính xác, top eigenvector của G3 (khối mỏ – địa chất ở 0,15–0,25, khối sư phạm ở 0,35) và nhận định G2/G3 “liên thông hơn” qua năm.
 
 ## 4.6. Chuyển kết quả mạng thành chỉ số “độ hot” và ngành tương tự
 
-**Mục tiêu và lý do chọn.** Web cần một chỉ số tham khảo để sắp thứ tự các lựa chọn phù hợp và một cách mở rộng tìm kiếm sang ngành liên quan. Nhóm dùng công thức kết hợp thứ hạng trường, tăng trưởng độ phủ ngành và biến động điểm; phần liên quan ngành dùng hàng xóm trực tiếp G3. Hai chức năng có mục đích khác với dự đoán liên kết AA.
+**Mục tiêu.** Đưa kết quả mạng vào tư vấn: một chỉ số tham khảo để sắp xếp lựa chọn và danh sách ngành gần nhau.
 
-**Nguyên lý, công thức và mã giả.** Theo `docs/TONG_KET_DU_LIEU.md`, chỉ số cố định theo bộ dữ liệu 2026 là
+**Công thức.** $H=0{,}5S_{trường}+0{,}3S_{ngành}+0{,}2S_{xu\ hướng}$, mỗi phần 0–1:
 
-$$H=0{,}5S_{trường}+0{,}3S_{ngành}+0{,}2S_{xu\ hướng}.$$
+- $S_{trường}=(101-\text{hạng VNUR})/100$; hạng kế thừa đại học mẹ nhân 0,8; chưa xếp hạng = 0.
+- $S_{ngành}$ = percentile của $\Delta k_m=k_m^{2026}-k_m^{2024}$, bậc của nút ngành trong **G1** (số trường mở ngành); 10% ngành cao nhất gắn nhãn “Ngành hot 2026”.
+- $S_{xu\ hướng}$ = percentile (trong cùng phương thức) của $s^{2026}-s^{2025}$ của cùng (trường, mã chương trình, phương thức, thang), điểm cao nhất, dòng không cờ; thiếu một năm = 0,5.
 
-$S_{trường}=(101-rank)/100$ với hạng VNUR trực tiếp; hạng kế thừa nhân thêm 0,8; chưa có hạng cho 0. Hạng 2026 dùng tham khảo cho các năm và đơn vị kế thừa phải ghi rõ đại học mẹ.
+Percentile hạng trung bình $p=\dfrac{L+R+1}{2N}$ ($L$: số giá trị nhỏ hơn, $R$: nhỏ hơn hoặc bằng). Ngành tương tự: tối đa 8 láng giềng G3 theo Jaccard giảm dần.
 
-$S_{ngành}$ là percentile của mức tăng bậc ngành **trong G1**, $\Delta k_m=k_m^{2026}-k_m^{2024}$, tức số trường mở ngành tăng/giảm. Không dùng bậc G3 thay thế. Tập so sánh là hợp các ngành có ở ít nhất một trong hai G1; ngành thiếu ở một mốc có bậc 0 ở mốc đó. Có 466 ngành, lấy $\lceil0{,}10\times466\rceil=47$ ngành để gắn nhãn “Ngành hot 2026”; dòng không có ngành thuộc tập so sánh cho điểm ngành 0.
-
-$S_{xu\ hướng}$ là percentile của $\Delta s=s^{2026}-s^{2025}$ trong cùng phương thức. Ghép bằng trường, mã chương trình, phương thức và thang điểm; mỗi năm lấy `MAX(score)` với flag rỗng. Có 12.914 khóa đủ hai năm; thiếu một năm nhận giá trị trung tính 0,5. Không cộng trực tiếp chênh lệch thang 30 với thang 100 hay các phương thức khác nhau.
-
-Với $N$ giá trị so sánh, $L$ là số giá trị nhỏ hơn và $R$ là số giá trị nhỏ hơn hoặc bằng giá trị đang xét, percentile hạng trung bình là
-
-$$p=\frac{L+R+1}{2N}.$$
-
-Percentile và H cuối làm tròn bốn chữ số. Khi bằng nhau, các giá trị nhận cùng hạng trung bình.
-
-```text
-tính Δdegree G1 năm2026 − năm2024 trên hợp ngành → percentile ngành
-chọn 47 ngành đầu làm nhãn hot
-ghép MAX điểm2025/2026 theo trường, chương trình, phương thức, thang
-tính percentile Δscore trong từng phương thức, thiếu cặp gán 0,5
-kết hợp điểm trường/ngành/xu hướng theo trọng số 0,5/0,3/0,2
-với ngành cần tìm: lấy tối đa 8 hàng xóm G3 theo Jaccard giảm dần
-```
-
-**Tham số và độ phức tạp.** Tỷ trọng là quy ước sản phẩm 50%–30%–20%, nhóm ngành hot là 10%; chưa được học hoặc hiệu chỉnh bằng nhãn thành công tuyển sinh. Sau nhóm/ghép dữ liệu, tính percentile bằng xếp hạng có chi phí khoảng $O(N\log N)$; lấy tám hàng xóm tương tự dùng sắp danh sách kề, khoảng $O(k\log k)$ cho một ngành. Jaccard G3 vẫn dùng ngưỡng 0,25 và trọng số bốn chữ số của mạng đã dựng.
-
-**Kết quả đã đối chiếu.**
-
-**Bảng 4.13. Phạm vi dữ liệu dùng cho chỉ số tham khảo**
+**Bảng 4.9. Phạm vi dữ liệu của chỉ số**
 
 | Thành phần | Kết quả |
 | --- | --- |
-| Trường có VNUR | 149/292: 95 trực tiếp, 54 kế thừa |
-| Trường chưa có hạng | 143 |
-| Tập tăng trưởng ngành G1 (2024 ∪ 2026) | 466 ngành |
-| Nhãn Ngành hot 2026 | 47 ngành |
-| Khóa điểm đủ 2025 và 2026 để tính xu hướng | 12.914 |
-| Ngành tương tự | Tối đa 8 hàng xóm G3 theo Jaccard giảm dần |
+| Ngành trong tập so sánh tăng bậc G1 (2024 ∪ 2026) | 451 |
+| Nhãn “Ngành hot 2026” (10% cao nhất) | 46 |
+| Khóa (trường, chương trình, phương thức, thang) đủ 2025 và 2026 | 12.914 |
 
-*Nguồn: `docs/TONG_KET_DU_LIEU.md`, mục VNUR và độ hot; quy tắc hàng xóm: `sna/build.py`, khối sinh `similar_majors`.*
+*Nguồn: `webapp/main.py`, hàm `hot_index`; `data/network/metrics/g1_uni_major_{2024,2026}.csv`.*
 
-**Đánh giá và ý nghĩa ứng dụng.** Chỉ số tạo cách sắp xếp có thể giải thích, nhưng là thang tham khảo do nhóm thiết kế, không phải xác suất trúng tuyển, dự báo điểm hay xác nhận ngành “hot” trên thị trường lao động. Chưa có thí nghiệm người dùng hoặc tập nhãn tuyển sinh để đánh giá chất lượng các trọng số. Tăng bậc G1 còn chịu ảnh hưởng độ phủ dữ liệu theo năm. Phân nhóm Thử sức/Vừa sức/An toàn vẫn phải dựa trên điểm và thang phương thức; không được suy ra chỉ từ H.
-
-Danh sách “Ngành tương tự” trên web lấy những ngành **đã có cạnh** trong G3 và ưu tiên Jaccard cao, tức gần nhau về tập trường mở. AA xét các cặp **chưa có cạnh** để xếp khả năng liên kết sau này. Do đó hai danh sách không được thay tên cho nhau. Ngành không còn trong G3 sau lọc ngưỡng sẽ không có danh sách hàng xóm G3; đó là giới hạn của mô hình hiện tại, không phải bằng chứng ngành không có lựa chọn liên quan.
-
-
+**Đánh giá.** Trọng số 50–30–20 là quy ước sản phẩm, chưa hiệu chỉnh bằng dữ liệu kết quả tuyển sinh; H không phải xác suất trúng tuyển. Danh sách ngành tương tự dùng cạnh **đã có** của G3, khác với Adamic–Adar dự đoán cạnh **chưa có**.
 
 # Chương 5. Trực quan hoá và mô phỏng
 
 ## 5.1. Công cụ và quy ước đọc hình
 
-NetworkX dựng đồ thị và tính độ đo; Matplotlib tạo biểu đồ có thể tái lập bằng `scripts/build_report_figures.py`. Các hình mạng trong báo cáo dùng bố cục lực `spring_layout`, seed 42, trọng số Jaccard, với màu đỉnh lấy từ phân hoạch Louvain đã lưu trong `metrics`. Gephi hỗ trợ khảo sát bố cục ForceAtlas2 trên tệp GEXF theo hướng dẫn ở mục 5.4; ảnh xuất từ Gephi cần người thực hiện bổ sung vào vị trí đã đánh dấu. Không gọi hình NetworkX là ảnh Gephi.
-
-Ứng dụng sử dụng vis-network để kéo, thu phóng, chọn đỉnh và đổi mạng/năm. Chuyển động các đỉnh là mô phỏng bố cục lực phục vụ đọc mạng; không phải mô phỏng hành vi thí sinh hay dự báo điểm chuẩn. Toàn bộ tính toán dùng đồ thị đầy đủ; lớp hiển thị web giữ tối đa 1.500 cạnh có trọng số lớn nhất để duy trì khả năng tương tác. Vì vậy, số cạnh nhìn thấy trên web có thể nhỏ hơn số cạnh trong bảng độ đo. GEXF xuất bởi `sna/build.py` giữ đồ thị đầy đủ để kiểm tra bằng Gephi.
+NetworkX dựng đồ thị, tính độ đo; Matplotlib vẽ biểu đồ tái lập được (`scripts/build_report_figures.py`); Gephi 0.10 (ForceAtlas2) vẽ hai hình mạng chính từ GEXF do `sna/build.py` xuất (đủ đỉnh, cạnh và thuộc tính độ đo). Web dùng vis-network: kéo, thu phóng, tìm nút, bấm nút để xem độ đo, lọc theo cộng đồng. Mọi độ đo tính trên đồ thị đầy đủ; web chỉ vẽ 1.500 cạnh nặng nhất để giữ tương tác mượt, điều này ghi ngay trên thẻ định nghĩa.
 
 ## 5.2. Mạng trường và mạng ngành năm 2026
 
 ![Mạng G2 năm 2026](fig/g2_uni_uni_net_2026.png)
 
-Hình 5.1. Mạng G2 năm 2026 vẽ bằng NetworkX; màu biểu diễn cộng đồng Louvain, kích thước đỉnh tăng theo bậc và nhãn chỉ các đỉnh betweenness cao. Nguồn: dựng từ `data/eduradar.db`; màu và nhãn theo `data/network/metrics/g2_uni_uni_2026.csv`.
+*Hình 5.1. G2 năm 2026 (NetworkX, bố cục lực, seed 42); màu = cộng đồng Louvain, kích thước theo bậc, nhãn = 8 đỉnh betweenness cao nhất. Nguồn: `data/eduradar.db`, `metrics/g2_uni_uni_2026.csv`.*
 
-Mục đích của hình là nhận diện các khối trường có danh mục ngành giống nhau và các trường nối giữa những khối đó. G2 có 249 đỉnh, 2.531 cạnh và 20 cộng đồng, modularity 0,4822. Vị trí hình học chỉ hỗ trợ đọc quan hệ; khoảng cách giữa hai đỉnh trên trang không phải khoảng cách địa lý hay chênh lệch điểm chuẩn.
+G2 có 250 đỉnh, 2.540 cạnh, 19 cộng đồng, Q = 0,4845. Vị trí trên hình không phải khoảng cách địa lý hay chênh lệch điểm.
 
 ![Mạng G3 năm 2026](fig/g3_major_major_net_2026.png)
 
-Hình 5.2. Mạng G3 năm 2026 vẽ bằng NetworkX, tô màu theo Louvain; nhãn ưu tiên các ngành cầu nối. Nguồn: `data/eduradar.db`; `data/network/metrics/g3_major_major_2026.csv`.
+*Hình 5.2. G3 năm 2026, cùng quy ước Hình 5.1. Nguồn: `metrics/g3_major_major_2026.csv`.*
 
-Mục đích là quan sát cụm lĩnh vực và các lối nối giữa chúng. G3 có 377 đỉnh, 1.412 cạnh, 19 cộng đồng và modularity 0,8363; cấu trúc cộng đồng rõ hơn G2 theo độ đo này. Các ngành cùng nhóm có tập trường đào tạo tương tự; không thể từ màu cụm kết luận chúng có cùng chương trình học hay chuẩn đầu ra.
+G3 có 370 đỉnh, 1.391 cạnh, 20 cộng đồng, Q = 0,8363.
 
 ![Top 10 betweenness G3](fig/g3_betweenness_top10.png)
 
-Hình 5.3. Mười ngành có betweenness cao nhất G3 năm 2026, sắp giảm dần. Nguồn: `data/network/metrics/g3_major_major_2026.csv`, cột `betweenness`; script `scripts/build_report_figures.py`.
-
-Biểu đồ thanh làm rõ chênh lệch vị trí cầu nối: Sinh học đạt khoảng 0,1624, cao hơn Kỹ thuật vật liệu khoảng 0,0780. Thứ hạng này chỉ diễn giải ở Jaccard 0,25; phân tích độ nhạy cho thấy Sinh học đổi hạng mạnh khi thay ngưỡng, nên không suy ra đây là ngành cầu nối số một trong mọi mô hình.
-
-![Hạng PageRank và điểm trung bình](fig/g4_pagerank_score.png)
-
-Hình 5.4. Hạng PageRank G4 và điểm THPT trung bình theo trường, ba năm. Hạng 1 biểu diễn PageRank cao nhất nên chiều trục hạng ngược chiều giá trị PageRank. Nguồn: `data/network/metrics/g4_competition_2024.csv`, `g4_competition_2025.csv`, `g4_competition_2026.csv`; điểm trung bình từ `admissions` trong `data/eduradar.db`, lọc THPT thang 30 theo đúng phép tính ở `sna/build.py`.
-
-Biểu đồ giúp so sánh xếp hạng mạng với điểm thực tế thay vì chỉ xem danh sách đứng đầu. Spearman giữa giá trị PageRank và điểm trung bình lần lượt là 0,5669; 0,5352; 0,6069. Quan hệ dương có độ phân tán rõ rệt: PageRank không thay thế điểm chuẩn của từng chương trình và không đo chất lượng đào tạo.
+*Hình 5.3. Mười ngành betweenness cao nhất G3 2026. Nguồn: `metrics/g3_major_major_2026.csv`.*
 
 ## 5.3. Mô phỏng thay đổi tham số
 
 ![Độ nhạy Jaccard](fig/sensitivity_jaccard.png)
 
-Hình 5.5. Thay đổi tỉ lệ đỉnh trong LCC, modularity và số cạnh của G2/G3 năm 2026 theo ngưỡng Jaccard. Nguồn: `docs/do_nhay_sna.md`, mục 2; script `scripts/build_report_figures.py`.
+*Hình 5.4. Tỉ lệ đỉnh trong LCC, modularity và số cạnh của G2/G3 năm 2026 theo ngưỡng Jaccard. Nguồn: `docs/do_nhay_sna.json`.*
 
-Mục đích là kiểm tra mức đánh đổi giữa khả năng liên thông và độ tách cộng đồng. G3 giảm LCC từ 96,6% ở ngưỡng 0,25 xuống 63,8% ở 0,30 và 8,4% ở 0,35; modularity tăng khi mạng bị chia nhỏ. Vì vậy, modularity cao hơn không tự động có nghĩa mô hình tốt hơn cho mọi câu hỏi.
+Modularity tăng khi ngưỡng tăng vì mạng bị chia nhỏ; LCC của G3 sụp giữa 0,25 và 0,35. Modularity cao hơn vì vậy không tự động là mô hình tốt hơn.
 
 ![Độ nhạy khoảng điểm](fig/sensitivity_gap.png)
 
-Hình 5.6. Số cạnh và tương quan Spearman của G4 khi khoảng điểm thay đổi. Nguồn: `docs/do_nhay_sna.md`, mục 3, số đã làm tròn trong nguồn.
+*Hình 5.5. Số cạnh và Spearman của G4 theo khoảng điểm. Nguồn: `docs/do_nhay_sna.json`.*
 
-Mục đích là quan sát tác động của phạm vi cạnh tranh. Năm 2026 số cạnh tăng từ 6.098 lên 11.492 khi khoảng điểm tăng từ 1 lên 3; dấu tương quan authority năm 2024 vẫn âm và năm 2026 vẫn dương. Mô phỏng này là phép đổi tham số mô hình, không phải can thiệp lên quá trình tuyển sinh thực tế.
+Số cạnh G4 2026 tăng 6.098 → 11.492 khi khoảng điểm tăng 1 → 3; dấu tương quan không đổi. Đây là phép đổi tham số mô hình, không phải can thiệp vào tuyển sinh thực tế.
 
-![Tab Mạng SNA trên web thật](fig/web_network.png)
+![Tab Mạng SNA trên web](fig/web_network.png)
 
-Hình 5.7. Tab Mạng SNA trên GitHub Pages, khung nhìn rộng 1.280 px, chụp ngày 25/10/2026. Nguồn giao diện: [web EduRadar](https://tiennguyen2406.github.io/Tuyensinhdaihoc/); dữ liệu đối chiếu `data/network/summary.csv`.
+*Hình 5.6. Tab Mạng SNA (G2 2026) ở 1.280 px: thẻ “Định nghĩa đồ thị”, hai mốc ngày, ô tìm nút, bộ lọc cộng đồng, bảng chỉ số có tên tiếng Việt và chú thích công thức khi rê chuột. Ảnh chụp bản tĩnh `site/` ngày 21/11/2026.*
 
-Hình minh hoạ việc chuyển kết quả phân tích thành công cụ quan sát: chọn mạng/năm, kéo và thu phóng, xem độ đo và đỉnh nổi bật. Giới hạn hiển thị cạnh được nêu ở mục 5.1 để tránh nhầm hình tương tác với toàn bộ đồ thị dùng để tính toán.
+## 5.4. Hình mạng vẽ bằng Gephi
 
-## 5.4. Chỗ chèn hình Gephi và hướng dẫn thực hiện
+Hai hình dưới xuất từ Gephi theo cùng quy ước: mở `data/network/gexf/<mạng>_2026.gexf` (vô hướng), tô màu theo thuộc tính `community` đã tính bằng Louvain (không chạy lại Modularity của Gephi), kích thước theo `degree`, bố cục ForceAtlas2 (Prevent Overlap), chỉ hiện nhãn đỉnh bậc cao, xuất PNG nền trắng.
 
-**[CHỖ CHÈN HÌNH GEPHI G2 — NGƯỜI THỰC HIỆN BỔ SUNG]**
+![Mạng G2 năm 2026 trong Gephi](fig/gephi_g2_2026.png)
 
-Hình 5.8. Mạng G2 năm 2026 trong Gephi, bố cục ForceAtlas2, màu theo cộng đồng Louvain. Dự kiến lưu `docs/fig/gephi_g2_2026.png`. Mục đích: kiểm tra trực quan lõi trường đa ngành và nhóm y dược; khi bổ sung ảnh, nhận xét dựa trên 20 cộng đồng và modularity 0,4822 đã tính, không lấy số cụm theo màu mắt thường.
+*Hình 5.7. G2 năm 2026 trong Gephi, ForceAtlas2, màu = cộng đồng Louvain (19 cộng đồng, Q = 0,4845), kích thước = bậc. Nguồn: `data/network/gexf/g2_uni_uni_2026.gexf`.*
 
-**[CHỖ CHÈN HÌNH GEPHI G3 — NGƯỜI THỰC HIỆN BỔ SUNG]**
+Hình cho thấy một lõi lớn dày đặc gồm các trường tư đa ngành (nhãn LHU, BVU, HUFLIT, GDU, DNU…), sát bên là cụm kinh tế – ngân hàng (KSV, HUB, BAV, TMU, DLA); một cụm lớn khác nằm phía trên lõi, một cụm nhỏ dày tách hẳn bên phải và nhiều cụm 2–6 trường rời rạc ở rìa, đúng với 8 thành phần liên thông của G2.
 
-Hình 5.9. Mạng G3 năm 2026 trong Gephi, bố cục ForceAtlas2, màu theo cộng đồng Louvain. Dự kiến lưu `docs/fig/gephi_g3_2026.png`. Mục đích: quan sát các khối ngành và lối nối của Sinh học; khi bổ sung ảnh, đối chiếu 19 cộng đồng và modularity 0,8363 với bảng số liệu.
+![Mạng G3 năm 2026 trong Gephi](fig/gephi_g3_2026.png)
 
-Nguồn số cho hai chú thích dự kiến: `data/network/summary.csv`, năm 2026. Các đường dẫn Gephi ở trên là tên tệp dự kiến, chưa được dùng làm đường dẫn nhúng hình trong bản Word.
+*Hình 5.8. G3 năm 2026 trong Gephi, cùng quy ước (20 cộng đồng, Q = 0,8363). Nguồn: `data/network/gexf/g3_major_major_2026.gexf`.*
 
-Cách làm trong Gephi:
-
-1. Mở `data/network/gexf/g2_uni_uni_2026.gexf` bằng Open, chọn đồ thị vô hướng; kiểm tra bảng import đủ 249 đỉnh và 2.531 cạnh. Lặp lại cho `g3_major_major_2026.gexf` với 377 đỉnh, 1.412 cạnh.
-2. Trong Appearance → Nodes → Partition, chọn thuộc tính `community` đã xuất từ Louvain. Dùng thuộc tính có sẵn để màu thống nhất với báo cáo; không chạy lại Modularity rồi mặc nhiên coi số nhóm giống seed 42.
-3. Trong Ranking, chọn `degree` cho kích thước đỉnh. Chạy ForceAtlas2, bật Prevent Overlap; có thể bật LinLog để tách cụm. Dừng khi bố cục dễ đọc, sau đó điều chỉnh nhãn và Preview.
-4. Xuất PNG nền trắng, giữ chú giải màu và các nhãn tiêu biểu. Lưu vào hai đường dẫn dự kiến, thay các dấu chỗ trống bằng ảnh, rồi chạy lại script xuất Word.
+Các khối ngành tách rõ, giữa các khối có rất ít cạnh: khối kinh tế – dịch vụ (nhãn Logistics), khối địa chất – trắc địa (Kỹ thuật trắc địa – bản đồ), khối khoa học xã hội – ngôn ngữ (Hán Nôm), khối kỹ thuật (Kỹ thuật xây dựng), khối nông – thủy sản (Công nghệ chế biến thủy sản) cùng các khối nhỏ hơn. Hình phù hợp Q ≈ 0,84 và đường đi trung bình 5,67 bước.
 
 # Chương 6. Ứng dụng minh hoạ
 
 ## 6.1. Địa chỉ và kiến trúc vận hành
 
-Ứng dụng công khai: [https://tiennguyen2406.github.io/Tuyensinhdaihoc/](https://tiennguyen2406.github.io/Tuyensinhdaihoc/). GitHub Pages phục vụ HTML, CSS, JavaScript và các JSON được xuất trước bởi `scripts/export_static.py`. Trình duyệt đọc JSON theo đường dẫn tương đối dưới thư mục dự án. Bản này dùng được khi máy chủ FastAPI của người thực hiện đã tắt.
+Ứng dụng công khai: [https://diemthidaihoc.com](https://diemthidaihoc.com). Bản tĩnh gồm HTML, CSS, JavaScript và JSON xuất trước bởi `scripts/export_static.py`, chạy được khi máy chủ FastAPI đã tắt. Bản chạy tại máy dùng `webapp/main.py` (FastAPI) truy vấn SQLite cho cùng giao diện `webapp/static/`. Luồng: crawler → raw → `pipeline/clean.py` → SQLite → FastAPI và `sna/build.py`; xuất JSON chỉ là bước đóng gói. Đầu trang hiển thị hai mốc lấy từ dữ liệu: **Thu thập dữ liệu 23/10/2026** (`MAX(crawled_at)`) và **Xử lý/cập nhật 09/11/2026** (`updated_on`).
 
-Bản chạy tại máy sử dụng `webapp/main.py` với FastAPI để truy vấn SQLite và trả kết quả cho cùng giao diện tĩnh trong `webapp/static/`. Luồng kiến trúc giữ nguyên: crawler → raw → `pipeline/clean.py` → SQLite → FastAPI và `sna/build.py`. Việc xuất JSON cho Pages là bước đóng gói kết quả để trình diễn công khai, không bổ sung một cơ sở dữ liệu hay một tầng phân tích mới.
+## 6.2. Sáu tab và chức năng
 
-## 6.2. Năm tab và chức năng
-
-**Bảng 6.1. Chức năng và dữ liệu phục vụ của ứng dụng.**
+**Bảng 6.1. Chức năng của ứng dụng**
 
 | Tab | Chức năng chính | Liên hệ với đồ án |
 | --- | --- | --- |
-| Theo trường | Tìm tên/mã, lọc tỉnh và năm; xem điểm theo phương thức, chương trình, tổ hợp; đề án và học phí có nguồn | Kiểm tra dữ liệu sạch, phân biệt đơn vị học phí, năm đề án và hạng kế thừa |
-| Theo ngành | Tra mã ngành chuẩn hoặc tên chương trình; so trường, năm và phương thức; gợi ý ngành gần trên G3 | Đưa chuẩn hoá ngành và mạng chiếu vào tra cứu |
-| Tư vấn theo điểm | Nhập phương thức, tổ hợp, điểm, năm; phân mức Thử sức/Vừa sức/An toàn và sắp theo độ hot | Sử dụng mức tăng bậc ngành G1 trong công thức mục 4.6 |
-| Mạng SNA | Chọn G1–G4 và năm; mạng tương tác, độ đo và top đỉnh | Minh hoạ centrality, cộng đồng và hướng cạnh tranh |
-| Độ phủ dữ liệu | Xem phạm vi từng trường/năm, nguồn, thời điểm, học phí và các giới hạn | Công khai phần thiếu để người dùng đánh giá kết quả |
+| Theo trường | Tìm tên/mã, lọc tỉnh và năm; điểm theo phương thức, chương trình, tổ hợp; đề án, học phí có nguồn | Kiểm tra dữ liệu sạch, đơn vị học phí, năm đề án, hạng kế thừa |
+| Theo ngành | Tra mã ngành chuẩn hoặc tên chương trình; so trường theo năm, phương thức; gợi ý ngành tương tự từ G3 | Đưa chuẩn hoá mã ngành và mạng chiếu G3 vào tra cứu |
+| Xếp nguyện vọng | Nhập điểm, tổ hợp, 5–15 nguyện vọng và mức mong muốn (1–5 sao); dự báo điểm chuẩn năm sau, xác suất đỗ từng nguyện vọng và thứ tự đăng ký đề xuất | Dùng chuỗi điểm chuẩn THPT 3 năm của từng chương trình |
+| Tư vấn chọn ngành | Trắc nghiệm 58 câu (sở thích RIASEC, tính cách MBTI, giá trị, học lực, điều kiện) và bảng điểm; chấm mức phù hợp với 86 ngành, kèm khả năng trúng tuyển và lý do | Kết hợp hồ sơ người dùng với điểm chuẩn THPT 2026 thật |
+| Mạng SNA | G1–G4 × 3 năm; thẻ định nghĩa đồ thị; chỉ số nhóm theo chủ đề, tên tiếng Việt và công thức; tìm nút, bấm nút xem độ đo, lọc cộng đồng | Minh hoạ trực tiếp Chương 3–4 |
+| Độ phủ dữ liệu | Cách thu thập (nguồn, 2 API, số request, độ trễ, robots.txt), phễu làm sạch 76.726 → 71.011, cách gán mã ngành, cờ chất lượng; độ phủ từng trường–năm, học phí, đề án | Công khai quy trình và phần thiếu để người dùng tự đánh giá |
 
-Nguồn mô tả chức năng: `webapp/static/index.html`, `webapp/static/app.js`, `webapp/main.py`; số độ phủ: `docs/TONG_KET_DU_LIEU.md`. Bảng mô tả chức năng không bổ sung số liệu ngoài bộ nguồn đã chỉ định.
+*Nguồn: `webapp/static/index.html`, `app.js`, `nv.js`, `career.js`, `webapp/main.py`.*
+
+**Xếp nguyện vọng** (`nv.js`). Với mỗi chương trình, điểm chuẩn năm sau được dự báo bằng $\hat s=0{,}5\,(\beta_0+\beta_1s_{t-1}+\beta_2s_t)+0{,}5\,s_t$, hệ số hồi quy học từ dữ liệu ba năm (dự báo năm thứ ba từ hai năm trước rồi so với thực tế; chương trình chỉ có một năm dùng hồi quy một biến). Sai số không giả định phân phối chuẩn: dùng 41 phân vị của sai số thực tế, chia theo mức dao động giữa hai năm gần nhất (ổn định / dao động vừa / mạnh). Xác suất đỗ $P=F(\text{điểm}-\hat s)$ xếp nhóm An toàn (≥ 90%), Vừa sức (≥ 60%), Mạo hiểm (≥ 20%), Rất khó. Thứ tự đề xuất sắp theo mức mong muốn giảm dần rồi xác suất đỗ tăng dần (nguyện vọng khó đặt trước không làm mất cơ hội nguyện vọng sau); trang tính xác suất trúng ở từng nguyện vọng theo chuỗi xét lần lượt và giải thích lý do mỗi lần đổi chỗ. Giới hạn 15 nguyện vọng, ngành sư phạm chỉ ở nguyện vọng 1–5.
+
+**Tư vấn chọn ngành** (`career.js`). Điểm tổng = 80% độ phù hợp + 20% khả năng trúng tuyển. Độ phù hợp gồm sở thích RIASEC 35% (so hồ sơ 6 nhóm Holland với mã 3 chữ của ngành, cả mức và hình dạng hồ sơ), học lực 20%, tính cách MBTI 15% (4 trục cộng trục “vững vàng”, dạng phần trăm liên tục), giá trị nghề nghiệp 15% và điều kiện thực tế 15%. RIASEC và MBTI được đối chiếu chéo để báo độ tin cậy; khả năng trúng tuyển dùng điểm chuẩn THPT 2026 của tổ hợp tốt nhất người dùng đủ điều kiện. Kết quả là gợi ý tham khảo.
 
 ![Theo trường](fig/web_uni.png)
 
-Hình 6.1. Tab Theo trường trên web thật ở 1.280 px. Mục đích: minh hoạ danh mục trường và lọc theo tên/tỉnh. Danh mục có 292 trường có điểm; hạng trực tiếp và hạng kế thừa có nhãn riêng. Nguồn số: `docs/TONG_KET_DU_LIEU.md`; ảnh web công khai ngày 25/10/2026.
+*Hình 6.1. Tab Theo trường, 1.280 px: danh mục 292 trường xếp theo hạng VNUR.*
 
 ![Theo ngành](fig/web_major.png)
 
-Hình 6.2. Tra ngành Công nghệ thông tin trên web thật ở 1.280 px. Mục đích: so sánh các trường cùng ngành trong đúng năm và phương thức. Mã ngành chuẩn giúp ghép tên chương trình khác nhau; 1.735 dòng chưa có mã vẫn là giới hạn khi tra theo ngành chuẩn. Nguồn số: `docs/TONG_KET_DU_LIEU.md`; ảnh ngày 25/10/2026.
+*Hình 6.2. Tra ngành Công nghệ thông tin (7480201), 1.280 px; 1.899 dòng chưa có mã ngành vẫn là giới hạn khi tra theo ngành chuẩn.*
 
-![Tư vấn theo điểm](fig/web_advice.png)
+![Xếp nguyện vọng](fig/web_nv.png)
 
-Hình 6.3. Tư vấn với điểm 24, phương thức THPT, tổ hợp A00, năm tham chiếu 2026; rộng 1.280 px. Mục đích: minh hoạ các mức gợi ý và giải thích độ hot. Đây là truy vấn mẫu; điểm 24 là đầu vào minh hoạ, không phải số thống kê. Dữ liệu/công thức: `docs/TONG_KET_DU_LIEU.md`; ảnh web thật ngày 25/10/2026.
+*Hình 6.3. Tab Xếp nguyện vọng với hồ sơ mẫu (26 điểm, A00, 8 nguyện vọng), 1.280 px; điểm 26 là đầu vào minh hoạ.*
+
+![Tư vấn chọn ngành](fig/web_career.png)
+
+*Hình 6.4. Tab Tư vấn chọn ngành với hồ sơ mẫu: mã Holland, kiểu MBTI, ngành gợi ý kèm khả năng trúng tuyển, 1.280 px.*
 
 ![Độ phủ dữ liệu](fig/web_coverage.png)
 
-Hình 6.4. Tab Độ phủ dữ liệu trên web thật ở 1.280 px. Mục đích: cho phép kiểm tra năm thiếu và giới hạn nguồn. Học phí tham khảo phủ 285/292 trường, đề án phủ 267/292; độ phủ không đồng nghĩa mọi thông tin đều thuộc năm 2026. Nguồn số: `docs/TONG_KET_DU_LIEU.md`; ảnh ngày 25/10/2026.
-
-Tab Mạng SNA ở Hình 5.7 là ảnh thứ năm trong bộ ảnh các tab ở 1.280 px. Ảnh dùng lại trong mục này để giữ một bản minh hoạ thống nhất, không tính thành một lần kiểm tra riêng.
+*Hình 6.5. Tab Độ phủ dữ liệu: khối “Cách thu thập” và “Các bước làm sạch” (phễu, gán mã ngành, cờ chất lượng), 1.280 px. Số liệu đọc từ `data/raw/fetch_log.csv` và `data/clean/quality_report.md` qua API `/api/coverage`.*
 
 ![Đề án trường](fig/web_dean.png)
 
-Hình 6.5. Phần đề án của Đại học Bách khoa Hà Nội trên web thật. Mục đích: minh hoạ dữ kiện bóc theo heading thành từng phương thức, thời gian và hồ sơ. Giao diện dẫn về HOCMAI và giữ năm nguồn; các chi tiết trong ảnh là nội dung hiển thị, không được dùng để suy rộng độ phủ ngoài `docs/TONG_KET_DU_LIEU.md`. Ảnh ngày 25/10/2026, rộng 1.280 px.
+*Hình 6.6. Phần đề án của Đại học Bách khoa Hà Nội: dữ kiện bóc theo heading thành từng phương thức, thời gian, hồ sơ.*
 
 ![Học phí trường](fig/web_tuition.png)
 
-Hình 6.6. Phần cuối đề án và thẻ học phí trên cùng trang Đại học Bách khoa Hà Nội, web thật ở 1.280 px. Mục đích: cho thấy mức học phí đi cùng đơn vị, năm học và nhãn nguồn. Các mức trong ảnh là ví dụ giao diện; khi dùng để quyết định đăng ký phải theo liên kết và phạm vi chương trình trên thẻ. Ảnh ngày 25/10/2026; cách xử lý học phí mô tả tại mục 2.5.
+*Hình 6.7. Thẻ học phí cùng trang: mức tiền kèm đơn vị, năm học và nhãn loại nguồn.*
 
 ![Trang trường có đề án và học phí](fig/web_school_info.png)
 
-Hình 6.7. Cùng một trang trường hiển thị đề án và học phí sau khi thu gọn các khối chi tiết bằng điều khiển trên giao diện. Mục đích: kiểm tra hai nguồn thông tin bổ sung xuất hiện trong một luồng tra cứu. Ảnh web thật ngày 25/10/2026, rộng 1.280 px; không ghép ảnh từ các trang khác nhau.
+*Hình 6.8. Một trang trường hiển thị cả đề án và học phí sau khi thu gọn các khối chi tiết.*
 
 ![Giao diện điện thoại](fig/web_mobile.png)
 
-Hình 6.8. Tab Tư vấn theo điểm ở khung nhìn 375 px. Mục đích: minh hoạ khả năng dùng trên điện thoại; thanh điều khiển và kết quả được bố trí theo chiều dọc. Ảnh web thật ngày 25/10/2026; cùng truy vấn mẫu với Hình 6.3.
+*Hình 6.9. Tab Xếp nguyện vọng ở 375 px: các khối xếp dọc, không tràn ngang.*
+
+*Ảnh Hình 6.1–6.9 chụp bằng `scripts/capture_report_web.cjs` từ bản tĩnh `site/` (nội dung sẽ triển khai tại diemthidaihoc.com) ngày 21/11/2026.*
 
 ## 6.3. Kiểm chứng ứng dụng
 
-`docs/TONG_KET_DU_LIEU.md` ghi nhận kiểm Edge headless ở 375 px và 1.280 px cho năm tab trên FastAPI và bản tĩnh: 100 phép đối chiếu JSON khớp; sau deploy, 50 phép đối chiếu JSON trên GitHub Pages khớp FastAPI. Các kiểm tra đó xác nhận sự nhất quán của hai cách phục vụ tại thời điểm kiểm; không thay cho đánh giá tính đúng của thông báo gốc. Bộ ảnh trong báo cáo được chụp lại từ URL công khai bằng `scripts/capture_report_web.cjs`, không dùng bản chạy localhost.
+`scripts/check_static.py` so dữ liệu bản tĩnh với FastAPI (meta, đề án, trang trường, ngành, chương trình, mạng G2) và kiểm 624 trang HTML, sitemap, liên kết nội bộ; `--committed` kiểm dữ liệu đã commit. `scripts/check_static_browser.cjs` chạy Edge headless ở 375 px và 1.280 px cho cả bản tĩnh và FastAPI: sáu tab, 25 phép đối chiếu API, không lỗi console/HTTP, không tràn ngang; thêm 10 trang SEO ngẫu nhiên. Ngày 21/11/2026 cả bốn mức kiểm đều đạt; ngoài ra đã duyệt 4 mạng × 3 năm trên tab Mạng SNA và quét toàn bộ 619 trang trường/ngành ở 375 px (0 trang tràn ngang). Các kiểm tra này xác nhận tính nhất quán giữa hai cách phục vụ, không thay cho việc đối chiếu thông báo gốc.
 
-## 6.4. Kịch bản demo năm bước
+## 6.4. Kịch bản demo sáu bước
 
-1. Mở URL công khai; tại Theo trường tìm BKA, chọn 2026, xem một dòng điểm kèm tổ hợp, mở phần đề án và học phí để chỉ ra năm, đơn vị và nguồn.
-2. Sang Theo ngành, nhập mã `7480201` (Công nghệ thông tin), chọn cùng năm và phương thức THPT; so sánh các trường và xem gợi ý ngành tương tự từ G3.
-3. Sang Tư vấn theo điểm, nhập THPT, A00, 24 điểm; giải thích ba mức theo khoảng điểm và mở phần giải thích độ hot của một kết quả. Nêu rõ độ hot là chỉ số tham khảo, không phải xác suất đỗ.
-4. Sang Mạng SNA, chọn G2 năm 2026 rồi G3 năm 2026; thu phóng và chọn một đỉnh; đối chiếu trường/ngành cầu nối với bảng betweenness. Chuyển G4 để giải thích mũi tên và sự khác nhau giữa authority với PageRank.
-5. Sang Độ phủ dữ liệu; chỉ ra trường/năm thiếu, ngày cập nhật và giới hạn học phí/đề án. Kết thúc bằng việc mở nguồn chính thức hoặc nguồn gốc của một kết quả để minh hoạ khả năng truy nguồn.
+1. Mở https://diemthidaihoc.com; chỉ hai mốc ngày ở đầu trang. Tại Theo trường tìm BKA, năm 2026: một dòng điểm kèm tổ hợp, phần đề án và học phí (năm, đơn vị, nguồn).
+2. Theo ngành: nhập `7480201`, phương thức THPT; so các trường và mở một ngành tương tự từ G3.
+3. Xếp nguyện vọng: bấm “Dùng ví dụ mẫu”, chỉ xác suất đỗ từng nguyện vọng và lý do thứ tự đề xuất.
+4. Tư vấn chọn ngành: “Xem lại hồ sơ mẫu”, giải thích trọng số RIASEC/MBTI và khả năng trúng tuyển.
+5. Mạng SNA: G2 2026, đọc thẻ định nghĩa; tìm “Võ Trường Toản”, bấm nút xem betweenness; lọc cộng đồng y dược; chuyển G4 để giải thích mũi tên, authority và PageRank.
+6. Độ phủ dữ liệu: phễu 76.726 → 71.011, cách gán mã ngành, trường/năm thiếu.
 
 # Chương 7. Kết luận
 
 ## 7.1. Trả lời các câu hỏi nghiên cứu
 
-Về các trường giống nhau, G2 năm 2026 cho 20 cộng đồng với modularity 0,4822. Nhóm trường kinh tế, trường đa ngành, đại học địa phương và y dược có cấu trúc phân biệt trong tập ngành đào tạo. Cộng đồng là kết quả từ danh mục ngành ở ngưỡng Jaccard 0,25; không phải một bảng xếp hạng chất lượng. Nhóm y dược giữ được cấu trúc chung trong phân tích độ nhạy, trong khi số cộng đồng chính xác thay đổi theo ngưỡng.
+**Trường giống nhau.** G2 năm 2026 có 19 cộng đồng, Q = 0,4845: trường tư đa ngành phía Nam, đại học địa phương, kinh tế – ngân hàng, kỹ thuật, y dược, công an – quân đội, nghệ thuật, thể thao. Cụm y dược giữ nguyên ở mọi ngưỡng Jaccard đã thử; số cộng đồng chính xác thì nhạy với ngưỡng.
 
-Về ngành phổ biến và ngành cầu nối, phải tách hai câu hỏi. Bậc ngành G1 đo số trường mở ngành; các ngành như Quản trị kinh doanh và Công nghệ thông tin có độ phủ cao. Betweenness G3 đo vai trò nối giữa các tập trường: Sinh học đạt khoảng 0,1624 và đứng đầu ở cấu hình chuẩn, nhưng đổi hạng mạnh khi ngưỡng thay đổi. Eigenvector cao của nhóm ngành chỉ có ở Đại học Mỏ – Địa chất là hệ quả clique có Jaccard bằng 1, không chứng minh nhu cầu tuyển sinh hay nhu cầu lao động cao.
+**Ngành phổ biến và ngành cầu nối.** Bậc G1 đo độ phổ biến (Quản trị kinh doanh, Công nghệ thông tin mở ở hơn 150 trường); betweenness G3 đo vai trò nối khối (Sinh học 0,1624), nhưng thứ hạng cầu nối nhạy với ngưỡng. Eigenvector G3 bị localization vào khối ngành mỏ – địa chất (Jaccard = 1), không đo tầm quan trọng toàn cục.
 
-Về cạnh tranh, G4 năm 2026 có 226 đỉnh, 9.215 cạnh; authority nhấn mạnh các trường nhận liên kết từ lõi hub dày đặc. PageRank thể hiện sự lan truyền nhiều bước và tương quan dương với điểm THPT trung bình ở cả ba năm. Authority âm năm 2024–2025 rồi dương năm 2026 cho thấy tên gọi authority không thể mặc nhiên hiểu là uy tín học thuật; cách xây dựng cạnh và phân bố điểm chi phối kết quả.
+**Cạnh tranh.** G4 năm 2026 có 226 đỉnh, 9.215 cạnh, SCC lớn nhất 192 trường, đường kính có hướng 4. PageRank tương quan dương với điểm THPT trung bình ở cả ba năm (0,54–0,61); authority đổi dấu (âm 2024–2025, dương 2026) vì HITS dồn vào lõi cạnh tranh dày nhất, nên “authority” không phải uy tín học thuật.
 
-Về thay đổi theo thời gian, số cạnh G1 tăng từ 4.447 lên 5.058, trong khi số trường phía G1 giảm từ 279 xuống 276. Trong mẫu thu thập, các trường hiện diện có danh mục ngành rộng hơn, nhưng không đủ căn cứ kết luận toàn bộ hệ thống đại học mở thêm ngành hay thu hẹp quy mô. G3 vẫn có cấu trúc cộng đồng mạnh, modularity khoảng 0,84. Chiều tăng modularity G2 và transitivity G3 bền hơn qua các cấu hình đã thử; thứ hạng cầu nối và mức liên thông nhạy với ngưỡng.
+**Thay đổi 2024–2026.** G1 dày hơn (cạnh +13,9%, 16,05 → 18,28 ngành/trường); G3 giữ Q ≈ 0,84; phân bố bậc đuôi nặng (γ ≈ 2,4–2,9) nhưng không phải scale-free thuần. Chiều tăng Q của G2 và transitivity của G3 vững qua các ngưỡng; mức liên thông và thứ hạng cầu nối thì nhạy.
 
-Về ứng dụng, mức tăng bậc ngành G1 được dùng làm một thành phần độ hot; G3 cung cấp các ngành có tập trường đào tạo tương tự. Năm tab giúp người dùng đi từ số điểm đến trường/ngành, xem cấu trúc mạng và kiểm tra độ phủ. Đây là cách chuyển kết quả SNA thành chức năng có thể trình diễn, đồng thời giữ được giới hạn diễn giải.
+**Ứng dụng.** Mức tăng bậc ngành G1 là một thành phần của độ hot; G3 cho ngành tương tự; Adamic–Adar dự đoán cặp ngành mở cùng nhau tốt hơn nền hàng chục lần. Sáu tab đưa người dùng từ điểm số đến trường/ngành, xếp nguyện vọng, tư vấn ngành, cấu trúc mạng và độ phủ dữ liệu.
 
-Nguồn cho các kết luận định lượng: `data/network/summary.csv`; `data/network/metrics/g3_major_major_2026.csv`; `docs/do_nhay_sna.md`; `docs/TONG_KET_DU_LIEU.md`.
+*Nguồn: `data/network/summary.csv`, `metrics/*.csv`, `docs/do_nhay_sna.md`, `docs/TONG_KET_DU_LIEU.md`.*
 
 ## 7.2. Hạn chế
 
-Dữ liệu điểm xuất phát từ một trang tổng hợp nên có thể kế thừa sai sót hoặc thiếu sót của nguồn. Thang điểm có phần suy ra; các dòng có cờ và trùng khoá khác điểm chưa thể coi là đã xác minh. Tỉ lệ map 97,56% là độ phủ ánh xạ, không phải độ chính xác đã đo bằng đối chiếu tay. Kết quả kiểm 20 dòng còn để người thực hiện điền, không được sử dụng để tuyên bố độ chính xác trước khi kiểm.
+Dữ liệu điểm đến từ một trang tổng hợp nên có thể kế thừa sai sót của nguồn. Thang điểm một phần là suy luận; dòng có cờ và 631 dòng trùng khoá khác điểm chưa được phân xử. Tỉ lệ 97,33% dòng có mã ngành là độ phủ ánh xạ, chưa phải độ chính xác đã đo; kết quả kiểm 20 dòng còn để người thực hiện điền.
 
-Phép chiếu theo Jaccard làm mất một phần thông tin của mạng hai phía và có hiệu ứng clique đối với ngành hiếm. Đường đi trong G2/G3 đang tính không trọng số; đồ thị không liên thông buộc giới hạn đường đi và đường kính trên LCC. Chưa có kiểm định thế giới nhỏ với tập đồ thị null bảo toàn bậc. Louvain là heuristic có yếu tố ngẫu nhiên; so sánh Girvan–Newman chỉ trên mẫu bậc cao nên không đại diện mọi vùng mạng. Dự đoán liên kết dùng danh sách tên ngành lưu trong CSV, có nguy cơ nhập nhằng tên–mã; độ chính xác không được suy ra cho ngành mới không có trong tập gốc.
+Phép chiếu Jaccard làm mất thông tin của mạng hai phía và tạo khối Jaccard = 1 ở ngành hiếm (nguyên nhân localization của eigenvector). Đường đi tính không trọng số, giới hạn trên LCC. Chưa kiểm định thế giới nhỏ với mô hình null; ước lượng power-law chưa so với phân bố thay thế (log-normal, mũ cắt). Louvain là heuristic; GN dừng ở 40 cộng đồng. Closeness hai phía của G1 không xếp hạng được toàn cục. Dự đoán liên kết lưu theo tên ngành nên có nguy cơ nhập nhằng tên–mã.
 
-Đề án, học phí, xếp hạng và tỉnh có phạm vi nguồn khác nhau. Hạng kế thừa thuộc đại học mẹ; học phí có nhiều đơn vị và năm học; đề án có bài mang năm tiêu đề khác năm nội dung. Các thông tin này chỉ được dùng khi giữ các ghi chú đi kèm.
+Đề án, học phí, xếp hạng và tỉnh có phạm vi và mốc thời gian khác nhau; chỉ dùng kèm các ghi chú đi cùng.
 
 ## 7.3. Hướng phát triển
 
-Ưu tiên tiếp theo là hoàn tất kiểm tra 20 dòng, bổ sung nguồn chính thức cho các mục còn thiếu và đo riêng độ chính xác của ánh xạ mã ngành. Phân tích mạng có thể thử khoảng cách từ Jaccard với quy ước rõ ràng, so sánh với mô hình null và các phương pháp giữ cạnh quan trọng theo từng đỉnh. Dự đoán liên kết nên lưu mã ngành, đánh giá nhiều mốc thời gian và so sánh Adamic–Adar với các nền khác. Khi có dữ liệu đủ đồng nhất, có thể phân tích mạng theo từng phương thức và theo dõi cộng đồng động; những hướng này chưa được tính vào kết quả hiện tại.
+Hoàn tất kiểm tra 20 dòng và đo độ chính xác ánh xạ mã ngành; so phân bố bậc với các phân bố thay thế bằng kiểm định tỉ số hợp lý; thêm mô hình null bảo toàn bậc cho nhận định thế giới nhỏ; thử khoảng cách $1-J$ cho đường đi có trọng số; lưu mã ngành trong dự đoán liên kết và so Adamic–Adar với các nền khác; phân tích mạng theo từng phương thức và cộng đồng động qua năm.
 
 # Tài liệu tham khảo
 
@@ -1848,8 +1717,10 @@ Phép chiếu theo Jaccard làm mất một phần thông tin của mạng hai p
 8. Kleinberg, J. M. (1999). [Authoritative sources in a hyperlinked environment](https://www.cs.cornell.edu/home/kleinber/auth.pdf). Journal of the ACM, 46(5), 604–632. DOI: 10.1145/324133.324140.
 9. Brin, S., & Page, L. (1998). [The anatomy of a large-scale hypertextual Web search engine](https://infolab.stanford.edu/~backrub/google.html). Computer Networks and ISDN Systems, 30, 107–117. DOI: 10.1016/S0169-7552(98)00110-X.
 10. Adamic, L. A., & Adar, E. (2003). [Friends and neighbors on the Web](https://doi.org/10.1016/S0378-8733(03)00009-1). Social Networks, 25(3), 211–230.
+11. Clauset, A., Shalizi, C. R., & Newman, M. E. J. (2009). [Power-law distributions in empirical data](https://arxiv.org/abs/0706.1062). SIAM Review, 51(4), 661–703. DOI: 10.1137/070710111.
+12. Latapy, M., Magnien, C., & Del Vecchio, N. (2008). [Basic notions for the analysis of large two-mode networks](https://doi.org/10.1016/j.socnet.2007.04.006). Social Networks, 30(1), 31–48.
 
-Số liệu thực nghiệm của báo cáo lấy từ `docs/TONG_KET_DU_LIEU.md`, `data/clean/quality_report.md`, `data/raw/fetch_log.csv`, `data/network/summary.csv`, `data/network/metrics/*.csv`, `docs/do_nhay_sna.md` và `data/eduradar.db`. Các tài liệu học thuật dùng cho định nghĩa, thuật toán và diễn giải phương pháp.
+Số liệu thực nghiệm của báo cáo lấy từ `docs/TONG_KET_DU_LIEU.md`, `data/clean/quality_report.md`, `data/raw/fetch_log.csv`, `data/network/summary.csv`, `data/network/metrics/*.csv`, `docs/do_nhay_sna.md` (`scripts/report_sensitivity.py`) và `data/eduradar.db`; các bảng Chương 3–4 sinh bằng `scripts/report_sna_tables.py`. Các tài liệu học thuật dùng cho định nghĩa, thuật toán và diễn giải phương pháp.
 
 # Phụ lục A. Cấu trúc thư mục và lệnh chạy
 
@@ -1866,7 +1737,7 @@ data/eduradar.db        DB sinh tại máy (không commit)
 sna/build.py            Dựng bốn mạng, tính độ đo, xuất GEXF
 data/network/           summary.csv, metrics/, gexf/, fig/ (sinh tại máy)
 webapp/                 FastAPI và HTML/JS tĩnh
-site/                   Bản tĩnh công khai trên GitHub Pages
+site/                   Bản tĩnh công khai tại https://diemthidaihoc.com
 scripts/                Xuất site, dựng báo cáo, kiểm tra và chụp ảnh
 docs/                   Báo cáo và docs/fig/ (commit)
 ```
@@ -1890,8 +1761,10 @@ uv sync --locked
 .venv/Scripts/python.exe -m uvicorn webapp.main:app --port 8000
 .venv/Scripts/python.exe -m http.server 8001 --directory site
 # Dựng hình và báo cáo từ dữ liệu có sẵn:
+.venv/Scripts/python.exe -X utf8 scripts/report_sensitivity.py
+.venv/Scripts/python.exe -X utf8 scripts/report_sna_tables.py
 .venv/Scripts/python.exe scripts/build_report_figures.py
-node scripts/capture_report_web.cjs
+node scripts/capture_report_web.cjs [url]
 .venv/Scripts/python.exe scripts/build_report_docx.py
 .venv/Scripts/python.exe scripts/check_report.py
 ```

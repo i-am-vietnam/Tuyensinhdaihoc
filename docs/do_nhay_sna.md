@@ -1,180 +1,109 @@
 # Phân tích độ nhạy tham số mạng SNA
 
-Phụ lục của [`bao_cao_sna.md`](bao_cao_sna.md). Báo cáo chính dùng hai tham số chọn tay:
-- ngưỡng Jaccard $J \ge 0{,}25$ cho G2 (Trường – Trường) và G3 (Ngành – Ngành);
-- khoảng điểm $0 < s_B - s_A \le 2$ cho G4 (mạng cạnh tranh).
+Sinh tự động bởi `scripts/report_sensitivity.py` từ `data/eduradar.db` hiện tại (dùng lại hàm dựng mạng của `sna/build.py`; cấu hình chuẩn Jaccard 0,25 và khoảng điểm 2 trùng `data/network/summary.csv`). Mỗi lần chỉ đổi một tham số. Louvain có trọng số, seed 42; ARI/NMI tính trên đỉnh chung của hai phân hoạch.
 
-Tài liệu này đo xem các số liệu và kết luận thay đổi thế nào khi đổi hai tham số đó.
+## G2 Trường – Trường theo ngưỡng Jaccard (2026)
 
-## 1. Thiết lập
-
-- **Cấu hình chạy.** Mỗi lần chỉ đổi một tham số, tham số kia giữ mức chuẩn:
-  - Jaccard ∈ {0,15; 0,25; 0,35}, khoảng điểm = 2;
-  - khoảng điểm ∈ {1; 2; 3}, Jaccard = 0,25.
-  - Thêm hai ngưỡng 0,20 và 0,30 (chỉ năm 2026) để khoanh vùng điểm chuyển của thành phần liên
-    thông lớn nhất (LCC).
-- **Năm.** 2026 là năm phân tích chính. Năm 2024 được chạy kèm để kiểm hai kết luận cần hai mốc
-  thời gian: dấu của Spearman(authority) và kiểm chứng Adamic–Adar 2024 → 2026.
-- **Cách chạy.**
-  `python -m sna.build --years 2024 2026 --jaccard 0.15 --gap 2 --out <thư mục tạm>`.
-  Tham số `--out` mới được thêm vào `sna/build.py` để không ghi đè `data/network/`. Cấu hình chuẩn
-  (0,25; 2) cho kết quả **trùng khớp** với `data/network/summary.csv`, nên mọi khác biệt dưới đây
-  là do tham số.
-- **Độ ổn định cộng đồng** đo bằng Adjusted Rand Index và Normalized Mutual Information giữa hai
-  phân hoạch Louvain, tính trên các đỉnh có mặt ở cả hai mạng:
-
-  $$\mathrm{ARI} = \frac{\sum_{ij}\binom{n_{ij}}{2} - \Big[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\Big]/\binom{n}{2}}{\tfrac12\Big[\sum_i \binom{a_i}{2} + \sum_j \binom{b_j}{2}\Big] - \Big[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\Big]/\binom{n}{2}}, \qquad \mathrm{NMI} = \frac{2\,I(X;Y)}{H(X) + H(Y)}.$$
-
-  ARI = 1 nghĩa là hai phân hoạch trùng khít, ARI ≈ 0 nghĩa là giống nhau như ngẫu nhiên. Vì
-  Louvain có yếu tố ngẫu nhiên, ARI giữa các ngưỡng được so với **mức dao động nội tại**: chạy lại
-  Louvain 20 lần với seed khác nhau trên cùng mạng 0,25.
-
-## 2. G2 và G3 theo ngưỡng Jaccard (năm 2026)
-
-Cột in đậm là ngưỡng dùng trong báo cáo; 0,20 và 0,30 là hai ngưỡng bổ sung.
-
-**G2 Trường – Trường**
-
-| Độ đo | 0,15 | 0,20 | **0,25** | 0,30 | 0,35 |
+| Độ đo | 0,15 | 0,20 | 0,25 | 0,30 | 0,35 |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Số đỉnh | 261 | 258 | **249** | 237 | 218 |
-| Số cạnh | 7.453 | 4.437 | **2.531** | 1.326 | 717 |
-| Mật độ | 0,220 | 0,134 | **0,082** | 0,047 | 0,030 |
-| Số thành phần | 5 | 6 | **8** | 15 | 24 |
-| LCC (số đỉnh / %) | 249 / 95,4% | 244 / 94,6% | **231 / 92,8%** | 198 / 83,5% | 141 / 64,7% |
-| Độ dài đường đi TB (LCC) | 2,20 | 2,63 | **3,25** | 3,66 | 3,94 |
-| Clustering TB | 0,656 | 0,608 | **0,549** | 0,524 | 0,429 |
-| Modularity Louvain | 0,260 | 0,360 | **0,482** | 0,614 | 0,702 |
-| Số cộng đồng | 11 | 11 | **20** | 23 | 30 |
+| Số đỉnh | 262 | 259 | 250 | 237 | 218 |
+| Số cạnh | 7.472 | 4.446 | 2.540 | 1.332 | 720 |
+| Mật độ | 0,218 | 0,133 | 0,082 | 0,048 | 0,030 |
+| Số thành phần | 5 | 6 | 8 | 14 | 23 |
+| LCC (đỉnh) | 250 | 245 | 232 | 201 | 141 |
+| LCC (%) | 95,4 | 94,6 | 92,8 | 84,8 | 64,7 |
+| Đường đi TB (LCC) | 2,21 | 2,63 | 3,24 | 3,75 | 3,93 |
+| Clustering TB | 0,657 | 0,610 | 0,548 | 0,523 | 0,439 |
+| Modularity Louvain | 0,257 | 0,363 | 0,484 | 0,615 | 0,703 |
+| Số cộng đồng | 10 | 11 | 19 | 22 | 30 |
 
-**G3 Ngành – Ngành**
+Năm 2024 (0,15 / 0,25 / 0,35): Q = 0,242 / 0,449 / 0,668; LCC = 251 / 219 / 163 đỉnh; thành phần = 4 / 11 / 20; cộng đồng = 10 / 18 / 26.
 
-| Độ đo | 0,15 | 0,20 | **0,25** | 0,30 | 0,35 |
+## G3 Ngành – Ngành theo ngưỡng Jaccard (2026)
+
+| Độ đo | 0,15 | 0,20 | 0,25 | 0,30 | 0,35 |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Số đỉnh | 406 | 399 | **377** | 337 | 275 |
-| Số cạnh | 3.461 | 2.164 | **1.412** | 917 | 589 |
-| Mật độ | 0,042 | 0,027 | **0,020** | 0,016 | 0,016 |
-| Số thành phần | 3 | 4 | **7** | 21 | 52 |
-| LCC (số đỉnh / %) | 402 / 99,0% | 392 / 98,2% | **364 / 96,6%** | 215 / 63,8% | 23 / 8,4% |
-| Độ dài đường đi TB (LCC) | 3,29 | 4,03 | **5,66** | 12,87 | 1,72 |
-| Clustering TB | 0,542 | 0,537 | **0,518** | 0,491 | 0,515 |
-| Modularity Louvain | 0,685 | 0,773 | **0,836** | 0,880 | 0,899 |
-| Số cộng đồng | 14 | 15 | **19** | 33 | 52 |
+| Số đỉnh | 399 | 392 | 370 | 330 | 267 |
+| Số cạnh | 3.429 | 2.135 | 1.391 | 906 | 579 |
+| Mật độ | 0,043 | 0,028 | 0,020 | 0,017 | 0,016 |
+| Số thành phần | 3 | 4 | 7 | 21 | 50 |
+| LCC (đỉnh) | 395 | 385 | 357 | 211 | 23 |
+| LCC (%) | 99,0 | 98,2 | 96,5 | 63,9 | 8,6 |
+| Đường đi TB (LCC) | 3,28 | 4,03 | 5,67 | 12,82 | 1,72 |
+| Clustering TB | 0,538 | 0,535 | 0,512 | 0,483 | 0,505 |
+| Modularity Louvain | 0,682 | 0,775 | 0,836 | 0,879 | 0,895 |
+| Số cộng đồng | 13 | 14 | 20 | 32 | 50 |
 
-Ở G3 có một **bước chuyển kiểu thẩm thấu (percolation)** giữa 0,25 và 0,35:
-- LCC giảm từ 96,6% (0,25) xuống 63,8% (0,30) rồi còn 8,4% (0,35);
-- ngay trước khi vỡ (0,30), độ dài đường đi TB vọt lên 12,87 vì LCC chỉ còn nối với nhau qua vài
-  "sợi" mảnh;
-- ở 0,35, giá trị 1,72 không còn ý nghĩa, vì nó chỉ tính trên một cụm 23 ngành.
+Năm 2024 (0,15 / 0,25 / 0,35): Q = 0,716 / 0,836 / 0,905; LCC = 381 / 345 / 28 đỉnh; thành phần = 5 / 13 / 41; cộng đồng = 16 / 27 / 42.
 
-Năm 2024 cho cùng bức tranh:
-- G2: Q = 0,242 / 0,451 / 0,672 và LCC = 251 / 219 / 163 đỉnh (ở 0,15 / 0,25 / 0,35);
-- G3: Q = 0,720 / 0,839 / 0,912 và LCC = 394 / 358 / 28 đỉnh.
+## G4 theo khoảng điểm
 
-## 3. G4 theo khoảng điểm
-
-| Độ đo | Năm | 1 điểm | **2 điểm** | 3 điểm |
+| Độ đo | Năm | 1 điểm | 2 điểm | 3 điểm |
 | --- | --- | ---: | ---: | ---: |
-| Số đỉnh | 2026 | 224 | **226** | 226 |
-| Số cạnh | 2026 | 6.098 | **9.215** | 11.492 |
-| Mật độ | 2026 | 0,122 | **0,181** | 0,226 |
-| Số thành phần liên thông mạnh | 2026 | 50 | **35** | 23 |
-| Spearman(PageRank, điểm TB) | 2026 | 0,527 | **0,607** | 0,664 |
-| Spearman(authority, điểm TB) | 2026 | 0,233 | **0,234** | 0,248 |
-| Số cạnh | 2024 | 7.107 | **10.541** | 12.731 |
-| Spearman(PageRank, điểm TB) | 2024 | 0,450 | **0,567** | 0,634 |
-| Spearman(authority, điểm TB) | 2024 | −0,384 | **−0,401** | −0,309 |
+| Số đỉnh | 2026 | 224 | 226 | 226 |
+| Số cạnh | 2026 | 6.098 | 9.215 | 11.492 |
+| Mật độ | 2026 | 0,122 | 0,181 | 0,226 |
+| Thành phần liên thông mạnh | 2026 | 50 | 35 | 23 |
+| Spearman(PageRank, điểm TB) | 2026 | 0,528 | 0,608 | 0,664 |
+| Spearman(authority, điểm TB) | 2026 | 0,233 | 0,235 | 0,249 |
+| Top 10 PageRank trùng mốc 2 điểm | 2026 | 6 | 10 | 9 |
+| Top 10 authority trùng mốc 2 điểm | 2026 | 5 | 10 | 8 |
+| Số đỉnh | 2024 | 257 | 259 | 259 |
+| Số cạnh | 2024 | 7.107 | 10.542 | 12.731 |
+| Mật độ | 2024 | 0,108 | 0,158 | 0,191 |
+| Thành phần liên thông mạnh | 2024 | 19 | 17 | 16 |
+| Spearman(PageRank, điểm TB) | 2024 | 0,450 | 0,567 | 0,634 |
+| Spearman(authority, điểm TB) | 2024 | −0,384 | −0,401 | −0,309 |
+| Top 10 PageRank trùng mốc 2 điểm | 2024 | 7 | 10 | 9 |
+| Top 10 authority trùng mốc 2 điểm | 2024 | 7 | 10 | 10 |
 
-Top 10 PageRank năm 2026 có 6/10 trường trùng với mốc chuẩn khi khoảng điểm là 1, và 9/10 khi là 3.
-Với top 10 authority, các con số tương ứng là 5/10 và 8/10.
+## Độ ổn định cộng đồng Louvain (2026)
 
-## 4. Độ ổn định cộng đồng Louvain (năm 2026)
-
-| So sánh | G2: ARI / NMI | G3: ARI / NMI |
+| So sánh | G2: ARI / NMI (đỉnh chung) | G3: ARI / NMI (đỉnh chung) |
 | --- | --- | --- |
-| 0,15 so với 0,25 (đỉnh chung: G2 249, G3 377) | 0,610 / 0,745 | 0,593 / 0,748 |
-| 0,35 so với 0,25 (đỉnh chung: G2 218, G3 275) | 0,676 / 0,835 | 0,485 / 0,792 |
-| 0,15 so với 0,35 | 0,504 / 0,715 | 0,408 / 0,748 |
-| *Mức nền:* 20 seed Louvain so với seed 42, cùng ngưỡng 0,25 | TB 0,813 (thấp nhất 0,612) / TB 0,904 | TB 0,923 (thấp nhất 0,849) / TB 0,964 |
+| 0,15 so với 0,25 | 0,525 / 0,725 (250) | 0,639 / 0,774 (370) |
+| 0,35 so với 0,25 | 0,598 / 0,804 (218) | 0,521 / 0,808 (267) |
+| 0,15 so với 0,35 | 0,406 / 0,663 (218) | 0,426 / 0,753 (267) |
+| Mức nền: 20 seed so với seed 42 (0,25) | TB 0,796 (thấp nhất 0,543) / 0,888 | TB 0,907 (thấp nhất 0,863) / 0,956 |
 
-- **Mức độ thay đổi:** đổi ngưỡng làm phân hoạch thay đổi nhiều hơn đổi seed (ARI 0,49–0,68 so
-  với mức nền 0,81–0,92), nhưng vẫn còn rất xa mức ngẫu nhiên (NMI ≥ 0,72 ở mọi cặp). Khung các
-  khối lớn được giữ; khác biệt nằm ở việc các khối này **tách nhỏ hoặc gộp lại**: G2 có 11 cộng
-  đồng ở 0,15 nhưng 30 ở 0,35.
-- **Cụm y dược:** cụm này được giữ nguyên ở mọi ngưỡng. Lấy 10 trường y dược làm mẫu (QHY, YDN,
-  DDY, DHY, QSY, TYS, YDS, YHB, YPB, DTY): cả 10 luôn rơi vào cùng một cộng đồng. Tỉ lệ cạnh từ
-  cộng đồng đó ra ngoài là 24,1% (0,15), 6,9% (0,25) và 0% (0,35).
+Cụm y dược (10 trường QHY, YDN, DDY, DHY, QSY, TYS, YDS, YHB, YPB, DTY) trong G2 2026:
 
-## 5. Vì sao chọn Jaccard 0,25 và khoảng 2 điểm
+- Ngưỡng 0,15: 10/10 trường cùng một cộng đồng; tỉ lệ cạnh của cộng đồng đó đi ra ngoài 24,6%.
+- Ngưỡng 0,20: 10/10 trường cùng một cộng đồng; tỉ lệ cạnh của cộng đồng đó đi ra ngoài 10,9%.
+- Ngưỡng 0,25: 10/10 trường cùng một cộng đồng; tỉ lệ cạnh của cộng đồng đó đi ra ngoài 6,6%.
+- Ngưỡng 0,30: 10/10 trường cùng một cộng đồng; tỉ lệ cạnh của cộng đồng đó đi ra ngoài 1,4%.
+- Ngưỡng 0,35: 10/10 trường cùng một cộng đồng; tỉ lệ cạnh của cộng đồng đó đi ra ngoài 0,9%.
 
-**Jaccard 0,25** là ngưỡng **lớn nhất** mà cả hai mạng chiếu vẫn giữ trên 90% số đỉnh trong
-LCC (G2 92,8%, G3 96,6%).
-- **Ngưỡng thấp hơn** (0,15–0,20): G2 gần như trở thành một khối.
-  - Mật độ 0,13–0,22, bậc TB 57 ở 0,15, tức mỗi trường "giống" khoảng 1/5 số trường còn lại.
-  - Modularity chỉ 0,26–0,36, cộng đồng mờ.
-  - Các ngành đại trà kéo mọi trường lại gần nhau, nên mạng phản ánh "ai cũng mở Quản trị kinh
-    doanh" hơn là phản ánh đặc thù của từng trường.
-- **Ngưỡng cao hơn** (0,30–0,35): G3 vỡ vụn (LCC 63,8% rồi 8,4%), nên các độ đo dựa trên đường đi
-  (closeness, betweenness, độ dài đường đi, đường kính) mất ý nghĩa.
-- **Kết luận:** 0,25 nằm ngay trước bước chuyển thẩm thấu của G3. Đây là điểm cân bằng giữa giữ
-  liên thông và giữ được cấu trúc cộng đồng (Q của G2 tăng từ 0,26 lên 0,48).
+## Trùng lặp top 10 so với ngưỡng 0,25 (2026)
 
-**Khoảng 2 điểm** khớp với mức dao động thực tế của điểm chuẩn. Với cùng một ngành tại cùng một
-trường (điểm THPT cao nhất, như cách dựng G4), mức thay đổi tuyệt đối giữa hai năm liền kề:
-- có trung vị khoảng 1 điểm (1,00 cho 2024 → 2025; 0,95 cho 2025 → 2026);
-- **76–80%** không vượt quá 2 điểm (55–61% nếu lấy 1 điểm; 88–89% nếu lấy 3 điểm).
+| Mạng | Ngưỡng | Bậc | Betweenness | Eigenvector | PageRank |
+| --- | --- | ---: | ---: | ---: | ---: |
+| G2 | 0,15 | 5/10 | 4/10 | 8/10 | 7/10 |
+| G2 | 0,35 | 6/10 | 2/10 | 8/10 | 7/10 |
+| G3 | 0,15 | 2/10 | 1/10 | 10/10 | 3/10 |
+| G3 | 0,35 | 4/10 | 0/10 | 0/10 | 1/10 |
 
-Như vậy hai trường cách nhau trong 2 điểm hoàn toàn có thể đổi chỗ vào năm sau, tức là đang thực
-sự cạnh tranh cùng một nhóm thí sinh.
-- **Khoảng 1 điểm** bỏ sót gần một nửa trường hợp đó, làm G4 rời rạc hơn (50 thành phần liên thông
-  mạnh, so với 35).
-- **Khoảng 3 điểm** bắt đầu nối các trường ở mức điểm khác hẳn nhau (mật độ 0,23).
+G2: đỉnh betweenness cao nhất ở 0,25 là `U:VTT`; hạng ở 0,15 / 0,25 / 0,35 = 1 / 1 / 74.
 
-## 6. Kết luận nào đứng vững, kết luận nào nhạy
+G2 top 5 eigenvector: 0,15: HUFLIT, HUB, BETU, UTM, BVU; 0,25: HUFLIT, HUB, GDU, BVU, DNU; 0,35: HUFLIT, HUB, GDU, BETU, HVUH.
 
-| Kết luận trong báo cáo SNA | 0,15 | 0,25 | 0,35 | Đánh giá |
-| --- | --- | --- | --- | --- |
-| Mọi kết luận về G1 (đuôi dài, ngành đại trà, ngành "nóng" 2024 → 2026) | — | — | — | **Vững**: G1 không phụ thuộc ngưỡng |
-| G2 là mạng thế giới nhỏ (đường đi ngắn, clustering ≫ mật độ) | L 2,20; C/mật độ 3,0 | L 3,25; C/mật độ 6,7 | L 3,94; C/mật độ 14,2 | **Vững** về định tính; độ lớn thay đổi |
-| G3 có cụm lĩnh vực rất rõ (modularity cao) | Q 0,69 | Q 0,84 | Q 0,90 | **Vững** (Q ≥ 0,69); con số cụ thể nhạy |
-| Cộng đồng G2 có ý nghĩa thực tế, cụm y dược tách riêng | 10/10 trường y cùng cụm | 10/10 | 10/10 | **Vững** |
-| Số cộng đồng (G2 20, G3 19) | 11 / 14 | 20 / 19 | 30 / 52 | **Nhạy** |
-| Top bậc / eigenvector / PageRank G2 là trường tư đa ngành phía Nam | trùng 5 / 8 / 7 trên 10 | — | trùng 6 / 8 / 7 trên 10 | **Khá vững** (eigenvector, PageRank); bậc nhạy hơn |
-| Top betweenness G2 (Võ Trường Toản, Hải Phòng…) | trùng 4/10 | — | trùng 2/10 | **Nhạy** |
-| Sinh học là cầu nối số 1 của G3 (betweenness) | hạng 24 | hạng 1 | hạng 78 | **Nhạy**: chỉ đúng ở 0,25 |
-| Top bậc / PageRank G3 | trùng 3 / 4 trên 10 | — | trùng 3 / 1 trên 10 | **Nhạy** |
-| Eigenvector G3 bị chi phối bởi một clique, không đo "tầm quan trọng" | clique 10 ngành MDA | clique 10 ngành MDA | clique các ngành sư phạm | **Vững** về bản chất; clique nào thì nhạy |
-| G4: PageRank tương quan dương với điểm chuẩn | ρ 0,45–0,53 (khoảng 1) | 0,57–0,61 | 0,63–0,66 (khoảng 3) | **Vững** (cả 2024 và 2026, mọi khoảng điểm) |
-| G4: authority âm năm 2024, dương năm 2026 | −0,38 / +0,23 (khoảng 1) | −0,40 / +0,23 | −0,31 / +0,25 (khoảng 3) | **Vững** theo khoảng điểm |
-| Adamic–Adar dự đoán cạnh G3 tốt hơn ngẫu nhiên nhiều lần | 121/300 trúng, gấp 29 lần nền | 69/300, gấp 44 lần | 59/300, gấp 58 lần | **Vững**; tỉ lệ trúng tuyệt đối nhạy |
-| 2024 → 2026: modularity G2 tăng, transitivity G3 tăng | tăng / tăng | tăng / tăng | tăng / tăng | **Vững** về chiều thay đổi |
-| 2024 → 2026: G2 liên kết hơn (ít thành phần, LCC lớn hơn) | 5 → 5; LCC 251 → 249 | 12 → 8; 219 → 231 | 21 → 24; 163 → 141 | **Nhạy**: chỉ đúng ở 0,25 |
-| 2024 → 2026: G3 hội tụ (ít thành phần, ít cộng đồng) | 5 → 3; 16 → 14 | 13 → 7; 28 → 19 | 43 → 52; 44 → 52 | **Nhạy**: đảo chiều ở 0,35 |
+G3: đỉnh betweenness cao nhất ở 0,25 là `M:7420101`; hạng ở 0,15 / 0,25 / 0,35 = 23 / 1 / 76.
 
-Ở bảng trên, "trùng k/10" là số phần tử chung giữa top 10 ở ngưỡng đó và top 10 ở ngưỡng 0,25.
-Với G4, cột 0,15 / 0,35 được thay bằng khoảng điểm 1 / 3.
+G3 top 5 eigenvector: 0,15: Địa tin học, Kỹ thuật địa vật lý, Đá quý Đá mỹ nghệ, Công nghệ số trong thăm dò và khai thác tài nguyên thiên nhiên, Xây dựng công trình ngầm thành phố và Hệ thống tàu điện ngầm; 0,25: Kỹ thuật địa vật lý, Kỹ thuật khí thiên nhiên, Công nghệ số trong thăm dò và khai thác tài nguyên thiên nhiên, An toàn, Vệ sinh lao động, Quản lý và phân tích dữ liệu khoa học; 0,35: Sư phạm Vật lý, Sư phạm Ngữ văn, Sư phạm Hóa học, Sư phạm Sinh học, Sư phạm Lịch sử.
 
-**Tóm lại:**
-- **Đứng vững:** các kết luận về *cấu trúc vĩ mô*:
-  - đuôi dài ở G1;
-  - thế giới nhỏ ở G2;
-  - cụm lĩnh vực rõ ở G3, trong đó cụm y dược tách riêng;
-  - PageRank phản ánh điểm chuẩn tốt hơn authority;
-  - dấu của Spearman(authority) theo năm;
-  - Adamic–Adar có giá trị dự đoán;
-  - chiều tăng của modularity G2 và transitivity G3.
-- **Nhạy:** các kết luận ở *mức từng đỉnh* dựa trên đường đi (top betweenness, đặc biệt "Sinh học
-  là cầu nối số 1"), số cộng đồng chính xác, và hai nhận định về mức liên thông của G2, G3 thay đổi
-  từ 2024 sang 2026. Những kết luận này chỉ nên đọc như đặc điểm của mạng ở ngưỡng 0,25, không nên
-  khái quát.
+## Adamic–Adar G3 2024 → 2026 theo ngưỡng
 
-## 7. Tái lập
+| Ngưỡng | Trúng trong top 300 | Tỉ lệ nền | Gấp nền |
+| --- | ---: | ---: | ---: |
+| 0,15 | 121/300 | 0,01426 | 28,3 |
+| 0,25 | 68/300 | 0,00532 | 42,6 |
+| 0,35 | 57/300 | 0,00361 | 52,6 |
 
-```powershell
-# mỗi cấu hình ghi vào một thư mục riêng, không đụng data/network/
-.venv\Scripts\python.exe -m sna.build --years 2024 2026 --jaccard 0.15 --gap 2 --out <tạm>\j015_g2
-.venv\Scripts\python.exe -m sna.build --years 2024 2026 --jaccard 0.25 --gap 3 --out <tạm>\j025_g3
-```
+## Mức dao động điểm chuẩn giữa hai năm (lý do chọn khoảng 2 điểm)
 
-Các bảng ở trên lấy từ `summary.csv` và `metrics/*.csv` của từng thư mục. ARI và NMI được tính
-trên cột `community` của `metrics/<mạng>_2026.csv`.
+Điểm THPT thang 30 cao nhất của cùng (trường, ngành), dòng không cờ.
+
+| Cặp năm | Số cặp | Trung vị mức thay đổi | ≤ 1 điểm | ≤ 2 điểm | ≤ 3 điểm |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 2024 → 2025 | 3.985 | 1,00 | 54,7% | 76,3% | 87,6% |
+| 2025 → 2026 | 3.957 | 0,95 | 61,1% | 79,5% | 88,8% |

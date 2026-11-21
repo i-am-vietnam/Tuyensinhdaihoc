@@ -187,6 +187,141 @@ def browser_search_index():
     return search_index()
 
 
+# Nhan tieng Viet cho bang buoc lam sach (data/clean/quality_report.md do pipeline.clean sinh)
+CLEAN_LABELS = {
+    "Dong tho tu API": "Dòng thô từ API",
+    "Bo dong khong co diem / diem <= 0": "Bỏ dòng không có điểm hoặc điểm ≤ 0",
+    "Bo dong khong co ten nganh": "Bỏ dòng không có tên ngành",
+    "Gop cap (diem goc + diem quy doi) thanh 1 dong": "Gộp cặp điểm gốc + điểm quy đổi thành 1 dòng",
+    "Bo dong trung hoan toan": "Bỏ dòng trùng hoàn toàn",
+    "Trung khoa khac diem (giu ca, xem data/interim/conflicts.csv)": (
+        "Trùng khoá nhưng khác điểm (giữ cả hai, liệt kê ở data/interim/conflicts.csv)"
+    ),
+    "Ten chuong trinh chi la ma so -> ten nganh chuan": (
+        "Tên chương trình chỉ là mã số → thay bằng tên ngành chuẩn"
+    ),
+    "To hop kem mon": "Mã tổ hợp có danh sách môn (bảng combos)",
+    "Truong co hang VNUR (ke ca ke thua)": "Trường có hạng VNUR (kể cả kế thừa đại học mẹ)",
+    "Hoc phi (tu data/manual/tuition.csv)": "Dòng học phí (data/manual/tuition.csv)",
+}
+MATCH_HOW = {
+    "ma_7_so": "Nguồn ghi sẵn mã ngành 7 số",
+    "ten_khop": "Tên chương trình (đã chuẩn hoá) trùng tên từng đi kèm mã 7 số; lấy mã gặp nhiều nhất",
+    "thu_cong": "Gán tay trong data/manual/major_map.csv",
+    "chua_map": "Chưa gán được mã ngành",
+    "dau_ten_chuan": "Tên ngành chuẩn (≥ 2 từ) đứng ở đầu tên chương trình",
+    "bo_ma_nguon": "Mã nguồn ghi sai, bỏ theo major_map.csv (ma:<mã> → -)",
+    "chua_ten_chuan": "Tên chương trình chứa cụm tên ngành chuẩn",
+    "ten_gan_dung": "Tên gần đúng với tên đã biết (difflib, độ giống ≥ 0,9)",
+    "thu_cong_bo": "Đánh dấu tay là không gán mã (- trong major_map.csv)",
+    "ten_tu_ma": "Nguồn chỉ ghi mã số làm tên; lấy tên ngành chuẩn",
+    "doi_ma_nguon": "Mã nguồn ghi sai, đổi theo major_map.csv",
+}
+FLAGS = {
+    "ok": "Không có cờ",
+    "thang_khac_30": "THPT/Học bạ nhưng thang điểm khác 30",
+    "diem_thap_bat_thuong": "THPT dưới 12 điểm",
+    "outlier": "Không suy ra được thang điểm (vượt mọi thang đã biết)",
+}
+
+
+def md_tables(text: str) -> dict[str, list[list[str]]]:
+    """Bang markdown theo tieu de ## gan nhat (bo dong tieu de va dong ---)."""
+    out, head = {}, ""
+    for line in text.splitlines():
+        if line.startswith("## "):
+            head = line[3:].strip()
+        elif line.startswith("|") and not set(line) <= set("|-: "):
+            cells = [c.strip().strip("*").strip() for c in line.strip().strip("|").split("|")]
+            out.setdefault(head, []).append(cells)
+    return {k: v[1:] for k, v in out.items()}
+
+
+def num(s: str) -> int:
+    return int(re.sub(r"[^\d]", "", s) or 0)
+
+
+def cleaning_info() -> dict | None:
+    f = ROOT / "data/clean/quality_report.md"
+    if not f.exists():
+        return None
+    text = f.read_text(encoding="utf-8")
+    t = md_tables(text)
+    steps = []
+    for label, n in t.get("Các bước làm sạch", []):
+        kind = (
+            "final"
+            if "sạch" in label
+            else "raw"
+            if not steps
+            else "remove"
+            if label.startswith(("Bo ", "Gop "))
+            else "info"
+        )
+        steps.append({"label": CLEAN_LABELS.get(label, label), "rows": num(n), "kind": kind})
+    raw = next((s["rows"] for s in steps if s["kind"] == "raw"), None)
+    final = next((s["rows"] for s in steps if s["kind"] == "final"), None)
+    removed = sum(s["rows"] for s in steps if s["kind"] == "remove")
+    created = re.search(r"Tạo lúc (\d{2}/\d{2}/\d{4})", text)
+    return {
+        "report_date": created.group(1) if created else None,
+        "steps": steps,
+        "funnel_ok": raw is not None and final is not None and raw - removed == final,
+        "match_how": [
+            {"how": r[0], "label": MATCH_HOW.get(r[0], r[0]), "rows": num(r[1]), "pct": r[2]}
+            for r in t.get("Chuẩn hoá mã ngành", [])
+        ],
+        "flags": [
+            {"flag": r[0], "label": FLAGS.get(r[0], r[0]), "rows": num(r[1])}
+            for r in t.get("Cờ chất lượng", [])
+        ],
+    }
+
+
+def crawl_info() -> dict:
+    """So lieu thu thap lay tu data/raw (fetch_log.csv do crawler.fetch ghi); thieu thi None."""
+    from crawler import fetch
+
+    info = {
+        "source": fetch.BASE,
+        "apis": ["/api/school/search", "/api/common/cutoff-score?school_id=&year="],
+        "delay_seconds": fetch.DELAY,
+        "robots": True,  # crawler.fetch.check_robots kiem robots.txt truoc moi request
+        "catalog": None,
+        "universities": None,
+        "requests": None,
+        "errors": None,
+        "pages_with_rows": None,
+        "unis_with_rows": None,
+        "raw_rows": None,
+        "years": [],
+        "started": None,
+        "finished": None,
+    }
+    schools = ROOT / "data/raw/schools.json"
+    if schools.exists():
+        s = json.loads(schools.read_text(encoding="utf-8"))
+        info["catalog"] = len(s)
+        info["universities"] = sum(1 for x in s if x.get("level") == 2)
+    log = ROOT / "data/raw/fetch_log.csv"
+    if log.exists():
+        with log.open(encoding="utf-8") as fh:
+            rows = list(csv.DictReader(fh))
+        if rows:
+            ok = [r for r in rows if int(r["rows"] or 0) > 0]
+            info.update(
+                requests=len(rows),
+                errors=sum(1 for r in rows if r["error"]),
+                pages_with_rows=len(ok),
+                unis_with_rows=len({r["code"] for r in ok}),
+                raw_rows=sum(int(r["rows"] or 0) for r in rows),
+                years=sorted({int(r["year"]) for r in rows}),
+                started=min(r["time"] for r in rows),
+                finished=max(r["time"] for r in rows),
+            )
+    return info
+
+
 @app.get("/api/coverage")
 def coverage():
     c = con()
@@ -230,6 +365,8 @@ def coverage():
         "collected_from": dates[0],
         "collected_to": dates[1],
         "source_url": "https://diemthi.tuyensinh247.com",
+        "crawl": crawl_info(),
+        "cleaning": cleaning_info(),
     }
 
 
@@ -655,6 +792,10 @@ def meta():
         "combo_tooltips": tooltips,
         "combo_usage": usage,
         "updated_on": c.execute("SELECT MAX(updated_on) FROM universities").fetchone()[0],
+        # ngay thu thap = lan tai cuoi cung (crawled_at); khac ngay xu ly (updated_on)
+        "collected_on": (c.execute("SELECT MAX(crawled_at) FROM admissions").fetchone()[0] or "")[
+            :10
+        ],
         "stats": stats,
         "ranking_source": {"name": "VNUR 2026", "url": "https://vnur.vn/bang-xep-hang/"},
     }

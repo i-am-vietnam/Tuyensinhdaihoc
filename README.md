@@ -1,9 +1,9 @@
 # EduRadar V2 — Tra cứu điểm chuẩn và phân tích mạng
 
-Đồ án SNA: tra cứu theo trường/ngành, tư vấn theo điểm, mạng SNA và độ phủ dữ liệu.
-Dữ liệu điểm chuẩn 2024–2026; đề án HOCMAI; học phí tra tay; VNUR 2026.
+Đồ án SNA: tra cứu theo trường/ngành, xếp nguyện vọng, tư vấn chọn ngành (RIASEC/MBTI), mạng SNA và độ phủ dữ liệu.
+Dữ liệu điểm chuẩn 2024–2026 (thu thập 23/10/2026, xử lý 09/11/2026); đề án HOCMAI; học phí tra tay; VNUR 2026.
 
-**Web công khai:** <[https://tiennguyen2406.github.io/Tuyensinhdaihoc/](https://i-am-vietnam.github.io/Tuyensinhdaihoc/)>
+**Web công khai:** <https://diemthidaihoc.com>
 
 ## Cài đặt
 
@@ -91,11 +91,11 @@ chiếu với các hàm FastAPI. Kiểm Edge headless cần Node.js và Microsof
 ```powershell
 npm install --prefix .venv/browser-check playwright@1.64.1
 node scripts/check_static_browser.cjs
-# Kiểm cả 5 tab trên web GitHub Pages, đối chiếu với dữ liệu FastAPI ở máy
+# Kiểm cả 6 tab trên web thật (https://diemthidaihoc.com), đối chiếu với dữ liệu FastAPI ở máy
 node scripts/check_static_browser.cjs --live
 ```
 
-Bộ kiểm chạy đủ 5 tab ở 375px và 1280px trên cả FastAPI và bản tĩnh dưới đường dẫn con;
+Bộ kiểm chạy đủ 6 tab ở 375px và 1280px trên cả FastAPI và bản tĩnh dưới đường dẫn con;
 kiểm lỗi console/HTTP và so JSON với API. Ảnh, kết quả kiểm được ghi vào thư mục tạm
 của hệ điều hành, không tạo lại `state/` hoặc `_to_delete/`.
 
